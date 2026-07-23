@@ -3,9 +3,16 @@
 import { useRef, useState } from "react";
 import { quickAdd } from "@/app/(app)/quick-actions";
 
+const TYPES = [
+  { v: "task", l: "Zadatak" },
+  { v: "note", l: "Bilješka" },
+  { v: "reminder", l: "Podsjetnik" },
+];
+
 // "+ Brzo" — dodaj zadatak/bilješku/podsjetnik odmah, bez otvaranja modula.
 export default function QuickCapture() {
   const [open, setOpen] = useState(false);
+  const [type, setType] = useState("task");
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
@@ -19,7 +26,6 @@ export default function QuickCapture() {
 
       {open && (
         <>
-          {/* klik izvan zatvara */}
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <form
             ref={formRef}
@@ -32,25 +38,21 @@ export default function QuickCapture() {
             }}
             className="absolute right-0 z-20 mt-2 flex w-72 flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
           >
+            <input type="hidden" name="type" value={type} />
             <div className="flex gap-1">
-              {[
-                { v: "task", l: "Zadatak" },
-                { v: "note", l: "Bilješka" },
-                { v: "reminder", l: "Podsjetnik" },
-              ].map((o, i) => (
-                <label
+              {TYPES.map((o) => (
+                <button
                   key={o.v}
-                  className="flex-1 cursor-pointer rounded-md border border-zinc-200 px-2 py-1 text-center text-xs has-[:checked]:border-black has-[:checked]:bg-zinc-900 has-[:checked]:text-white dark:border-zinc-700 dark:has-[:checked]:border-zinc-50 dark:has-[:checked]:bg-zinc-50 dark:has-[:checked]:text-black"
+                  type="button"
+                  onClick={() => setType(o.v)}
+                  className={`flex-1 rounded-md border px-2 py-1 text-xs transition-colors ${
+                    type === o.v
+                      ? "border-black bg-zinc-900 text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-black"
+                      : "border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  }`}
                 >
-                  <input
-                    type="radio"
-                    name="type"
-                    value={o.v}
-                    defaultChecked={i === 0}
-                    className="hidden"
-                  />
                   {o.l}
-                </label>
+                </button>
               ))}
             </div>
             <input
@@ -61,7 +63,9 @@ export default function QuickCapture() {
               className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
             />
             <p className="text-[11px] text-zinc-400">
-              Podsjetnik se postavlja za 1h (uredi u modulu).
+              {type === "reminder"
+                ? "Podsjetnik se postavlja za 1h (uredi u modulu)."
+                : "Kreira se odmah u odabranom modulu."}
             </p>
             <button className="rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black">
               Dodaj
