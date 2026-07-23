@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/tasks", label: "Zadaci" },
   { href: "/kanban", label: "Kanban" },
   { href: "/calendar", label: "Kalendar" },
+  { href: "/notes", label: "Bilješke" },
 ];
 
 export default function TopNav() {
