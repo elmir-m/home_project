@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/notes", label: "Bilješke" },
   { href: "/finance", label: "Finansije" },
   { href: "/reminders", label: "Podsjetnici" },
+  { href: "/life", label: "Life admin" },
 ];
 
 export default function TopNav() {

@@ -16,6 +16,7 @@ const TILES = [
   { href: "/notes", label: "📝 Bilješke" },
   { href: "/finance", label: "💰 Finansije" },
   { href: "/reminders", label: "🔔 Podsjetnici" },
+  { href: "/life", label: "🗂️ Life admin" },
 ];
 
 export default async function DashboardPage() {

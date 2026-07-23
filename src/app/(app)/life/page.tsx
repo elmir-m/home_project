@@ -1,0 +1,258 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import {
+  createRecord,
+  deleteRecord,
+  createContact,
+  deleteContact,
+  createList,
+  deleteList,
+  addListItem,
+  toggleListItem,
+  deleteListItem,
+} from "./actions";
+
+type Rec = {
+  id: string;
+  title: string;
+  category: string;
+  expiry_date: string | null;
+  notes: string | null;
+};
+type Contact = {
+  id: string;
+  name: string;
+  role: string | null;
+  phone: string | null;
+  email: string | null;
+};
+type List = { id: string; name: string };
+type Item = { id: string; list_id: string; text: string; done: boolean };
+
+const CAT_LABEL: Record<string, string> = {
+  document: "Dokument",
+  warranty: "Garancija",
+  renewal: "Obnova",
+  other: "Ostalo",
+};
+
+const input =
+  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50";
+const btn =
+  "rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black";
+
+export default async function LifePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const [{ data: records }, { data: contacts }, { data: lists }, { data: items }] =
+    await Promise.all([
+      supabase.from("records").select("*").order("created_at", { ascending: false }),
+      supabase.from("contacts").select("*").order("name"),
+      supabase.from("lists").select("id, name").order("created_at"),
+      supabase.from("list_items").select("id, list_id, text, done").order("created_at"),
+    ]);
+
+  const recList = (records as Rec[]) ?? [];
+  const contactList = (contacts as Contact[]) ?? [];
+  const listList = (lists as List[]) ?? [];
+  const itemList = (items as Item[]) ?? [];
+  const today = new Date().toISOString().slice(0, 10);
+
+  return (
+    <main className="mx-auto flex max-w-3xl flex-col gap-8 p-8">
+      <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
+        Life admin
+      </h1>
+
+      {/* EVIDENCIJA */}
+      <section>
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          Evidencija (dokumenti, garancije, obnove)
+        </h2>
+        <form
+          action={createRecord}
+          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+        >
+          <input name="title" required placeholder="Naziv" className={`flex-1 ${input}`} />
+          <select name="category" defaultValue="document" className={input}>
+            <option value="document">Dokument</option>
+            <option value="warranty">Garancija</option>
+            <option value="renewal">Obnova</option>
+            <option value="other">Ostalo</option>
+          </select>
+          <input type="date" name="expiry_date" className={input} title="Rok isteka" />
+          <input name="notes" placeholder="Bilješka" className={`flex-1 ${input}`} />
+          <button className={btn}>Dodaj</button>
+        </form>
+        <ul className="flex flex-col gap-1">
+          {recList.map((r) => {
+            const soon = r.expiry_date && r.expiry_date >= today;
+            const expired = r.expiry_date && r.expiry_date < today;
+            return (
+              <li
+                key={r.id}
+                className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+              >
+                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:bg-zinc-800">
+                  {CAT_LABEL[r.category]}
+                </span>
+                <span className="text-black dark:text-zinc-50">{r.title}</span>
+                {r.notes && <span className="text-xs text-zinc-400">{r.notes}</span>}
+                {r.expiry_date && (
+                  <span
+                    className={`ml-auto text-xs ${
+                      expired
+                        ? "font-medium text-red-600"
+                        : soon
+                          ? "text-amber-600"
+                          : "text-zinc-400"
+                    }`}
+                  >
+                    {expired ? "isteklo " : "ističe "}
+                    {r.expiry_date}
+                  </span>
+                )}
+                <form action={deleteRecord} className={r.expiry_date ? "" : "ml-auto"}>
+                  <input type="hidden" name="id" value={r.id} />
+                  <button className="text-zinc-300 hover:text-red-600">✕</button>
+                </form>
+              </li>
+            );
+          })}
+          {recList.length === 0 && (
+            <li className="py-3 text-center text-sm text-zinc-400">
+              Nema zapisa. (Ako ostane prazno, pokreni migraciju 0008.)
+            </li>
+          )}
+        </ul>
+        <p className="mt-1 text-xs text-zinc-400">
+          Ako uneseš rok isteka, automatski se pravi podsjetnik 7 dana ranije.
+        </p>
+      </section>
+
+      {/* KONTAKTI */}
+      <section>
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          Važni kontakti
+        </h2>
+        <form
+          action={createContact}
+          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+        >
+          <input name="name" required placeholder="Ime" className={input} />
+          <input name="role" placeholder="Uloga (npr. vodoinstalater)" className={`flex-1 ${input}`} />
+          <input name="phone" placeholder="Telefon" className={input} />
+          <input name="email" placeholder="Email" className={input} />
+          <button className={btn}>Dodaj</button>
+        </form>
+        <ul className="flex flex-col gap-1">
+          {contactList.map((c) => (
+            <li
+              key={c.id}
+              className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+            >
+              <span className="font-medium text-black dark:text-zinc-50">{c.name}</span>
+              {c.role && <span className="text-xs text-zinc-400">{c.role}</span>}
+              <span className="ml-auto text-xs text-zinc-500">
+                {[c.phone, c.email].filter(Boolean).join(" · ")}
+              </span>
+              <form action={deleteContact}>
+                <input type="hidden" name="id" value={c.id} />
+                <button className="text-zinc-300 hover:text-red-600">✕</button>
+              </form>
+            </li>
+          ))}
+          {contactList.length === 0 && (
+            <li className="py-3 text-center text-sm text-zinc-400">Nema kontakata.</li>
+          )}
+        </ul>
+      </section>
+
+      {/* LISTE */}
+      <section>
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          Dijeljene liste
+        </h2>
+        <form action={createList} className="mb-3 flex gap-2">
+          <input name="name" required placeholder="Nova lista (npr. Kupovina)" className={`flex-1 ${input}`} />
+          <button className={btn}>Napravi listu</button>
+        </form>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {listList.map((l) => {
+            const its = itemList.filter((i) => i.list_id === l.id);
+            return (
+              <div
+                key={l.id}
+                className="rounded-xl border border-zinc-200 p-3 dark:border-zinc-800"
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="font-semibold text-black dark:text-zinc-50">
+                    {l.name}
+                  </span>
+                  <form action={deleteList}>
+                    <input type="hidden" name="id" value={l.id} />
+                    <button className="text-xs text-zinc-300 hover:text-red-600">
+                      obriši listu
+                    </button>
+                  </form>
+                </div>
+                <ul className="flex flex-col gap-1">
+                  {its.map((i) => (
+                    <li key={i.id} className="flex items-center gap-2 text-sm">
+                      <form action={toggleListItem}>
+                        <input type="hidden" name="id" value={i.id} />
+                        <input type="hidden" name="done" value={String(i.done)} />
+                        <button
+                          className={`flex h-4 w-4 items-center justify-center rounded border text-[10px] ${
+                            i.done
+                              ? "border-green-600 bg-green-600 text-white"
+                              : "border-zinc-400"
+                          }`}
+                        >
+                          {i.done ? "✓" : ""}
+                        </button>
+                      </form>
+                      <span
+                        className={
+                          i.done
+                            ? "text-zinc-400 line-through"
+                            : "text-black dark:text-zinc-50"
+                        }
+                      >
+                        {i.text}
+                      </span>
+                      <form action={deleteListItem} className="ml-auto">
+                        <input type="hidden" name="id" value={i.id} />
+                        <button className="text-zinc-300 hover:text-red-600">✕</button>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+                <form action={addListItem} className="mt-2 flex gap-1">
+                  <input type="hidden" name="list_id" value={l.id} />
+                  <input
+                    name="text"
+                    required
+                    placeholder="Nova stavka…"
+                    className={`flex-1 ${input} py-1`}
+                  />
+                  <button className="rounded-md border border-zinc-300 px-2 text-sm dark:border-zinc-700">
+                    +
+                  </button>
+                </form>
+              </div>
+            );
+          })}
+        </div>
+        {listList.length === 0 && (
+          <p className="py-3 text-center text-sm text-zinc-400">Nema lista.</p>
+        )}
+      </section>
+    </main>
+  );
+}
