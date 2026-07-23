@@ -15,6 +15,7 @@ const ymd = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
 
 type EventRow = { id: string; title: string; event_date: string; start_time: string | null };
 type TaskRow = { id: string; title: string; due_date: string; status: string };
+type BillRow = { id: string; name: string; due_date: string; amount: number };
 
 export default async function CalendarPage({
   searchParams,
@@ -62,12 +63,22 @@ export default async function CalendarPage({
     .gte("due_date", first)
     .lte("due_date", last);
 
+  const { data: bills } = await supabase
+    .from("bills")
+    .select("id, name, due_date, amount")
+    .gte("due_date", first)
+    .lte("due_date", last);
+
   // Grupiši po danu.
-  const byDay: Record<string, { events: EventRow[]; tasks: TaskRow[] }> = {};
+  const byDay: Record<
+    string,
+    { events: EventRow[]; tasks: TaskRow[]; bills: BillRow[] }
+  > = {};
   for (let d = 1; d <= daysInMonth; d++)
-    byDay[ymd(year, month, d)] = { events: [], tasks: [] };
+    byDay[ymd(year, month, d)] = { events: [], tasks: [], bills: [] };
   (events as EventRow[])?.forEach((e) => byDay[e.event_date]?.events.push(e));
   (tasks as TaskRow[])?.forEach((t) => byDay[t.due_date]?.tasks.push(t));
+  (bills as BillRow[])?.forEach((b) => byDay[b.due_date]?.bills.push(b));
 
   const cells: (number | null)[] = [
     ...Array(firstWeekday).fill(null),
@@ -186,6 +197,15 @@ export default async function CalendarPage({
                     ✓ {t.title}
                   </div>
                 ))}
+                {cell.bills.map((b) => (
+                  <div
+                    key={b.id}
+                    title="Račun dospijeva"
+                    className="truncate rounded bg-orange-100 px-1 py-0.5 text-[11px] text-orange-800 dark:bg-orange-950 dark:text-orange-300"
+                  >
+                    💳 {b.name}
+                  </div>
+                ))}
               </div>
             </div>
           );
@@ -198,7 +218,11 @@ export default async function CalendarPage({
         <span className="rounded bg-green-100 px-1 dark:bg-green-950">
           zeleno
         </span>{" "}
-        = zadaci s rokom (automatski) · klik na događaj briše ga
+        = zadaci ·{" "}
+        <span className="rounded bg-orange-100 px-1 dark:bg-orange-950">
+          narandžasto
+        </span>{" "}
+        = računi (sve automatski) · klik na događaj briše ga
         {household ? "" : " · pokreni migraciju 0003"}
       </p>
     </main>
