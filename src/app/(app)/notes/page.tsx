@@ -65,7 +65,7 @@ export default async function NotesPage() {
 
       <form
         action={createNote}
-        className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
       >
         <input
           name="title"
@@ -117,7 +117,7 @@ export default async function NotesPage() {
               </optgroup>
             )}
           </select>
-          <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black">
+          <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
             Sačuvaj
           </button>
         </div>
@@ -134,7 +134,7 @@ export default async function NotesPage() {
           return (
             <li
               key={n.id}
-              className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+              className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">

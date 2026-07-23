@@ -9,7 +9,7 @@ export default function Home() {
       </p>
       <a
         href="/login"
-        className="mt-2 rounded-md bg-black px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+        className="mt-2 rounded-md bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white dark:hover:bg-zinc-200"
       >
         Prijava
       </a>

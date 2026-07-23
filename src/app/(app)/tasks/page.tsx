@@ -53,7 +53,7 @@ export default async function TasksPage() {
       {/* Forma za dodavanje */}
       <form
         action={createTask}
-        className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
       >
         <input
           name="title"
@@ -88,7 +88,7 @@ export default async function TasksPage() {
               </option>
             ))}
           </select>
-          <button className="ml-auto rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200">
+          <button className="ml-auto rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white dark:hover:bg-zinc-200">
             Dodaj
           </button>
         </div>
@@ -108,7 +108,7 @@ export default async function TasksPage() {
           return (
             <li
               key={t.id}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 dark:border-zinc-800"
+              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900"
             >
               <form action={toggleTask}>
                 <input type="hidden" name="id" value={t.id} />

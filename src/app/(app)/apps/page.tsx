@@ -78,7 +78,7 @@ export default async function AppsPage() {
                 key={app.slug}
                 className={`rounded-xl border p-4 ${
                   on
-                    ? "border-zinc-200 dark:border-zinc-800"
+                    ? "border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
                     : "border-dashed border-zinc-300 opacity-60 dark:border-zinc-700"
                 }`}
               >
@@ -96,7 +96,7 @@ export default async function AppsPage() {
                       className={`rounded-md px-2 py-1 text-xs ${
                         on
                           ? "border border-zinc-300 text-zinc-500 dark:border-zinc-700"
-                          : "bg-black text-white dark:bg-zinc-50 dark:text-black"
+                          : "bg-indigo-600 text-white dark:bg-indigo-500 dark:text-white"
                       }`}
                     >
                       {on ? "Deinstaliraj" : "Instaliraj"}
@@ -137,7 +137,7 @@ export default async function AppsPage() {
         </h2>
         <form
           action={createAutomation}
-          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
         >
           <span className="text-sm text-zinc-400">Kada</span>
           <select
@@ -166,7 +166,7 @@ export default async function AppsPage() {
             placeholder="Tekst (naslov / predmet)"
             className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
           />
-          <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white dark:bg-zinc-50 dark:text-black">
+          <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white dark:bg-indigo-500 dark:text-white">
             Dodaj
           </button>
         </form>
@@ -175,7 +175,7 @@ export default async function AppsPage() {
           {autoList.map((a) => (
             <li
               key={a.id}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
             >
               <span className="text-black dark:text-zinc-50">
                 Kada <b>{eventLabel(a.trigger_type)}</b> → {actionLabel(a.action_type)}

@@ -136,7 +136,7 @@ export default async function CalendarPage({
           name="start_time"
           className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
         />
-        <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black">
+        <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
           Dodaj
         </button>
       </form>
@@ -165,7 +165,7 @@ export default async function CalendarPage({
               <div
                 className={`mb-1 text-xs ${
                   isToday
-                    ? "inline-flex h-5 w-5 items-center justify-center rounded-full bg-black font-bold text-white dark:bg-zinc-50 dark:text-black"
+                    ? "inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 font-bold text-white dark:bg-indigo-500 dark:text-white"
                     : "text-zinc-400"
                 }`}
               >

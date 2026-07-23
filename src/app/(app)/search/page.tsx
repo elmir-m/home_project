@@ -84,7 +84,7 @@ export default async function SearchPage({
           placeholder="Traži kroz sve module…"
           className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
         />
-        <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black">
+        <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
           Traži
         </button>
       </form>
@@ -108,7 +108,7 @@ export default async function SearchPage({
                   <li key={i}>
                     <Link
                       href={h.href}
-                      className="block rounded-lg border border-zinc-200 px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
+                      className="block rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-900"
                     >
                       <span className="text-black dark:text-zinc-50">{h.label}</span>
                       {h.sub && (

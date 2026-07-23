@@ -101,7 +101,7 @@ export default async function DashboardPage() {
     empty: boolean;
     children: React.ReactNode;
   }) => (
-    <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+    <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
           {title}
@@ -201,7 +201,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Domaćinstvo */}
-      <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
             Domaćinstvo
@@ -240,7 +240,7 @@ export default async function DashboardPage() {
           <Link
             key={t.href}
             href={t.href}
-            className="rounded-xl border border-zinc-200 p-4 text-sm font-medium text-black transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-900"
+            className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 text-sm font-medium text-black transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-900"
           >
             {t.label}
           </Link>

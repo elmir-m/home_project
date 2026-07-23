@@ -39,7 +39,7 @@ const CAT_LABEL: Record<string, string> = {
 const input =
   "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50";
 const btn =
-  "rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black";
+  "rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white";
 
 export default async function LifePage() {
   const supabase = await createClient();
@@ -75,7 +75,7 @@ export default async function LifePage() {
         </h2>
         <form
           action={createRecord}
-          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
         >
           <input name="title" required placeholder="Naziv" className={`flex-1 ${input}`} />
           <select name="category" defaultValue="document" className={input}>
@@ -95,7 +95,7 @@ export default async function LifePage() {
             return (
               <li
                 key={r.id}
-                className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+                className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
               >
                 <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:bg-zinc-800">
                   {CAT_LABEL[r.category]}
@@ -141,7 +141,7 @@ export default async function LifePage() {
         </h2>
         <form
           action={createContact}
-          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
         >
           <input name="name" required placeholder="Ime" className={input} />
           <input name="role" placeholder="Uloga (npr. vodoinstalater)" className={`flex-1 ${input}`} />
@@ -153,7 +153,7 @@ export default async function LifePage() {
           {contactList.map((c) => (
             <li
               key={c.id}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
             >
               <span className="font-medium text-black dark:text-zinc-50">{c.name}</span>
               {c.role && <span className="text-xs text-zinc-400">{c.role}</span>}
@@ -188,7 +188,7 @@ export default async function LifePage() {
             return (
               <div
                 key={l.id}
-                className="rounded-xl border border-zinc-200 p-3 dark:border-zinc-800"
+                className="rounded-xl border border-zinc-200 bg-white shadow-sm p-3 dark:border-zinc-800 dark:bg-zinc-900"
               >
                 <div className="mb-2 flex items-center justify-between">
                   <span className="font-semibold text-black dark:text-zinc-50">

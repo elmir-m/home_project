@@ -9,7 +9,7 @@ export default async function LoginPage({
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-black">
-      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white shadow-sm bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:bg-zinc-900">
         <h1 className="mb-1 text-2xl font-bold text-black dark:text-zinc-50">
           Home OS
         </h1>
@@ -53,13 +53,13 @@ export default async function LoginPage({
           <div className="mt-2 flex gap-3">
             <button
               formAction={login}
-              className="flex-1 rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+              className="flex-1 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white dark:hover:bg-zinc-200"
             >
               Prijava
             </button>
             <button
               formAction={signup}
-              className="flex-1 rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
+              className="flex-1 rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-indigo-700"
             >
               Registracija
             </button>

@@ -88,15 +88,15 @@ export default async function FinancePage() {
 
       {/* Sažetak */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs text-zinc-400">Prihodi (mjesec)</p>
           <p className="mt-1 text-lg font-semibold text-green-600">{money(income)}</p>
         </div>
-        <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs text-zinc-400">Troškovi (mjesec)</p>
           <p className="mt-1 text-lg font-semibold text-red-600">{money(expenses)}</p>
         </div>
-        <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs text-zinc-400">Neto</p>
           <p
             className={`mt-1 text-lg font-semibold ${
@@ -110,7 +110,7 @@ export default async function FinancePage() {
 
       {/* Ko je platio / ko duguje */}
       {members.length > 1 && expenses > 0 && (
-        <div className="rounded-xl border border-zinc-200 p-4 text-sm dark:border-zinc-800">
+        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
             Ko je platio · pravedan udio {money(fairShare)}
           </p>
@@ -139,7 +139,7 @@ export default async function FinancePage() {
       {/* Dodaj transakciju */}
       <form
         action={createTransaction}
-        className="flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+        className="flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
       >
         <select
           name="kind"
@@ -185,7 +185,7 @@ export default async function FinancePage() {
             </option>
           ))}
         </select>
-        <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black">
+        <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
           Dodaj
         </button>
       </form>
@@ -204,7 +204,7 @@ export default async function FinancePage() {
           {txList.map((t) => (
             <li
               key={t.id}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
             >
               <span
                 className={`font-semibold ${
@@ -241,7 +241,7 @@ export default async function FinancePage() {
         </h2>
         <form
           action={createBill}
-          className="mb-3 flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+          className="mb-3 flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
         >
           <input
             name="name"
@@ -274,7 +274,7 @@ export default async function FinancePage() {
             <option value="yearly">Godišnje</option>
             <option value="none">Jednokratno</option>
           </select>
-          <button className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black">
+          <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
             Dodaj
           </button>
         </form>
@@ -288,7 +288,7 @@ export default async function FinancePage() {
             return (
               <li
                 key={b.id}
-                className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
+                className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
               >
                 <span className="font-medium text-black dark:text-zinc-50">
                   {b.name}

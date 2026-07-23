@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import TopNav from "@/components/top-nav";
+import Sidebar from "@/components/sidebar";
+import TopBar from "@/components/top-bar";
 
-// Layout za sve prijavljene stranice: zajednička navigacija + provjera sesije.
+// Layout za sve prijavljene stranice: sidebar + gornja traka + provjera sesije.
 export default async function AppLayout({
   children,
 }: {
@@ -15,9 +16,12 @@ export default async function AppLayout({
   if (!user) redirect("/login");
 
   return (
-    <div className="min-h-screen">
-      <TopNav />
-      {children}
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <TopBar />
+        <div className="flex-1">{children}</div>
+      </div>
     </div>
   );
 }

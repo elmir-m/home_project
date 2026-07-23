@@ -27,7 +27,7 @@ export default async function InvitePage({
 
   const Shell = ({ children }: { children: React.ReactNode }) => (
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-black">
-      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white shadow-sm bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:bg-zinc-900">
         {children}
       </div>
     </main>
@@ -64,7 +64,7 @@ export default async function InvitePage({
         </p>
         <Link
           href="/login"
-          className="mt-4 inline-block rounded-md bg-black px-4 py-2 text-sm font-medium text-white dark:bg-zinc-50 dark:text-black"
+          className="mt-4 inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white dark:bg-indigo-500 dark:text-white"
         >
           Prijava / Registracija
         </Link>
@@ -85,7 +85,7 @@ export default async function InvitePage({
         . Pridruživanjem dijelite zadatke, kalendar, finansije i ostalo.
       </p>
       <form action={acceptInvite.bind(null, token)} className="mt-4">
-        <button className="w-full rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black">
+        <button className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
           Prihvati pozivnicu
         </button>
       </form>
