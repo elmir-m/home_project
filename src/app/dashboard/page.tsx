@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "../login/actions";
@@ -82,6 +83,15 @@ export default async function DashboardPage() {
           </p>
         )}
       </section>
+
+      <nav className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <Link
+          href="/tasks"
+          className="rounded-xl border border-zinc-200 p-4 text-sm font-medium text-black transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-900"
+        >
+          ✅ Zadaci
+        </Link>
+      </nav>
     </main>
   );
 }
