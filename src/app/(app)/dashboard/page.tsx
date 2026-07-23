@@ -101,6 +101,12 @@ export default async function DashboardPage() {
         >
           📝 Bilješke
         </Link>
+        <Link
+          href="/finance"
+          className="rounded-xl border border-zinc-200 p-4 text-sm font-medium text-black transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-900"
+        >
+          💰 Finansije
+        </Link>
       </nav>
     </main>
   );
