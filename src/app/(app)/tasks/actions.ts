@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
+import { emitEvent } from "@/lib/platform";
 
 export async function createTask(formData: FormData) {
   const supabase = await createClient();
@@ -29,21 +30,38 @@ export async function createTask(formData: FormData) {
     created_by: user.id,
   });
 
+  await emitEvent(supabase, household.id, "task.created", { title }, user.id);
   revalidatePath("/tasks");
 }
 
 export async function toggleTask(formData: FormData) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const id = String(formData.get("id"));
   const done = String(formData.get("done")) === "true";
 
-  await supabase
+  const { data: task } = await supabase
     .from("tasks")
     .update({
       status: done ? "todo" : "done",
       completed_at: done ? null : new Date().toISOString(),
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("household_id, title")
+    .single();
+
+  // Prelazak u "završeno" -> objavi događaj (za automatizacije).
+  if (!done && task) {
+    await emitEvent(
+      supabase,
+      task.household_id,
+      "task.completed",
+      { title: task.title },
+      user?.id ?? null,
+    );
+  }
 
   revalidatePath("/tasks");
 }

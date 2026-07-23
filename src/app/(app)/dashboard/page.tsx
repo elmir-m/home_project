@@ -38,6 +38,7 @@ export default async function DashboardPage() {
     { data: todayEvents },
     { data: soonBills },
     { data: dueReminders },
+    { data: installs },
   ] = await Promise.all([
     supabase.from("households").select("id, name").order("created_at").limit(1),
     supabase
@@ -63,7 +64,13 @@ export default async function DashboardPage() {
       .eq("status", "pending")
       .lte("remind_at", in24hISO)
       .order("remind_at", { ascending: true }),
+    supabase.from("app_installs").select("slug, enabled"),
   ]);
+
+  const installMap = new Map((installs ?? []).map((i) => [i.slug, i.enabled]));
+  const visibleTiles = TILES.filter(
+    (t) => installMap.get(t.href.slice(1)) !== false,
+  );
 
   const household = households?.[0] ?? null;
 
@@ -229,7 +236,7 @@ export default async function DashboardPage() {
 
       {/* Moduli */}
       <nav className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {TILES.map((t) => (
+        {visibleTiles.map((t) => (
           <Link
             key={t.href}
             href={t.href}
@@ -238,6 +245,12 @@ export default async function DashboardPage() {
             {t.label}
           </Link>
         ))}
+        <Link
+          href="/apps"
+          className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm font-medium text-zinc-500 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+        >
+          🧩 Aplikacije
+        </Link>
       </nav>
     </main>
   );

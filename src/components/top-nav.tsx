@@ -14,6 +14,7 @@ const LINKS = [
   { href: "/finance", label: "Finansije" },
   { href: "/reminders", label: "Podsjetnici" },
   { href: "/life", label: "Life admin" },
+  { href: "/apps", label: "🧩 Aplikacije" },
 ];
 
 export default function TopNav() {

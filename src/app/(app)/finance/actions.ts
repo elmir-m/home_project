@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
+import { emitEvent } from "@/lib/platform";
 
 async function ctx() {
   const supabase = await createClient();
@@ -30,6 +31,13 @@ export async function createTransaction(formData: FormData) {
     paid_by: String(formData.get("paid_by") ?? "") || user.id,
     created_by: user.id,
   });
+  await emitEvent(
+    supabase,
+    household.id,
+    "transaction.created",
+    { title: String(formData.get("description") ?? "transakcija"), amount },
+    user.id,
+  );
   revalidatePath("/finance");
 }
 
@@ -57,6 +65,7 @@ export async function createBill(formData: FormData) {
     category: String(formData.get("category") ?? "").trim() || null,
     created_by: user.id,
   });
+  await emitEvent(supabase, household.id, "bill.created", { title: name, amount }, user.id);
   revalidatePath("/finance");
 }
 
