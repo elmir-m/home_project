@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export type Member = {
@@ -6,24 +7,36 @@ export type Member = {
   profiles: { display_name: string | null; email: string | null } | null;
 };
 
-// Vraća trenutno (prvo) domaćinstvo korisnika + njegove članove.
-// RLS garantuje da korisnik dobije samo domaćinstva kojima pripada.
+export type Household = { id: string; name: string };
+
+// Vraća aktivno domaćinstvo (iz kolačića 'hh', ili prvo), sve članove i listu svih
+// domaćinstava kojima korisnik pripada (za prebacivanje). RLS garantuje pristup.
 export async function getCurrentHousehold() {
   const supabase = await createClient();
 
   const { data: households } = await supabase
     .from("households")
     .select("id, name")
-    .order("created_at", { ascending: true })
-    .limit(1);
+    .order("created_at", { ascending: true });
 
-  const household = households?.[0] ?? null;
-  if (!household) return { household: null, members: [] as Member[] };
+  const list = (households as Household[]) ?? [];
+
+  const cookieStore = await cookies();
+  const active = cookieStore.get("hh")?.value;
+  const household = list.find((h) => h.id === active) ?? list[0] ?? null;
+
+  if (!household) {
+    return { household: null, households: list, members: [] as Member[] };
+  }
 
   const { data } = await supabase
     .from("household_members")
     .select("user_id, role, profiles(display_name, email)")
     .eq("household_id", household.id);
 
-  return { household, members: (data as unknown as Member[]) ?? [] };
+  return {
+    household,
+    households: list,
+    members: (data as unknown as Member[]) ?? [],
+  };
 }

@@ -194,9 +194,17 @@ export default async function DashboardPage() {
 
       {/* Domaćinstvo */}
       <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-          Domaćinstvo
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+            Domaćinstvo
+          </h2>
+          <Link
+            href="/members"
+            className="text-xs text-zinc-400 hover:text-zinc-600"
+          >
+            članovi / pozovi →
+          </Link>
+        </div>
         {household ? (
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <span className="text-lg font-semibold text-black dark:text-zinc-50">
