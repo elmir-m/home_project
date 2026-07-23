@@ -73,7 +73,7 @@ export default async function SearchPage({
   const total = groups.reduce((s, g) => s + g.hits.length, 0);
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-8">
+    <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
       <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Pretraga</h1>
 
       <form className="flex gap-2">

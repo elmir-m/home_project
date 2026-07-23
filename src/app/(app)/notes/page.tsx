@@ -58,7 +58,7 @@ export default async function NotesPage() {
   });
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-8">
+    <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
       <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
         Bilješke
       </h1>
