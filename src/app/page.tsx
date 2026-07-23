@@ -7,9 +7,12 @@ export default function Home() {
       <p className="text-lg text-zinc-600 dark:text-zinc-400">
         Hello World — platforma radi. 🎉
       </p>
-      <p className="text-sm text-zinc-400">
-        Next.js + Supabase · sljedeći korak: deploy pa auth
-      </p>
+      <a
+        href="/login"
+        className="mt-2 rounded-md bg-black px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+      >
+        Prijava
+      </a>
     </main>
   );
 }
