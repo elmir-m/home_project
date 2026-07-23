@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
@@ -45,17 +44,9 @@ export default async function TasksPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 p-8">
       <header className="flex items-center justify-between">
-        <div>
-          <Link
-            href="/dashboard"
-            className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-          >
-            ← Dashboard
-          </Link>
-          <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-            Zadaci
-          </h1>
-        </div>
+        <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
+          Zadaci
+        </h1>
         <span className="text-xs text-zinc-400">{household?.name}</span>
       </header>
 

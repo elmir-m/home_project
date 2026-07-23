@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { logout } from "../login/actions";
 
 type MemberRow = {
   role: string;
@@ -35,17 +34,10 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 p-8">
-      <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-          Dashboard
-        </h1>
-        <form action={logout}>
-          <button className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800">
-            Odjava
-          </button>
-        </form>
-      </header>
+    <main className="mx-auto flex max-w-2xl flex-col gap-8 p-8">
+      <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
+        Dashboard
+      </h1>
 
       <p className="text-sm text-zinc-500">
         Prijavljen kao{" "}
@@ -96,6 +88,12 @@ export default async function DashboardPage() {
           className="rounded-xl border border-zinc-200 p-4 text-sm font-medium text-black transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-900"
         >
           📋 Kanban
+        </Link>
+        <Link
+          href="/calendar"
+          className="rounded-xl border border-zinc-200 p-4 text-sm font-medium text-black transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-900"
+        >
+          📅 Kalendar
         </Link>
       </nav>
     </main>
