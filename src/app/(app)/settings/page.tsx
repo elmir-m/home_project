@@ -53,7 +53,7 @@ export default async function SettingsPage() {
 
       <form
         action={saveNotificationPrefs}
-        className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+        className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
       >
         <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Email obavijesti
@@ -89,7 +89,7 @@ export default async function SettingsPage() {
           <select
             name="digest"
             defaultValue={prefs.digest}
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           >
             <option value="none">Isključeno</option>
             <option value="daily">Dnevni</option>

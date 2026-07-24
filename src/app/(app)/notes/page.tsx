@@ -65,29 +65,29 @@ export default async function NotesPage() {
 
       <form
         action={createNote}
-        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
+        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
       >
         <input
           name="title"
           placeholder="Naslov (opciono)"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <textarea
           name="body"
           rows={3}
           placeholder="Sadržaj…"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <input
           name="tags"
           placeholder="Tagovi, odvojeni zarezom (npr. kuća, hitno)"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <div className="flex flex-wrap gap-3">
           <select
             name="kind"
             defaultValue="note"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           >
             <option value="note">Bilješka</option>
             <option value="journal">Dnevnik</option>
@@ -95,7 +95,7 @@ export default async function NotesPage() {
           <select
             name="link"
             defaultValue=""
-            className="min-w-40 flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="min-w-40 flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           >
             <option value="">Poveži sa… (opciono)</option>
             {(tasks ?? []).length > 0 && (
@@ -134,7 +134,7 @@ export default async function NotesPage() {
           return (
             <li
               key={n.id}
-              className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
+              className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
@@ -157,7 +157,7 @@ export default async function NotesPage() {
                     {n.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded bg-zinc-100 px-1.5 py-0.5 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                        className="rounded bg-zinc-100 px-1.5 py-0.5 text-zinc-600 dark:bg-[#2a2f39] dark:text-zinc-300"
                       >
                         #{tag}
                       </span>

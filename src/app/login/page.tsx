@@ -11,7 +11,7 @@ export default async function LoginPage({
   const { error, message } = await searchParams;
 
   const inputCls =
-    "w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder:text-zinc-500";
+    "w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50 dark:placeholder:text-zinc-500";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-zinc-50 to-zinc-100 p-4 dark:from-zinc-950 dark:to-black">
@@ -28,7 +28,7 @@ export default async function LoginPage({
           </p>
         </div>
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-[#20242c]">
           {error && (
             <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/60 dark:text-red-300">
               {error}
@@ -85,9 +85,9 @@ export default async function LoginPage({
             </SubmitButton>
 
             <div className="flex items-center gap-3 text-xs text-zinc-400">
-              <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+              <span className="h-px flex-1 bg-zinc-200 dark:bg-[#2a2f39]" />
               ili
-              <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+              <span className="h-px flex-1 bg-zinc-200 dark:bg-[#2a2f39]" />
             </div>
 
             <Link

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
 import {
   inviteMember,
+  createMember,
   revokeInvite,
   renameHousehold,
   setActiveHousehold,
@@ -11,6 +12,7 @@ import {
 } from "./actions";
 import { BUILTIN_APPS } from "@/lib/apps";
 import { AppIcon } from "@/components/app-icon";
+import SubmitButton from "@/components/submit-button";
 
 type Invitation = {
   id: string;
@@ -19,7 +21,12 @@ type Invitation = {
   status: string;
 };
 
-export default async function MembersPage() {
+export default async function MembersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; invited?: string; created?: string }>;
+}) {
+  const sp = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -57,9 +64,26 @@ export default async function MembersPage() {
         Domaćinstvo i članovi
       </h1>
 
+      {sp.error && (
+        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+          {sp.error}
+        </p>
+      )}
+      {sp.invited && (
+        <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-950/50 dark:text-green-300">
+          ✓ Pozivnica poslana.
+        </p>
+      )}
+      {sp.created && (
+        <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-950/50 dark:text-green-300">
+          ✓ Član kreiran ({sp.created}) i dodan u domaćinstvo. Daj mu email i
+          lozinku za prijavu.
+        </p>
+      )}
+
       {/* Prebacivanje aktivnog domaćinstva */}
       {households.length > 1 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-3 text-sm dark:border-zinc-800 dark:bg-[#20242c]">
           <span className="text-zinc-500">Aktivno:</span>
           {households.map((hh) => (
             <form key={hh.id} action={setActiveHousehold}>
@@ -78,25 +102,30 @@ export default async function MembersPage() {
         </div>
       )}
 
-      {/* Naziv domaćinstva */}
-      <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Naziv domaćinstva
-        </h2>
-        <form action={renameHousehold} className="flex gap-2">
-          <input
-            name="name"
-            defaultValue={household?.name ?? ""}
-            className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-          />
-          <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white dark:bg-indigo-500 dark:text-white">
-            Sačuvaj
-          </button>
-        </form>
-      </section>
+      {/* Naziv domaćinstva (samo vlasnik) */}
+      {isOwner && (
+        <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Naziv domaćinstva
+          </h2>
+          <form action={renameHousehold} className="flex gap-2">
+            <input
+              name="name"
+              defaultValue={household?.name ?? ""}
+              className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
+            />
+            <SubmitButton
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              pendingText="Čuvam…"
+            >
+              Sačuvaj
+            </SubmitButton>
+          </form>
+        </section>
+      )}
 
       {/* Članovi */}
-      <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Članovi ({members.length})
         </h2>
@@ -104,7 +133,7 @@ export default async function MembersPage() {
           {members.map((m) => (
             <li
               key={m.user_id}
-              className="rounded-lg border border-zinc-100 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-800/40"
+              className="rounded-lg border border-zinc-100 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-[#2a2f39]/40"
             >
               <div className="flex items-center justify-between">
                 <span className="font-medium text-black dark:text-zinc-50">
@@ -161,30 +190,78 @@ export default async function MembersPage() {
         </ul>
       </section>
 
-      {/* Pozovi člana */}
-      <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Pozovi člana
-        </h2>
-        <form action={inviteMember} className="flex gap-2">
-          <input
-            name="email"
-            type="email"
-            required
-            placeholder="email@primjer.com"
-            className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-          />
-          <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white dark:bg-indigo-500 dark:text-white">
-            Pozovi
-          </button>
-        </form>
+      {/* Kreiraj člana (samo vlasnik) */}
+      {isOwner && (
+        <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
+          <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Kreiraj člana
+          </h2>
+          <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+            Napravi nalog za nekoga ko još nije u aplikaciji (npr. dijete). Odmah
+            se dodaje u domaćinstvo.
+          </p>
+          <form action={createMember} className="flex flex-wrap items-end gap-2">
+            <input
+              name="full_name"
+              placeholder="Ime i prezime"
+              className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
+            />
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="email@primjer.com"
+              className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
+            />
+            <input
+              name="password"
+              type="text"
+              required
+              minLength={6}
+              placeholder="Lozinka (min 6)"
+              className="w-40 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
+            />
+            <SubmitButton
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              pendingText="Kreiram…"
+            >
+              Kreiraj
+            </SubmitButton>
+          </form>
+        </section>
+      )}
+
+      {/* Pozovi člana (samo vlasnik) */}
+      {isOwner && (
+        <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
+          <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Pozovi postojećeg korisnika
+          </h2>
+          <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+            Za osobu koja se već registrovala u aplikaciji.
+          </p>
+          <form action={inviteMember} className="flex gap-2">
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="email@primjer.com"
+              className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
+            />
+            <SubmitButton
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              pendingText="Šaljem…"
+            >
+              Pozovi
+            </SubmitButton>
+          </form>
 
         {pending.length > 0 && (
           <ul className="mt-4 flex flex-col gap-2">
             {pending.map((inv) => (
               <li
                 key={inv.id}
-                className="rounded-md border border-zinc-200 bg-white shadow-sm p-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+                className="rounded-md border border-zinc-200 bg-white shadow-sm p-2 text-sm dark:border-zinc-800 dark:bg-[#20242c]"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-black dark:text-zinc-50">{inv.email}</span>
@@ -198,17 +275,18 @@ export default async function MembersPage() {
                 <input
                   readOnly
                   value={`${base}/invite/${inv.token}`}
-                  className="mt-1 w-full rounded bg-zinc-50 px-2 py-1 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-zinc-900"
+                  className="mt-1 w-full rounded bg-zinc-50 px-2 py-1 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-[#20242c]"
                 />
               </li>
             ))}
           </ul>
         )}
-        <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
-          Poziv se šalje mejlom na adresu pozvane osobe. Link iznad možeš i ručno
-          proslijediti ako želiš.
-        </p>
-      </section>
+          <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+            Poziv se šalje mejlom na adresu pozvane osobe. Link iznad možeš i
+            ručno proslijediti ako želiš.
+          </p>
+        </section>
+      )}
     </main>
   );
 }

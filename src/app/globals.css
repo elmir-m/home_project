@@ -9,8 +9,8 @@
 }
 
 :root[data-theme="dark"] {
-  --background: #0b0d12;
-  --foreground: #f4f4f5;
+  --background: #15171d; /* mekši tamni slate (nije čisto crno) */
+  --foreground: #e6e7ea;
 }
 
 @theme inline {

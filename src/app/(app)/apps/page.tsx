@@ -49,7 +49,7 @@ export default async function AppsPage() {
               key={app.slug}
               className={`rounded-xl border p-4 ${
                 on
-                  ? "border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+                  ? "border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
                   : "border-dashed border-zinc-300 opacity-60 dark:border-zinc-700"
               }`}
             >
@@ -83,7 +83,7 @@ export default async function AppsPage() {
                 {app.capabilities.map((c) => (
                   <span
                     key={c}
-                    className="rounded bg-zinc-100 px-1.5 py-0.5 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                    className="rounded bg-zinc-100 px-1.5 py-0.5 text-zinc-500 dark:bg-[#2a2f39] dark:text-zinc-400"
                     title="koristi sposobnost"
                   >
                     ⚙ {c}

@@ -61,13 +61,13 @@ export default function Board({ initial }: { initial: KanbanTask[] }) {
             onDrop={() => drop(col.key)}
             className={`flex min-h-[200px] flex-col gap-2 rounded-xl border p-3 transition-colors ${
               over === col.key
-                ? "border-zinc-500 bg-zinc-50 dark:bg-zinc-900"
-                : "border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900"
+                ? "border-zinc-500 bg-zinc-50 dark:bg-[#20242c]"
+                : "border-zinc-200 dark:border-zinc-800 dark:bg-[#20242c]"
             }`}
           >
             <h2 className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-zinc-500">
               {col.label}
-              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-zinc-500 dark:bg-zinc-800">
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-zinc-500 dark:bg-[#2a2f39]">
                 {items.length}
               </span>
             </h2>
@@ -81,7 +81,7 @@ export default function Board({ initial }: { initial: KanbanTask[] }) {
                   setDragId(null);
                   setOver(null);
                 }}
-                className="cursor-grab rounded-lg border border-zinc-200 bg-white shadow-sm bg-white p-3 shadow-sm active:cursor-grabbing dark:border-zinc-700 dark:bg-zinc-800"
+                className="cursor-grab rounded-lg border border-zinc-200 bg-white shadow-sm bg-white p-3 shadow-sm active:cursor-grabbing dark:border-zinc-700 dark:bg-[#2a2f39]"
               >
                 <p
                   className={`text-sm ${

@@ -60,7 +60,7 @@ export default async function AutomationsPage() {
 
       {/* Lista automatizacija */}
       {autoList.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-zinc-900/40">
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-[#20242c]/40">
           <Zap className="h-8 w-8 text-zinc-400" />
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Još nema automatizacija. Npr: „Kada Zadatak završen → Pošalji email".
@@ -74,7 +74,7 @@ export default async function AutomationsPage() {
           {autoList.map((a) => (
             <li
               key={a.id}
-              className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                 <Zap className="h-[18px] w-[18px]" />
@@ -99,7 +99,7 @@ export default async function AutomationsPage() {
                   className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                     a.enabled
                       ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"
-                      : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                      : "bg-zinc-100 text-zinc-500 dark:bg-[#2a2f39] dark:text-zinc-400"
                   }`}
                 >
                   {a.enabled ? "uključeno" : "isključeno"}
@@ -125,7 +125,7 @@ export default async function AutomationsPage() {
           {eventList.map((e) => (
             <li
               key={e.id}
-              className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-sm shadow-sm dark:bg-zinc-900"
+              className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-sm shadow-sm dark:bg-[#20242c]"
             >
               <span className="text-zinc-800 dark:text-zinc-100">
                 <span className="text-zinc-500 dark:text-zinc-400">

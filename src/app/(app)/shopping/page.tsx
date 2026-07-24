@@ -74,18 +74,18 @@ export default async function ShoppingPage({
 
       <form
         action={addShoppingItem}
-        className="flex gap-2 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+        className="flex gap-2 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
       >
         <input
           name="text"
           required
           placeholder="Šta treba kupiti?"
-          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <input
           name="quantity"
           placeholder="Količina"
-          className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500">
           Dodaj
@@ -102,7 +102,7 @@ export default async function ShoppingPage({
         {items.map((i) => (
           <li
             key={i.id}
-            className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
           >
             <form action={toggleShoppingItem}>
               <input type="hidden" name="id" value={i.id} />
@@ -127,7 +127,7 @@ export default async function ShoppingPage({
               {i.text}
             </span>
             {i.quantity && (
-              <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-zinc-800">
+              <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-[#2a2f39]">
                 {i.quantity}
               </span>
             )}

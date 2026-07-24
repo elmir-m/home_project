@@ -122,19 +122,19 @@ export default async function CalendarPage({
           name="title"
           required
           placeholder="Novi događaj…"
-          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <input
           type="date"
           name="event_date"
           required
           defaultValue={first}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <input
           type="time"
           name="start_time"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
           Dodaj
@@ -142,25 +142,25 @@ export default async function CalendarPage({
       </form>
 
       {/* Mreža */}
-      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-800">
+      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-[#2a2f39]">
         {WEEKDAYS.map((w) => (
           <div
             key={w}
-            className="bg-zinc-50 py-2.5 text-center text-sm font-semibold text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300"
+            className="bg-zinc-50 py-2.5 text-center text-sm font-semibold text-zinc-600 dark:bg-[#20242c] dark:text-zinc-300"
           >
             {w}
           </div>
         ))}
         {cells.map((day, i) => {
           if (day === null)
-            return <div key={i} className="min-h-32 bg-white dark:bg-black" />;
+            return <div key={i} className="min-h-32 bg-white dark:bg-[#191c23]" />;
           const key = ymd(year, month, day);
           const cell = byDay[key];
           const isToday = key === todayStr;
           return (
             <div
               key={i}
-              className="min-h-32 bg-white p-2 dark:bg-black"
+              className="min-h-32 bg-white p-2 dark:bg-[#191c23]"
             >
               <div
                 className={`mb-1.5 text-sm font-medium ${
@@ -190,7 +190,7 @@ export default async function CalendarPage({
                     title="Zadatak s rokom"
                     className={`truncate rounded px-1 py-0.5 text-xs ${
                       t.status === "done"
-                        ? "bg-zinc-100 text-zinc-500 line-through dark:bg-zinc-900"
+                        ? "bg-zinc-100 text-zinc-500 line-through dark:bg-[#20242c]"
                         : "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300"
                     }`}
                   >

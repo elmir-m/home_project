@@ -18,7 +18,7 @@ type Task = {
 const PRIORITY: Record<string, { label: string; cls: string }> = {
   low: {
     label: "Nizak",
-    cls: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300",
+    cls: "bg-zinc-100 text-zinc-600 dark:bg-[#2a2f39] dark:text-zinc-300",
   },
   medium: {
     label: "Srednji",
@@ -104,7 +104,7 @@ export default async function TasksPage({
     const overdue = !isDone && t.due_date && t.due_date < today;
     const assignee = nameOf(t.assignee_id);
     return (
-      <li className="group flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
+      <li className="group flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-[#20242c]">
         <form action={toggleTask}>
           <input type="hidden" name="id" value={t.id} />
           <input type="hidden" name="done" value={String(isDone)} />
@@ -189,7 +189,7 @@ export default async function TasksPage({
       </header>
 
       {/* Grupisanje */}
-      <div className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white p-1 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:w-fit">
+      <div className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white p-1 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c] sm:w-fit">
         {GROUPS.map((g) => {
           const active = group === g.key;
           return (
@@ -209,7 +209,7 @@ export default async function TasksPage({
       </div>
 
       {list.length === 0 && (
-        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-zinc-900/40">
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-[#20242c]/40">
           <ListChecks className="h-8 w-8 text-zinc-400" />
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Još nema zadataka. Klikni „Novi zadatak".

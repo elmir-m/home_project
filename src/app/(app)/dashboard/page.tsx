@@ -97,7 +97,7 @@ export default async function DashboardPage() {
     empty: boolean;
     children: React.ReactNode;
   }) => (
-    <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-5 dark:border-zinc-800 dark:bg-[#20242c]">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           {title}
@@ -197,7 +197,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Domaćinstvo */}
-      <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
             Domaćinstvo
@@ -217,7 +217,7 @@ export default async function DashboardPage() {
             {members.map((m, i) => (
               <span
                 key={i}
-                className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-[#2a2f39] dark:text-zinc-300"
               >
                 {m.profiles?.display_name ?? m.profiles?.email} · {m.role}
               </span>
@@ -231,7 +231,7 @@ export default async function DashboardPage() {
       </section>
 
       {/* Nedavna aktivnost */}
-      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Nedavna aktivnost
         </h2>

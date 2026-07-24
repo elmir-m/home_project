@@ -68,7 +68,7 @@ export default async function RemindersPage() {
       className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm ${
         overdue
           ? "border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/40"
-          : "border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900"
+          : "border-zinc-200 dark:border-zinc-800 dark:bg-[#20242c]"
       }`}
     >
       <form action={completeReminder}>
@@ -107,20 +107,20 @@ export default async function RemindersPage() {
 
       <form
         action={createReminder}
-        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
+        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
       >
         <input
           name="title"
           required
           placeholder="Na šta te podsjetiti?"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <div className="flex flex-wrap gap-3">
           <RemindAtField defaultValue={defStr} />
           <select
             name="recurrence"
             defaultValue="none"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           >
             <option value="none">Jednokratno</option>
             <option value="daily">Dnevno</option>
@@ -131,7 +131,7 @@ export default async function RemindersPage() {
           <select
             name="target_user_id"
             defaultValue=""
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           >
             <option value="">Cijelo domaćinstvo</option>
             {members.map((m) => (

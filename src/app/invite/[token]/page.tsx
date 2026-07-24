@@ -26,8 +26,8 @@ export default async function InvitePage({
     (inv?.households as unknown as { name: string } | null)?.name ?? null;
 
   const Shell = ({ children }: { children: React.ReactNode }) => (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-black">
-      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white shadow-sm bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:bg-zinc-900">
+    <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-[#191c23]">
+      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white shadow-sm bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-[#20242c] dark:bg-[#20242c]">
         {children}
       </div>
     </main>

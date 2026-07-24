@@ -15,7 +15,7 @@ export default function RemindAtField({ defaultValue }: { defaultValue: string }
         required
         defaultValue={defaultValue}
         onChange={(e) => setIso(toIso(e.target.value))}
-        className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+        className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
       />
       <input type="hidden" name="remind_at" value={iso} />
     </>

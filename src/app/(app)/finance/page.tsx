@@ -88,15 +88,15 @@ export default async function FinancePage() {
 
       {/* Sažetak */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Prihodi (mjesec)</p>
           <p className="mt-1 text-lg font-semibold text-green-600">{money(income)}</p>
         </div>
-        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Troškovi (mjesec)</p>
           <p className="mt-1 text-lg font-semibold text-red-600">{money(expenses)}</p>
         </div>
-        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Neto</p>
           <p
             className={`mt-1 text-lg font-semibold ${
@@ -110,7 +110,7 @@ export default async function FinancePage() {
 
       {/* Ko je platio / ko duguje */}
       {members.length > 1 && expenses > 0 && (
-        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 text-sm dark:border-zinc-800 dark:bg-[#20242c]">
           <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
             Ko je platio · pravedan udio {money(fairShare)}
           </p>
@@ -139,12 +139,12 @@ export default async function FinancePage() {
       {/* Dodaj transakciju */}
       <form
         action={createTransaction}
-        className="flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
+        className="flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
       >
         <select
           name="kind"
           defaultValue="expense"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         >
           <option value="expense">Trošak</option>
           <option value="income">Prihod</option>
@@ -156,28 +156,28 @@ export default async function FinancePage() {
           min="0"
           required
           placeholder="Iznos"
-          className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <input
           name="category"
           placeholder="Kategorija"
-          className="w-32 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="w-32 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <input
           name="description"
           placeholder="Opis"
-          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <input
           name="occurred_on"
           type="date"
           defaultValue={today}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <select
           name="paid_by"
           defaultValue={user.id}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         >
           {members.map((m) => (
             <option key={m.user_id} value={m.user_id}>
@@ -204,7 +204,7 @@ export default async function FinancePage() {
           {txList.map((t) => (
             <li
               key={t.id}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-[#20242c]"
             >
               <span
                 className={`font-semibold ${
@@ -218,7 +218,7 @@ export default async function FinancePage() {
                 {t.description || t.category || "—"}
               </span>
               {t.category && (
-                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-zinc-800">
+                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-[#2a2f39]">
                   {t.category}
                 </span>
               )}
@@ -241,13 +241,13 @@ export default async function FinancePage() {
         </h2>
         <form
           action={createBill}
-          className="mb-3 flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
+          className="mb-3 flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
         >
           <input
             name="name"
             required
             placeholder="Naziv (npr. Struja)"
-            className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           />
           <input
             name="amount"
@@ -256,19 +256,19 @@ export default async function FinancePage() {
             min="0"
             required
             placeholder="Iznos"
-            className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           />
           <input
             name="due_date"
             type="date"
             required
             defaultValue={today}
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           />
           <select
             name="recurrence"
             defaultValue="monthly"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           >
             <option value="monthly">Mjesečno</option>
             <option value="yearly">Godišnje</option>
@@ -288,13 +288,13 @@ export default async function FinancePage() {
             return (
               <li
                 key={b.id}
-                className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+                className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-[#20242c]"
               >
                 <span className="font-medium text-black dark:text-zinc-50">
                   {b.name}
                 </span>
                 <span className="text-zinc-500">{money(Number(b.amount))}</span>
-                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-zinc-800">
+                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-[#2a2f39]">
                   {b.recurrence === "monthly"
                     ? "mjesečno"
                     : b.recurrence === "yearly"

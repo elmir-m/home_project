@@ -3,9 +3,13 @@
 import { randomUUID } from "crypto";
 import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentHousehold } from "@/lib/household";
 import { sendEmail, basicEmail } from "@/lib/email";
+
+const enc = (s: string) => encodeURIComponent(s);
 
 async function baseUrl() {
   const h = await headers();
@@ -14,21 +18,57 @@ async function baseUrl() {
   return `${proto}://${host}`;
 }
 
-export async function inviteMember(formData: FormData) {
+// Konktekst + provjera da je trenutni korisnik vlasnik aktivnog domaćinstva.
+async function ownerCtx() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  const { household, members } = await getCurrentHousehold();
+  const isOwner =
+    !!user && members.find((m) => m.user_id === user.id)?.role === "owner";
+  return { supabase, user, household, isOwner };
+}
 
-  const { household } = await getCurrentHousehold();
-  if (!household) return;
+export async function inviteMember(formData: FormData) {
+  const { user, household, isOwner } = await ownerCtx();
+  if (!user || !household) return;
+  if (!isOwner)
+    redirect("/members?error=" + enc("Samo vlasnik može pozivati članove."));
 
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!email) return;
 
+  // Poziv je moguć samo za osobu koja VEĆ ima nalog u aplikaciji.
+  const admin = createAdminClient();
+  const { data: prof } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (!prof) {
+    redirect(
+      "/members?error=" +
+        enc(
+          "Taj email nije registrovan u aplikaciji. Koristi „Kreiraj člana" +
+            "“ ili neka se osoba prvo sama registruje.",
+        ),
+    );
+  }
+
+  const { data: already } = await admin
+    .from("household_members")
+    .select("user_id")
+    .eq("household_id", household.id)
+    .eq("user_id", prof!.id)
+    .maybeSingle();
+  if (already) {
+    redirect("/members?error=" + enc("Ta osoba je već član domaćinstva."));
+  }
+
   const token = randomUUID();
-  await supabase.from("invitations").insert({
+  await admin.from("invitations").insert({
     household_id: household.id,
     email,
     token,
@@ -38,7 +78,7 @@ export async function inviteMember(formData: FormData) {
   const link = `${await baseUrl()}/invite/${token}`;
   await sendEmail({
     to: email,
-    subject: `Pozvani ste u domaćinstvo "${household.name}" — Home OS`,
+    subject: `Pozvani ste u domaćinstvo "${household.name}" — Moj dom`,
     html: basicEmail(
       "Pozivnica u domaćinstvo",
       `Pozvani ste da se pridružite domaćinstvu <b>${household.name}</b>.<br/><br/>
@@ -47,7 +87,50 @@ export async function inviteMember(formData: FormData) {
     ),
   });
 
+  redirect("/members?invited=1");
+}
+
+// Vlasnik pravi nalog za novog člana (npr. dijete) i dodaje ga u domaćinstvo.
+export async function createMember(formData: FormData) {
+  const { household, isOwner } = await ownerCtx();
+  if (!household) return;
+  if (!isOwner)
+    redirect("/members?error=" + enc("Samo vlasnik može kreirati članove."));
+
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  const fullName = String(formData.get("full_name") ?? "").trim();
+
+  if (!email || password.length < 6) {
+    redirect(
+      "/members?error=" + enc("Email i lozinka (najmanje 6 znakova) su obavezni."),
+    );
+  }
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { full_name: fullName },
+  });
+
+  if (error || !data.user) {
+    const m = (error?.message ?? "").toLowerCase();
+    const msg = m.includes("already")
+      ? "Korisnik s tim emailom već postoji."
+      : "Nije moguće kreirati člana. Pokušaj ponovo ili kontaktiraj administratora.";
+    redirect("/members?error=" + enc(msg));
+  }
+
+  await admin.from("household_members").upsert(
+    { household_id: household.id, user_id: data!.user.id, role: "member" },
+    { onConflict: "household_id,user_id" },
+  );
+
   revalidatePath("/members");
+  revalidatePath("/", "layout");
+  redirect("/members?created=" + enc(email));
 }
 
 export async function revokeInvite(formData: FormData) {
