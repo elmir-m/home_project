@@ -27,13 +27,15 @@ export default async function TopBar() {
 
   return (
     <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-zinc-200 bg-[var(--background)]/80 px-4 py-3 backdrop-blur sm:px-6 dark:border-zinc-800">
-      <form action="/search" className="relative flex-1">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-        <input
-          name="q"
-          placeholder="Traži kroz sve…"
-          className="w-full max-w-md rounded-lg border border-zinc-200 bg-white py-2 pl-9 pr-3 text-sm text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
+      <form action="/search" className="flex-1">
+        <div className="flex w-full max-w-md items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39]">
+          <Search className="h-4 w-4 shrink-0 text-zinc-400" />
+          <input
+            name="q"
+            placeholder="Traži kroz sve…"
+            className="w-full border-0 bg-transparent py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-50"
+          />
+        </div>
       </form>
 
       {/* Identitet prijavljenog korisnika (klik → profil) */}
