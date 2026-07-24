@@ -14,6 +14,7 @@ const LINKS = [
   { href: "/reminders", label: "Podsjetnici", icon: "🔔" },
   { href: "/life", label: "Life admin", icon: "🗂️" },
   { href: "/apps", label: "Aplikacije", icon: "🧩" },
+  { href: "/settings", label: "Postavke", icon: "⚙️" },
 ];
 
 export default function Sidebar() {

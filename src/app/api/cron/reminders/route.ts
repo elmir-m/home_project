@@ -75,25 +75,41 @@ export async function GET(req: NextRequest) {
 
   for (const r of due) {
     // Odredi primaoce (ciljani član ili cijelo domaćinstvo).
-    let emails: string[] = [];
+    let recipients: { id: string; email: string }[] = [];
     if (r.target_user_id) {
       const { data: p } = await supabase
         .from("profiles")
-        .select("email")
+        .select("id, email")
         .eq("id", r.target_user_id)
         .single();
-      if (p?.email) emails = [p.email];
+      if (p?.email) recipients = [{ id: p.id, email: p.email }];
     } else {
       const { data: m } = await supabase
         .from("household_members")
-        .select("profiles(email)")
+        .select("user_id, profiles(email)")
         .eq("household_id", r.household_id);
-      const rows =
-        (m as unknown as { profiles: { email: string | null } | null }[]) ?? [];
-      emails = rows
-        .map((x) => x.profiles?.email)
-        .filter((e): e is string => !!e);
+      recipients = (
+        (m as unknown as {
+          user_id: string;
+          profiles: { email: string | null } | null;
+        }[]) ?? []
+      )
+        .filter((x) => x.profiles?.email)
+        .map((x) => ({ id: x.user_id, email: x.profiles!.email! }));
     }
+
+    // Poštuj postavku "email_reminders" svakog primaoca (default: uključeno).
+    const ids = recipients.map((rc) => rc.id);
+    const { data: prefs } = await supabase
+      .from("notification_prefs")
+      .select("user_id, email_reminders")
+      .in("user_id", ids);
+    const prefMap = new Map(
+      (prefs ?? []).map((p) => [p.user_id, p.email_reminders]),
+    );
+    const emails = recipients
+      .filter((rc) => prefMap.get(rc.id) !== false)
+      .map((rc) => rc.email);
 
     if (emails.length > 0) {
       const res = await sendEmail({
