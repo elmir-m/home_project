@@ -86,7 +86,7 @@ export default async function CalendarPage({
   ];
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
           {MONTHS[month]} {year}
@@ -153,14 +153,14 @@ export default async function CalendarPage({
         ))}
         {cells.map((day, i) => {
           if (day === null)
-            return <div key={i} className="min-h-24 bg-white dark:bg-black" />;
+            return <div key={i} className="min-h-32 bg-white dark:bg-black" />;
           const key = ymd(year, month, day);
           const cell = byDay[key];
           const isToday = key === todayStr;
           return (
             <div
               key={i}
-              className="min-h-24 bg-white p-1.5 dark:bg-black"
+              className="min-h-32 bg-white p-2 dark:bg-black"
             >
               <div
                 className={`mb-1 text-xs ${
