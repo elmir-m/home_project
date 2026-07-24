@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
+import { StickyNote } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentHousehold } from "@/lib/household";
-import { createNote, deleteNote } from "./actions";
+import { deleteNote } from "./actions";
+import NoteForm from "./note-form";
 
 type Note = {
   id: string;
@@ -23,8 +24,6 @@ export default async function NotesPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-
-  const { household } = await getCurrentHousehold();
 
   const [{ data: notes }, { data: tasks }, { data: events }, { data: links }] =
     await Promise.all([
@@ -57,99 +56,54 @@ export default async function NotesPage() {
     linksByNote.set(l.source_id, arr);
   });
 
+  const taskOpts = (tasks ?? []).map((t) => ({ id: t.id, title: t.title }));
+  const eventOpts = (events ?? []).map((e) => ({ id: e.id, title: e.title }));
+
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
-      <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-        Bilješke
-      </h1>
-
-      <form
-        action={createNote}
-        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
-      >
-        <input
-          name="title"
-          placeholder="Naslov (opciono)"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <textarea
-          name="body"
-          rows={3}
-          placeholder="Sadržaj…"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <input
-          name="tags"
-          placeholder="Tagovi, odvojeni zarezom (npr. kuća, hitno)"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <div className="flex flex-wrap gap-3">
-          <select
-            name="kind"
-            defaultValue="note"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-          >
-            <option value="note">Bilješka</option>
-            <option value="journal">Dnevnik</option>
-          </select>
-          <select
-            name="link"
-            defaultValue=""
-            className="min-w-40 flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-          >
-            <option value="">Poveži sa… (opciono)</option>
-            {(tasks ?? []).length > 0 && (
-              <optgroup label="Zadaci">
-                {(tasks ?? []).map((t) => (
-                  <option key={t.id} value={`task:${t.id}`}>
-                    {t.title}
-                  </option>
-                ))}
-              </optgroup>
-            )}
-            {(events ?? []).length > 0 && (
-              <optgroup label="Događaji">
-                {(events ?? []).map((e) => (
-                  <option key={e.id} value={`event:${e.id}`}>
-                    {e.title}
-                  </option>
-                ))}
-              </optgroup>
-            )}
-          </select>
-          <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
-            Sačuvaj
-          </button>
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-8">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+            Bilješke
+          </h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            {noteList.length} bilješki
+          </p>
         </div>
-      </form>
+        <NoteForm tasks={taskOpts} events={eventOpts} />
+      </header>
 
-      <ul className="flex flex-col gap-3">
-        {noteList.length === 0 && (
-          <li className="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Nema bilješki. (Ako ostane prazno, pokreni migraciju 0004.)
-          </li>
-        )}
+      {noteList.length === 0 && (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-[#20242c]/40">
+          <StickyNote className="h-8 w-8 text-zinc-400" />
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Još nema bilješki. Klikni „Nova bilješka".
+          </p>
+        </div>
+      )}
+
+      <ul className="grid gap-3 sm:grid-cols-2">
         {noteList.map((n) => {
           const noteLinks = linksByNote.get(n.id) ?? [];
           return (
             <li
               key={n.id}
-              className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
+              className="group rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-[#20242c]"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
                   {n.kind === "journal" && (
-                    <span className="mr-2 rounded bg-purple-100 px-1.5 py-0.5 text-[11px] text-purple-700 dark:bg-purple-950 dark:text-purple-300">
+                    <span className="mb-1 mr-2 inline-block rounded bg-purple-100 px-1.5 py-0.5 text-[11px] font-medium text-purple-700 dark:bg-purple-950 dark:text-purple-300">
                       dnevnik
                     </span>
                   )}
                   {n.title && (
-                    <span className="font-semibold text-black dark:text-zinc-50">
+                    <p className="font-semibold text-zinc-900 dark:text-zinc-50">
                       {n.title}
-                    </span>
+                    </p>
                   )}
                   {n.body && (
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-600 dark:text-zinc-500">
+                    <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-600 dark:text-zinc-300">
                       {n.body}
                     </p>
                   )}
@@ -172,15 +126,18 @@ export default async function NotesPage() {
                     ))}
                   </div>
                 </div>
-                <form action={deleteNote}>
-                  <input type="hidden" name="id" value={n.id} />
-                  <button
-                    title="Obriši"
-                    className="text-zinc-300 hover:text-red-600"
-                  >
-                    ✕
-                  </button>
-                </form>
+                <div className="flex shrink-0 items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                  <NoteForm note={n} />
+                  <form action={deleteNote}>
+                    <input type="hidden" name="id" value={n.id} />
+                    <button
+                      title="Obriši"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40"
+                    >
+                      ✕
+                    </button>
+                  </form>
+                </div>
               </div>
             </li>
           );

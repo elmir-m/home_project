@@ -53,6 +53,29 @@ export async function createNote(formData: FormData) {
   revalidatePath("/notes");
 }
 
+export async function editNote(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id"));
+  if (!id) return;
+
+  const tags = String(formData.get("tags") ?? "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+
+  await supabase
+    .from("notes")
+    .update({
+      kind: String(formData.get("kind") ?? "note"),
+      title: String(formData.get("title") ?? "").trim() || null,
+      body: String(formData.get("body") ?? "").trim() || null,
+      tags,
+    })
+    .eq("id", id);
+
+  revalidatePath("/notes");
+}
+
 export async function deleteNote(formData: FormData) {
   const supabase = await createClient();
   const id = String(formData.get("id"));
