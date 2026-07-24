@@ -100,12 +100,12 @@ export default async function DashboardPage() {
     empty: boolean;
     children: React.ReactNode;
   }) => (
-    <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+    <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           {title}
         </h2>
-        <Link href={href} className="text-xs text-zinc-500 hover:text-zinc-600">
+        <Link href={href} className="text-xs text-zinc-500 hover:text-indigo-600">
           otvori →
         </Link>
       </div>
@@ -202,12 +202,12 @@ export default async function DashboardPage() {
       {/* Domaćinstvo */}
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
             Domaćinstvo
           </h2>
           <Link
             href="/members"
-            className="text-xs text-zinc-500 hover:text-zinc-600"
+            className="text-xs text-zinc-500 hover:text-indigo-600"
           >
             članovi / pozovi →
           </Link>

@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   Blocks,
   Settings,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +27,7 @@ const ICONS: Record<string, LucideIcon> = {
   shopping: ShoppingCart,
   apps: Blocks,
   settings: Settings,
+  members: Users,
 };
 
 export function AppIcon({

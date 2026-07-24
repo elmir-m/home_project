@@ -6,19 +6,35 @@ import { Home } from "lucide-react";
 import { BUILTIN_APPS } from "@/lib/apps";
 import { AppIcon } from "@/components/app-icon";
 
+type Item = { href: string; label: string; slug: string };
+
 export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
   const pathname = usePathname();
 
-  // Navigacija se izvodi iz manifesta; deinstalirane aplikacije se izostave.
-  const links = [
-    { href: "/dashboard", label: "Danas", slug: "dashboard" },
-    ...BUILTIN_APPS.filter((a) => !hidden.includes(a.slug)).map((a) => ({
-      href: a.href,
-      label: a.name,
-      slug: a.slug,
-    })),
-    { href: "/apps", label: "Aplikacije", slug: "apps" },
-    { href: "/settings", label: "Postavke", slug: "settings" },
+  // Meni grupisan: aplikacije / administracija / postavke.
+  const groups: { label: string | null; items: Item[] }[] = [
+    {
+      label: null,
+      items: [
+        { href: "/dashboard", label: "Danas", slug: "dashboard" },
+        ...BUILTIN_APPS.filter((a) => !hidden.includes(a.slug)).map((a) => ({
+          href: a.href,
+          label: a.name,
+          slug: a.slug,
+        })),
+      ],
+    },
+    {
+      label: "Administracija",
+      items: [
+        { href: "/members", label: "Članovi", slug: "members" },
+        { href: "/apps", label: "Aplikacije", slug: "apps" },
+      ],
+    },
+    {
+      label: "Postavke",
+      items: [{ href: "/settings", label: "Postavke", slug: "settings" }],
+    },
   ];
 
   return (
@@ -35,25 +51,41 @@ export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
         </span>
       </Link>
 
-      <nav className="flex flex-1 flex-col gap-0.5">
-        {links.map((l) => {
-          const active = pathname === l.href;
-          return (
-            <Link
-              key={l.href}
-              href={l.href}
-              title={l.label}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                active
-                  ? "bg-indigo-600 font-medium text-white"
-                  : "text-zinc-400 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              <AppIcon slug={l.slug} className="h-[18px] w-[18px] shrink-0" />
-              <span className="hidden md:inline">{l.label}</span>
-            </Link>
-          );
-        })}
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
+        {groups.map((group, gi) => (
+          <div key={gi} className={gi > 0 ? "mt-4" : ""}>
+            {group.label ? (
+              <p className="mb-1 hidden px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 md:block">
+                {group.label}
+              </p>
+            ) : (
+              gi > 0 && <div className="mx-3 mb-3 h-px bg-white/10" />
+            )}
+            <div className="flex flex-col gap-0.5">
+              {group.items.map((l) => {
+                const active = pathname === l.href;
+                return (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    title={l.label}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                      active
+                        ? "bg-indigo-600 font-medium text-white"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    <AppIcon
+                      slug={l.slug}
+                      className="h-[18px] w-[18px] shrink-0"
+                    />
+                    <span className="hidden md:inline">{l.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
     </aside>
   );
