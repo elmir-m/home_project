@@ -146,7 +146,7 @@ export default async function CalendarPage({
         {WEEKDAYS.map((w) => (
           <div
             key={w}
-            className="bg-zinc-50 py-2 text-center text-xs font-semibold text-zinc-500 dark:bg-zinc-900"
+            className="bg-zinc-50 py-2.5 text-center text-sm font-semibold text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300"
           >
             {w}
           </div>
@@ -163,10 +163,10 @@ export default async function CalendarPage({
               className="min-h-32 bg-white p-2 dark:bg-black"
             >
               <div
-                className={`mb-1 text-xs ${
+                className={`mb-1.5 text-sm font-medium ${
                   isToday
-                    ? "inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 font-bold text-white dark:bg-indigo-500 dark:text-white"
-                    : "text-zinc-500"
+                    ? "inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 font-bold text-white dark:bg-indigo-500"
+                    : "text-zinc-600 dark:text-zinc-300"
                 }`}
               >
                 {day}
@@ -177,7 +177,7 @@ export default async function CalendarPage({
                     <input type="hidden" name="id" value={e.id} />
                     <button
                       title="Klik za brisanje"
-                      className="w-full truncate rounded bg-blue-100 px-1 py-0.5 text-left text-[11px] text-blue-800 hover:line-through dark:bg-blue-950 dark:text-blue-300"
+                      className="w-full truncate rounded bg-blue-100 px-1 py-0.5 text-left text-xs text-blue-800 hover:line-through dark:bg-blue-950 dark:text-blue-300"
                     >
                       {e.start_time ? e.start_time.slice(0, 5) + " " : ""}
                       {e.title}
@@ -188,7 +188,7 @@ export default async function CalendarPage({
                   <div
                     key={t.id}
                     title="Zadatak s rokom"
-                    className={`truncate rounded px-1 py-0.5 text-[11px] ${
+                    className={`truncate rounded px-1 py-0.5 text-xs ${
                       t.status === "done"
                         ? "bg-zinc-100 text-zinc-500 line-through dark:bg-zinc-900"
                         : "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300"
@@ -201,7 +201,7 @@ export default async function CalendarPage({
                   <div
                     key={b.id}
                     title="Račun dospijeva"
-                    className="truncate rounded bg-orange-100 px-1 py-0.5 text-[11px] text-orange-800 dark:bg-orange-950 dark:text-orange-300"
+                    className="truncate rounded bg-orange-100 px-1 py-0.5 text-xs text-orange-800 dark:bg-orange-950 dark:text-orange-300"
                   >
                     💳 {b.name}
                   </div>
