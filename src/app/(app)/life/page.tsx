@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
-  createRecord,
   deleteRecord,
-  createContact,
   deleteContact,
   createList,
   deleteList,
@@ -11,6 +9,7 @@ import {
   toggleListItem,
   deleteListItem,
 } from "./actions";
+import { RecordForm, ContactForm } from "./life-forms";
 
 type Rec = {
   id: string;
@@ -70,38 +69,30 @@ export default async function LifePage() {
 
       {/* EVIDENCIJA */}
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Evidencija (dokumenti, garancije, obnove)
-        </h2>
-        <form
-          action={createRecord}
-          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
-        >
-          <input name="title" required placeholder="Naziv" className={`flex-1 ${input}`} />
-          <select name="category" defaultValue="document" className={input}>
-            <option value="document">Dokument</option>
-            <option value="warranty">Garancija</option>
-            <option value="renewal">Obnova</option>
-            <option value="other">Ostalo</option>
-          </select>
-          <input type="date" name="expiry_date" className={input} title="Rok isteka" />
-          <input name="notes" placeholder="Bilješka" className={`flex-1 ${input}`} />
-          <button className={btn}>Dodaj</button>
-        </form>
-        <ul className="flex flex-col gap-1">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Evidencija (dokumenti, garancije, obnove)
+          </h2>
+          <RecordForm />
+        </div>
+        <ul className="flex flex-col gap-1.5">
           {recList.map((r) => {
             const soon = r.expiry_date && r.expiry_date >= today;
             const expired = r.expiry_date && r.expiry_date < today;
             return (
               <li
                 key={r.id}
-                className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-[#20242c]"
+                className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
               >
                 <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-[#2a2f39]">
                   {CAT_LABEL[r.category]}
                 </span>
-                <span className="text-black dark:text-zinc-50">{r.title}</span>
-                {r.notes && <span className="text-xs text-zinc-500 dark:text-zinc-400">{r.notes}</span>}
+                <span className="text-zinc-900 dark:text-zinc-50">{r.title}</span>
+                {r.notes && (
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {r.notes}
+                  </span>
+                )}
                 {r.expiry_date && (
                   <span
                     className={`ml-auto text-xs ${
@@ -109,65 +100,77 @@ export default async function LifePage() {
                         ? "font-medium text-red-600"
                         : soon
                           ? "text-amber-600"
-                          : "text-zinc-500"
+                          : "text-zinc-500 dark:text-zinc-400"
                     }`}
                   >
                     {expired ? "isteklo " : "ističe "}
                     {r.expiry_date}
                   </span>
                 )}
-                <form action={deleteRecord} className={r.expiry_date ? "" : "ml-auto"}>
-                  <input type="hidden" name="id" value={r.id} />
-                  <button className="text-zinc-300 hover:text-red-600">✕</button>
-                </form>
+                <div
+                  className={`flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100 ${
+                    r.expiry_date ? "" : "ml-auto"
+                  }`}
+                >
+                  <RecordForm record={r} />
+                  <form action={deleteRecord}>
+                    <input type="hidden" name="id" value={r.id} />
+                    <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                      ✕
+                    </button>
+                  </form>
+                </div>
               </li>
             );
           })}
           {recList.length === 0 && (
             <li className="py-3 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              Nema zapisa. (Ako ostane prazno, pokreni migraciju 0008.)
+              Nema zapisa. Klikni „Novi zapis".
             </li>
           )}
         </ul>
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-          Ako uneseš rok isteka, automatski se pravi podsjetnik 7 dana ranije.
-        </p>
       </section>
 
       {/* KONTAKTI */}
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Važni kontakti
-        </h2>
-        <form
-          action={createContact}
-          className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
-        >
-          <input name="name" required placeholder="Ime" className={input} />
-          <input name="role" placeholder="Uloga (npr. vodoinstalater)" className={`flex-1 ${input}`} />
-          <input name="phone" placeholder="Telefon" className={input} />
-          <input name="email" placeholder="Email" className={input} />
-          <button className={btn}>Dodaj</button>
-        </form>
-        <ul className="flex flex-col gap-1">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Važni kontakti
+          </h2>
+          <ContactForm />
+        </div>
+        <ul className="flex flex-col gap-1.5">
           {contactList.map((c) => (
             <li
               key={c.id}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-[#20242c]"
+              className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
             >
-              <span className="font-medium text-black dark:text-zinc-50">{c.name}</span>
-              {c.role && <span className="text-xs text-zinc-500 dark:text-zinc-400">{c.role}</span>}
+              <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                {c.name}
+              </span>
+              {c.role && (
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {c.role}
+                </span>
+              )}
               <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
                 {[c.phone, c.email].filter(Boolean).join(" · ")}
               </span>
-              <form action={deleteContact}>
-                <input type="hidden" name="id" value={c.id} />
-                <button className="text-zinc-300 hover:text-red-600">✕</button>
-              </form>
+              <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                <ContactForm contact={c} />
+                <form action={deleteContact}>
+                  <input type="hidden" name="id" value={c.id} />
+                  <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                    ✕
+                  </button>
+                </form>
+              </div>
             </li>
           ))}
           {contactList.length === 0 && (
-            <li className="py-3 text-center text-sm text-zinc-500 dark:text-zinc-400">Nema kontakata.</li>
+            <li className="py-3 text-center text-sm text-zinc-500 dark:text-zinc-400">
+              Nema kontakata.
+            </li>
           )}
         </ul>
       </section>

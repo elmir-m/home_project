@@ -52,6 +52,23 @@ export async function createRecord(formData: FormData) {
   revalidatePath("/life");
 }
 
+export async function editRecord(formData: FormData) {
+  const { supabase } = await ctx();
+  const id = String(formData.get("id"));
+  const title = String(formData.get("title") ?? "").trim();
+  if (!id || !title) return;
+  await supabase
+    .from("records")
+    .update({
+      title,
+      category: String(formData.get("category") ?? "document"),
+      expiry_date: String(formData.get("expiry_date") ?? "") || null,
+      notes: String(formData.get("notes") ?? "").trim() || null,
+    })
+    .eq("id", id);
+  revalidatePath("/life");
+}
+
 export async function deleteRecord(formData: FormData) {
   const { supabase } = await ctx();
   await supabase.from("records").delete().eq("id", String(formData.get("id")));
@@ -71,6 +88,23 @@ export async function createContact(formData: FormData) {
     email: String(formData.get("email") ?? "").trim() || null,
     created_by: user.id,
   });
+  revalidatePath("/life");
+}
+
+export async function editContact(formData: FormData) {
+  const { supabase } = await ctx();
+  const id = String(formData.get("id"));
+  const name = String(formData.get("name") ?? "").trim();
+  if (!id || !name) return;
+  await supabase
+    .from("contacts")
+    .update({
+      name,
+      role: String(formData.get("role") ?? "").trim() || null,
+      phone: String(formData.get("phone") ?? "").trim() || null,
+      email: String(formData.get("email") ?? "").trim() || null,
+    })
+    .eq("id", id);
   revalidatePath("/life");
 }
 
