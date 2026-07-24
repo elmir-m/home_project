@@ -59,6 +59,5 @@ export async function toggleApp(formData: FormData) {
     },
     { onConflict: "household_id,slug" },
   );
-  revalidatePath("/apps");
-  revalidatePath("/dashboard");
+  revalidatePath("/", "layout");
 }

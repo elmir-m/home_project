@@ -16,10 +16,18 @@ export default async function AppLayout({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Deinstalirane aplikacije (enabled=false) se ne prikazuju u meniju.
+  const { data: installs } = await supabase
+    .from("app_installs")
+    .select("slug, enabled");
+  const hidden = (installs ?? [])
+    .filter((i) => i.enabled === false)
+    .map((i) => i.slug);
+
   return (
     <div className="flex min-h-screen">
       <RealtimeRefresh />
-      <Sidebar />
+      <Sidebar hidden={hidden} />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar />
         <div className="flex-1">{children}</div>

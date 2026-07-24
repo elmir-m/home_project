@@ -5,16 +5,20 @@ import { usePathname } from "next/navigation";
 import { logout } from "@/app/login/actions";
 import { BUILTIN_APPS } from "@/lib/apps";
 
-// Navigacija se izvodi iz manifesta aplikacija — nova app se pojavi automatski.
-const LINKS = [
-  { href: "/dashboard", label: "Danas", icon: "🏠" },
-  ...BUILTIN_APPS.map((a) => ({ href: a.href, label: a.name, icon: a.icon })),
-  { href: "/apps", label: "Aplikacije", icon: "🧩" },
-  { href: "/settings", label: "Postavke", icon: "⚙️" },
-];
-
-export default function Sidebar() {
+export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
   const pathname = usePathname();
+
+  // Navigacija se izvodi iz manifesta; deinstalirane aplikacije se izostave.
+  const LINKS = [
+    { href: "/dashboard", label: "Danas", icon: "🏠" },
+    ...BUILTIN_APPS.filter((a) => !hidden.includes(a.slug)).map((a) => ({
+      href: a.href,
+      label: a.name,
+      icon: a.icon,
+    })),
+    { href: "/apps", label: "Aplikacije", icon: "🧩" },
+    { href: "/settings", label: "Postavke", icon: "⚙️" },
+  ];
 
   return (
     <aside className="sticky top-0 flex h-screen w-16 flex-col bg-[#151823] px-2 py-4 text-zinc-300 md:w-60 md:px-3">
