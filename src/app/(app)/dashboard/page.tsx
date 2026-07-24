@@ -1,23 +1,20 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { BUILTIN_APPS } from "@/lib/apps";
-import { AppIcon } from "@/components/app-icon";
-import { getHiddenSlugs } from "@/lib/visibility";
+import { eventLabel } from "@/lib/platform";
 
 type MemberRow = {
   role: string;
   profiles: { display_name: string | null; email: string | null } | null;
 };
+type ActEvent = {
+  id: string;
+  type: string;
+  payload: { title?: string };
+  created_at: string;
+};
 
 const pad = (n: number) => String(n).padStart(2, "0");
-
-// Pločice se izvode iz manifesta — nova aplikacija se pojavi automatski.
-const TILES = BUILTIN_APPS.map((a) => ({
-  href: a.href,
-  slug: a.slug,
-  name: a.name,
-}));
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -38,6 +35,7 @@ export default async function DashboardPage() {
     { data: todayEvents },
     { data: soonBills },
     { data: dueReminders },
+    { data: recentEvents },
   ] = await Promise.all([
     supabase.from("households").select("id, name").order("created_at").limit(1),
     supabase
@@ -63,10 +61,12 @@ export default async function DashboardPage() {
       .eq("status", "pending")
       .lte("remind_at", in24hISO)
       .order("remind_at", { ascending: true }),
+    supabase
+      .from("app_events")
+      .select("id, type, payload, created_at")
+      .order("created_at", { ascending: false })
+      .limit(6),
   ]);
-
-  const hidden = await getHiddenSlugs();
-  const visibleTiles = TILES.filter((t) => !hidden.includes(t.slug));
 
   const household = households?.[0] ?? null;
 
@@ -230,30 +230,34 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      {/* Moduli */}
-      <nav className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {visibleTiles.map((t) => (
-          <Link
-            key={t.href}
-            href={t.href}
-            className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 text-sm font-medium text-zinc-800 shadow-sm transition hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-indigo-700"
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-              <AppIcon slug={t.slug} className="h-[18px] w-[18px]" />
-            </span>
-            {t.name}
-          </Link>
-        ))}
-        <Link
-          href="/apps"
-          className="flex items-center gap-3 rounded-xl border border-dashed border-zinc-300 p-4 text-sm font-medium text-zinc-500 transition hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-700 dark:hover:border-indigo-700"
-        >
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-            <AppIcon slug="apps" className="h-[18px] w-[18px]" />
-          </span>
-          Aplikacije
-        </Link>
-      </nav>
+      {/* Nedavna aktivnost */}
+      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+          Nedavna aktivnost
+        </h2>
+        {((recentEvents as ActEvent[]) ?? []).length === 0 ? (
+          <p className="py-2 text-sm text-zinc-500 dark:text-zinc-400">
+            Još nema aktivnosti. Kad neko doda zadatak, račun ili bilješku,
+            pojaviće se ovdje.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-1.5 text-sm">
+            {((recentEvents as ActEvent[]) ?? []).map((e) => (
+              <li key={e.id} className="flex items-center justify-between gap-2">
+                <span className="text-zinc-800 dark:text-zinc-100">
+                  <span className="text-zinc-500 dark:text-zinc-400">
+                    {eventLabel(e.type)}:
+                  </span>{" "}
+                  {e.payload?.title ?? ""}
+                </span>
+                <span className="shrink-0 text-xs text-zinc-400">
+                  {new Date(e.created_at).toLocaleString("bs-BA")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </main>
   );
 }

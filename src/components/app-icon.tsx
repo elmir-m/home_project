@@ -11,6 +11,7 @@ import {
   Blocks,
   Settings,
   Users,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -28,6 +29,7 @@ const ICONS: Record<string, LucideIcon> = {
   apps: Blocks,
   settings: Settings,
   members: Users,
+  automations: Zap,
 };
 
 export function AppIcon({

@@ -29,6 +29,7 @@ export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
       items: [
         { href: "/members", label: "Članovi", slug: "members" },
         { href: "/apps", label: "Aplikacije", slug: "apps" },
+        { href: "/automations", label: "Automatizacije", slug: "automations" },
       ],
     },
     {
