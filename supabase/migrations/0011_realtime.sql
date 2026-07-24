@@ -13,7 +13,11 @@ declare
   ];
 begin
   foreach t in array tables loop
-    if not exists (
+    -- preskoči tabele koje ne postoje (npr. ako neka migracija nije pokrenuta)
+    if exists (
+      select 1 from information_schema.tables
+      where table_schema = 'public' and table_name = t
+    ) and not exists (
       select 1 from pg_publication_tables
       where pubname = 'supabase_realtime'
         and schemaname = 'public'
