@@ -2,8 +2,28 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyAuthError } from "@/lib/auth-errors";
+
+export async function forgotPassword(formData: FormData) {
+  const supabase = await createClient();
+  const email = String(formData.get("email") ?? "").trim();
+
+  const h = await headers();
+  const host = h.get("host") ?? "localhost:3000";
+  const origin = `${host.includes("localhost") ? "http" : "https"}://${host}`;
+
+  try {
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/auth/reset`,
+    });
+  } catch {
+    // Ne otkrivamo da li email postoji — uvijek ista poruka.
+  }
+
+  redirect("/forgot?sent=1");
+}
 
 export async function login(formData: FormData) {
   const supabase = await createClient();

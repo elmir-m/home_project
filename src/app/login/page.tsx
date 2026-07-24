@@ -76,6 +76,15 @@ export default async function LoginPage({
               </div>
             </label>
 
+            <div className="-mt-1 text-right">
+              <Link
+                href="/forgot"
+                className="text-xs text-indigo-600 hover:underline dark:text-indigo-400"
+              >
+                Zaboravljena lozinka?
+              </Link>
+            </div>
+
             <SubmitButton
               formAction={login}
               className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
