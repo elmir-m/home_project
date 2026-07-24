@@ -44,6 +44,29 @@ export async function signup(formData: FormData) {
   );
 }
 
+export async function register(formData: FormData) {
+  const supabase = await createClient();
+
+  const fullName = String(formData.get("full_name") ?? "").trim();
+  const { data, error } = await supabase.auth.signUp({
+    email: String(formData.get("email")),
+    password: String(formData.get("password")),
+    options: { data: { full_name: fullName } },
+  });
+
+  if (error) {
+    redirect("/register?error=" + encodeURIComponent(error.message));
+  }
+
+  // Ako je potvrda emaila uključena -> nema sesije, prikaži poruku.
+  if (data.session) {
+    revalidatePath("/", "layout");
+    redirect("/dashboard");
+  }
+
+  redirect("/register?sent=1");
+}
+
 export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();

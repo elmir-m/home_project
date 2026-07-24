@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { Home, Mail, Lock } from "lucide-react";
-import { login, signup } from "./actions";
+import { login } from "./actions";
 import SubmitButton from "@/components/submit-button";
 
 export default async function LoginPage({
@@ -89,13 +90,12 @@ export default async function LoginPage({
               <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
             </div>
 
-            <SubmitButton
-              formAction={signup}
-              className="w-full rounded-lg border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800"
-              pendingText="Kreiram nalog…"
+            <Link
+              href="/register"
+              className="w-full rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-semibold text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800"
             >
-              Registruj se
-            </SubmitButton>
+              Napravi novi nalog
+            </Link>
           </form>
         </div>
 
