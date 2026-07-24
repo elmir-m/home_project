@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { BUILTIN_APPS } from "@/lib/apps";
 import { AppIcon } from "@/components/app-icon";
+import { getHiddenSlugs } from "@/lib/visibility";
 
 type MemberRow = {
   role: string;
@@ -37,7 +38,6 @@ export default async function DashboardPage() {
     { data: todayEvents },
     { data: soonBills },
     { data: dueReminders },
-    { data: installs },
   ] = await Promise.all([
     supabase.from("households").select("id, name").order("created_at").limit(1),
     supabase
@@ -63,13 +63,10 @@ export default async function DashboardPage() {
       .eq("status", "pending")
       .lte("remind_at", in24hISO)
       .order("remind_at", { ascending: true }),
-    supabase.from("app_installs").select("slug, enabled"),
   ]);
 
-  const installMap = new Map((installs ?? []).map((i) => [i.slug, i.enabled]));
-  const visibleTiles = TILES.filter(
-    (t) => installMap.get(t.href.slice(1)) !== false,
-  );
+  const hidden = await getHiddenSlugs();
+  const visibleTiles = TILES.filter((t) => !hidden.includes(t.slug));
 
   const household = households?.[0] ?? null;
 

@@ -7,7 +7,10 @@ import {
   revokeInvite,
   renameHousehold,
   setActiveHousehold,
+  setMemberAppHidden,
 } from "./actions";
+import { BUILTIN_APPS } from "@/lib/apps";
+import { AppIcon } from "@/components/app-icon";
 
 type Invitation = {
   id: string;
@@ -37,6 +40,16 @@ export default async function MembersPage() {
         .eq("status", "pending")
     : { data: [] };
   const pending = (invs as Invitation[]) ?? [];
+
+  // Dozvole po članu (vidi/mijenja samo vlasnik).
+  const myRole = members.find((m) => m.user_id === user.id)?.role;
+  const isOwner = myRole === "owner";
+  const { data: mah } = isOwner
+    ? await supabase.from("member_app_hidden").select("user_id, slug")
+    : { data: [] };
+  const hiddenSet = new Set(
+    (mah ?? []).map((r) => `${r.user_id}:${r.slug}`),
+  );
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
@@ -87,16 +100,62 @@ export default async function MembersPage() {
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Članovi ({members.length})
         </h2>
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col gap-2">
           {members.map((m) => (
             <li
               key={m.user_id}
-              className="flex items-center justify-between rounded-md bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900"
+              className="rounded-lg border border-zinc-100 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-800/40"
             >
-              <span className="text-black dark:text-zinc-50">
-                {m.profiles?.display_name ?? m.profiles?.email}
-              </span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">{m.role}</span>
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-black dark:text-zinc-50">
+                  {m.profiles?.display_name ?? m.profiles?.email}
+                </span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    m.role === "owner"
+                      ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+                      : "bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300"
+                  }`}
+                >
+                  {m.role === "owner" ? "vlasnik" : "član"}
+                </span>
+              </div>
+
+              {/* Vlasnik bira šta ovaj član vidi u meniju */}
+              {isOwner && m.role !== "owner" && (
+                <div className="mt-2.5">
+                  <p className="mb-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    Vidljive aplikacije (klikni za uključi/isključi):
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {BUILTIN_APPS.map((app) => {
+                      const isHidden = hiddenSet.has(`${m.user_id}:${app.slug}`);
+                      return (
+                        <form key={app.slug} action={setMemberAppHidden}>
+                          <input type="hidden" name="user_id" value={m.user_id} />
+                          <input type="hidden" name="slug" value={app.slug} />
+                          <input
+                            type="hidden"
+                            name="hide"
+                            value={String(!isHidden)}
+                          />
+                          <button
+                            title={isHidden ? "Uključi" : "Isključi"}
+                            className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition ${
+                              isHidden
+                                ? "border-zinc-200 text-zinc-400 line-through dark:border-zinc-700"
+                                : "border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/50 dark:text-indigo-300"
+                            }`}
+                          >
+                            <AppIcon slug={app.slug} className="h-3.5 w-3.5" />
+                            {app.name}
+                          </button>
+                        </form>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>

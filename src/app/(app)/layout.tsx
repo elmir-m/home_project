@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/sidebar";
 import TopBar from "@/components/top-bar";
 import RealtimeRefresh from "@/components/realtime-refresh";
+import { getHiddenSlugs } from "@/lib/visibility";
 
 // Layout za sve prijavljene stranice: sidebar + gornja traka + provjera sesije.
 export default async function AppLayout({
@@ -16,13 +17,8 @@ export default async function AppLayout({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Deinstalirane aplikacije (enabled=false) se ne prikazuju u meniju.
-  const { data: installs } = await supabase
-    .from("app_installs")
-    .select("slug, enabled");
-  const hidden = (installs ?? [])
-    .filter((i) => i.enabled === false)
-    .map((i) => i.slug);
+  // Skrivene aplikacije za ovog korisnika (household deinstalirane + individualno skrivene).
+  const hidden = await getHiddenSlugs();
 
   return (
     <div className="flex min-h-screen">

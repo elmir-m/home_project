@@ -70,6 +70,33 @@ export async function renameHousehold(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
+// Vlasnik uključuje/isključuje pojedinu aplikaciju određenom članu.
+export async function setMemberAppHidden(formData: FormData) {
+  const supabase = await createClient();
+  const { household } = await getCurrentHousehold();
+  if (!household) return;
+
+  const userId = String(formData.get("user_id"));
+  const slug = String(formData.get("slug"));
+  const hide = String(formData.get("hide")) === "true";
+
+  if (hide) {
+    await supabase.from("member_app_hidden").upsert(
+      { household_id: household.id, user_id: userId, slug },
+      { onConflict: "household_id,user_id,slug" },
+    );
+  } else {
+    await supabase
+      .from("member_app_hidden")
+      .delete()
+      .eq("household_id", household.id)
+      .eq("user_id", userId)
+      .eq("slug", slug);
+  }
+  revalidatePath("/members");
+  revalidatePath("/", "layout");
+}
+
 export async function setActiveHousehold(formData: FormData) {
   const cookieStore = await cookies();
   cookieStore.set("hh", String(formData.get("id")), {
