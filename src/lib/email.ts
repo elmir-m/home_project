@@ -1,8 +1,7 @@
 import { Resend } from "resend";
 
-// Free tier Resend: šalje sa onboarding@resend.dev i (bez verifikovanog domena)
-// samo na email adresu vlasnika naloga. Za slanje svima -> verifikuj domen u Resendu.
-const FROM = "Home OS <onboarding@resend.dev>";
+// Verifikovan domen (emurgic.info) — Resend sada šalje bilo kome.
+const FROM = "Home OS <noreply@emurgic.info>";
 
 export async function sendEmail(opts: {
   to: string | string[];

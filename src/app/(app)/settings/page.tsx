@@ -103,8 +103,8 @@ export default async function SettingsPage() {
       </form>
 
       <p className="text-xs text-zinc-400">
-        Napomena: na Resend free tieru email stvarno stiže samo na adresu vlasnika
-        Resend naloga dok se ne verifikuje domen.
+        Emailove šaljemo s verifikovanog domena (emurgic.info) — stižu svim
+        članovima.
       </p>
     </main>
   );

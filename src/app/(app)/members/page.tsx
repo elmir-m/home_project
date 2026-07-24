@@ -146,8 +146,8 @@ export default async function MembersPage() {
           </ul>
         )}
         <p className="mt-3 text-xs text-zinc-400">
-          Poziv se šalje mejlom. Na Resend free tieru mejl stiže samo na tvoju
-          adresu — zato je link iznad tu da ga možeš proslijediti ručno.
+          Poziv se šalje mejlom na adresu pozvane osobe. Link iznad možeš i ručno
+          proslijediti ako želiš.
         </p>
       </section>
     </main>
