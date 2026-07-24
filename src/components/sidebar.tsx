@@ -3,16 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/app/login/actions";
+import { BUILTIN_APPS } from "@/lib/apps";
 
+// Navigacija se izvodi iz manifesta aplikacija — nova app se pojavi automatski.
 const LINKS = [
   { href: "/dashboard", label: "Danas", icon: "🏠" },
-  { href: "/tasks", label: "Zadaci", icon: "✅" },
-  { href: "/kanban", label: "Kanban", icon: "📋" },
-  { href: "/calendar", label: "Kalendar", icon: "📅" },
-  { href: "/notes", label: "Bilješke", icon: "📝" },
-  { href: "/finance", label: "Finansije", icon: "💰" },
-  { href: "/reminders", label: "Podsjetnici", icon: "🔔" },
-  { href: "/life", label: "Life admin", icon: "🗂️" },
+  ...BUILTIN_APPS.map((a) => ({ href: a.href, label: a.name, icon: a.icon })),
   { href: "/apps", label: "Aplikacije", icon: "🧩" },
   { href: "/settings", label: "Postavke", icon: "⚙️" },
 ];

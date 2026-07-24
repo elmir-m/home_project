@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { BUILTIN_APPS } from "@/lib/apps";
 
 type MemberRow = {
   role: string;
@@ -9,15 +10,11 @@ type MemberRow = {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-const TILES = [
-  { href: "/tasks", label: "✅ Zadaci" },
-  { href: "/kanban", label: "📋 Kanban" },
-  { href: "/calendar", label: "📅 Kalendar" },
-  { href: "/notes", label: "📝 Bilješke" },
-  { href: "/finance", label: "💰 Finansije" },
-  { href: "/reminders", label: "🔔 Podsjetnici" },
-  { href: "/life", label: "🗂️ Life admin" },
-];
+// Pločice se izvode iz manifesta — nova aplikacija se pojavi automatski.
+const TILES = BUILTIN_APPS.map((a) => ({
+  href: a.href,
+  label: `${a.icon} ${a.name}`,
+}));
 
 export default async function DashboardPage() {
   const supabase = await createClient();

@@ -1,27 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { sendEmail, basicEmail } from "@/lib/email";
 
-// -------- Manifest ugrađenih aplikacija (registar) --------
-// Nove aplikacije se dodaju ovdje na isti način — bez posebnog tretmana.
-export type AppManifest = {
-  slug: string;
-  name: string;
-  icon: string;
-  href: string;
-  description: string;
-  emits: string[]; // event tipovi koje objavljuje
-  capabilities: string[]; // dijeljene sposobnosti koje koristi
-};
-
-export const BUILTIN_APPS: AppManifest[] = [
-  { slug: "tasks", name: "Zadaci", icon: "✅", href: "/tasks", description: "Zadaci s rokom, prioritetom i zaduženjem.", emits: ["task.created", "task.completed"], capabilities: ["members", "reminders"] },
-  { slug: "kanban", name: "Kanban", icon: "📋", href: "/kanban", description: "Tabla nad istim zadacima.", emits: [], capabilities: ["tasks"] },
-  { slug: "calendar", name: "Kalendar", icon: "📅", href: "/calendar", description: "Događaji + zadaci + računi po datumu.", emits: ["event.created"], capabilities: ["tasks", "finance"] },
-  { slug: "notes", name: "Bilješke", icon: "📝", href: "/notes", description: "Bilješke, tagovi, dnevnik, veze.", emits: ["note.created"], capabilities: ["links"] },
-  { slug: "finance", name: "Finansije", icon: "💰", href: "/finance", description: "Troškovi, prihodi, računi, podjela.", emits: ["bill.created", "transaction.created"], capabilities: ["members", "calendar"] },
-  { slug: "reminders", name: "Podsjetnici", icon: "🔔", href: "/reminders", description: "Jednokratni i ponavljajući, email.", emits: ["reminder.created"], capabilities: ["email", "members"] },
-  { slug: "life", name: "Life admin", icon: "🗂️", href: "/life", description: "Evidencija, kontakti, liste.", emits: ["record.created"], capabilities: ["reminders"] },
-];
+// Manifest je u čistom modulu (bez server importa); re-export radi kompatibilnosti.
+export { BUILTIN_APPS, type AppManifest } from "@/lib/apps";
 
 // -------- Event tipovi (za automatizacije) --------
 export const EVENT_TYPES: { type: string; label: string }[] = [
@@ -31,6 +12,7 @@ export const EVENT_TYPES: { type: string; label: string }[] = [
   { type: "transaction.created", label: "Transakcija dodana" },
   { type: "note.created", label: "Bilješka kreirana" },
   { type: "record.created", label: "Zapis dodan (Life admin)" },
+  { type: "shopping.added", label: "Stavka za kupovinu dodana" },
 ];
 
 export const ACTION_TYPES: { type: string; label: string }[] = [

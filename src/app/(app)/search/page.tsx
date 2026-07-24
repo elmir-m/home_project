@@ -21,12 +21,13 @@ export default async function SearchPage({
 
   if (q) {
     const like = `%${q}%`;
-    const [tasks, notes, events, bills, reminders] = await Promise.all([
+    const [tasks, notes, events, bills, reminders, shopping] = await Promise.all([
       supabase.from("tasks").select("id, title, notes").or(`title.ilike.${like},notes.ilike.${like}`).limit(10),
       supabase.from("notes").select("id, title, body").or(`title.ilike.${like},body.ilike.${like}`).limit(10),
       supabase.from("calendar_events").select("id, title, event_date").ilike("title", like).limit(10),
       supabase.from("bills").select("id, name, amount").ilike("name", like).limit(10),
       supabase.from("reminders").select("id, title").ilike("title", like).limit(10),
+      supabase.from("shopping_items").select("id, text").ilike("text", like).limit(10),
     ]);
 
     groups.push({
@@ -66,6 +67,13 @@ export default async function SearchPage({
       hits: (reminders.data ?? []).map((r) => ({
         label: r.title,
         href: "/reminders",
+      })),
+    });
+    groups.push({
+      title: "Kupovina",
+      hits: (shopping.data ?? []).map((s) => ({
+        label: s.text,
+        href: "/shopping",
       })),
     });
   }
