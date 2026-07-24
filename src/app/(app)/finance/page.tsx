@@ -1,12 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
-import {
-  createTransaction,
-  deleteTransaction,
-  createBill,
-  deleteBill,
-} from "./actions";
+import { deleteTransaction, deleteBill } from "./actions";
+import { TransactionForm, BillForm } from "./finance-forms";
 
 type Tx = {
   id: string;
@@ -136,75 +132,24 @@ export default async function FinancePage() {
         </div>
       )}
 
-      {/* Dodaj transakciju */}
-      <form
-        action={createTransaction}
-        className="flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
-      >
-        <select
-          name="kind"
-          defaultValue="expense"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        >
-          <option value="expense">Trošak</option>
-          <option value="income">Prihod</option>
-        </select>
-        <input
-          name="amount"
-          type="number"
-          step="0.01"
-          min="0"
-          required
-          placeholder="Iznos"
-          className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <input
-          name="category"
-          placeholder="Kategorija"
-          className="w-32 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <input
-          name="description"
-          placeholder="Opis"
-          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <input
-          name="occurred_on"
-          type="date"
-          defaultValue={today}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <select
-          name="paid_by"
-          defaultValue={user.id}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        >
-          {members.map((m) => (
-            <option key={m.user_id} value={m.user_id}>
-              {m.profiles?.display_name ?? m.profiles?.email}
-            </option>
-          ))}
-        </select>
-        <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
-          Dodaj
-        </button>
-      </form>
-
       {/* Transakcije */}
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Transakcije ovog mjeseca
-        </h2>
-        <ul className="flex flex-col gap-1">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Transakcije ovog mjeseca
+          </h2>
+          <TransactionForm members={members} userId={user.id} today={today} />
+        </div>
+        <ul className="flex flex-col gap-1.5">
           {txList.length === 0 && (
             <li className="py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              Nema transakcija. (Ako ostane prazno, pokreni migraciju 0005.)
+              Nema transakcija ovog mjeseca.
             </li>
           )}
           {txList.map((t) => (
             <li
               key={t.id}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-[#20242c]"
+              className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
             >
               <span
                 className={`font-semibold ${
@@ -214,7 +159,7 @@ export default async function FinancePage() {
                 {t.kind === "income" ? "+" : "−"}
                 {money(Number(t.amount))}
               </span>
-              <span className="text-black dark:text-zinc-50">
+              <span className="text-zinc-900 dark:text-zinc-50">
                 {t.description || t.category || "—"}
               </span>
               {t.category && (
@@ -225,10 +170,20 @@ export default async function FinancePage() {
               <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
                 {t.occurred_on} · {nameOf(t.paid_by)}
               </span>
-              <form action={deleteTransaction}>
-                <input type="hidden" name="id" value={t.id} />
-                <button className="text-zinc-300 hover:text-red-600">✕</button>
-              </form>
+              <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                <TransactionForm
+                  members={members}
+                  userId={user.id}
+                  today={today}
+                  tx={t}
+                />
+                <form action={deleteTransaction}>
+                  <input type="hidden" name="id" value={t.id} />
+                  <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                    ✕
+                  </button>
+                </form>
+              </div>
             </li>
           ))}
         </ul>
@@ -236,49 +191,13 @@ export default async function FinancePage() {
 
       {/* Računi / pretplate */}
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Računi i pretplate
-        </h2>
-        <form
-          action={createBill}
-          className="mb-3 flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
-        >
-          <input
-            name="name"
-            required
-            placeholder="Naziv (npr. Struja)"
-            className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-          />
-          <input
-            name="amount"
-            type="number"
-            step="0.01"
-            min="0"
-            required
-            placeholder="Iznos"
-            className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-          />
-          <input
-            name="due_date"
-            type="date"
-            required
-            defaultValue={today}
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-          />
-          <select
-            name="recurrence"
-            defaultValue="monthly"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-          >
-            <option value="monthly">Mjesečno</option>
-            <option value="yearly">Godišnje</option>
-            <option value="none">Jednokratno</option>
-          </select>
-          <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
-            Dodaj
-          </button>
-        </form>
-        <ul className="flex flex-col gap-1">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Računi i pretplate
+          </h2>
+          <BillForm today={today} />
+        </div>
+        <ul className="flex flex-col gap-1.5">
           {billList.map((b) => {
             const daysLeft = Math.ceil(
               (new Date(b.due_date).getTime() - new Date(today).getTime()) /
@@ -288,12 +207,14 @@ export default async function FinancePage() {
             return (
               <li
                 key={b.id}
-                className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-[#20242c]"
+                className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
               >
-                <span className="font-medium text-black dark:text-zinc-50">
+                <span className="font-medium text-zinc-900 dark:text-zinc-50">
                   {b.name}
                 </span>
-                <span className="text-zinc-500">{money(Number(b.amount))}</span>
+                <span className="text-zinc-500 dark:text-zinc-400">
+                  {money(Number(b.amount))}
+                </span>
                 <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-[#2a2f39]">
                   {b.recurrence === "monthly"
                     ? "mjesečno"
@@ -303,17 +224,22 @@ export default async function FinancePage() {
                 </span>
                 <span
                   className={`ml-auto text-xs ${
-                    soon ? "font-medium text-red-600" : "text-zinc-500"
+                    soon ? "font-medium text-red-600" : "text-zinc-500 dark:text-zinc-400"
                   }`}
                 >
                   {soon ? "⚠ " : ""}
                   {b.due_date}
                   {daysLeft >= 0 ? ` (za ${daysLeft}d)` : " (isteklo)"}
                 </span>
-                <form action={deleteBill}>
-                  <input type="hidden" name="id" value={b.id} />
-                  <button className="text-zinc-300 hover:text-red-600">✕</button>
-                </form>
+                <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                  <BillForm today={today} bill={b} />
+                  <form action={deleteBill}>
+                    <input type="hidden" name="id" value={b.id} />
+                    <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                      ✕
+                    </button>
+                  </form>
+                </div>
               </li>
             );
           })}
