@@ -31,6 +31,25 @@ export async function createEvent(formData: FormData) {
   revalidatePath("/calendar");
 }
 
+export async function editEvent(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id"));
+  const title = String(formData.get("title") ?? "").trim();
+  const date = String(formData.get("event_date") ?? "");
+  if (!id || !title || !date) return;
+
+  await supabase
+    .from("calendar_events")
+    .update({
+      title,
+      event_date: date,
+      start_time: String(formData.get("start_time") ?? "") || null,
+    })
+    .eq("id", id);
+
+  revalidatePath("/calendar");
+}
+
 export async function deleteEvent(formData: FormData) {
   const supabase = await createClient();
   await supabase

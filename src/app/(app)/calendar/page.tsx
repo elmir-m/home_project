@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
-import { createEvent, deleteEvent } from "./actions";
+import EventForm from "./event-form";
 
 const MONTHS = [
   "Januar", "Februar", "Mart", "April", "Maj", "Juni",
@@ -94,52 +94,25 @@ export default async function CalendarPage({
         <div className="flex items-center gap-2">
           <Link
             href={`/calendar?month=${prev}`}
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700"
+            className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
           >
             ←
           </Link>
           <Link
             href="/calendar"
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700"
+            className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
           >
             Danas
           </Link>
           <Link
             href={`/calendar?month=${next}`}
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700"
+            className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
           >
             →
           </Link>
+          <EventForm defaultDate={first} />
         </div>
       </header>
-
-      {/* Dodaj događaj */}
-      <form
-        action={createEvent}
-        className="flex flex-wrap items-center gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
-      >
-        <input
-          name="title"
-          required
-          placeholder="Novi događaj…"
-          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <input
-          type="date"
-          name="event_date"
-          required
-          defaultValue={first}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <input
-          type="time"
-          name="start_time"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
-          Dodaj
-        </button>
-      </form>
 
       {/* Mreža */}
       <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-[#2a2f39]">
@@ -173,16 +146,7 @@ export default async function CalendarPage({
               </div>
               <div className="flex flex-col gap-1">
                 {cell.events.map((e) => (
-                  <form action={deleteEvent} key={e.id}>
-                    <input type="hidden" name="id" value={e.id} />
-                    <button
-                      title="Klik za brisanje"
-                      className="w-full truncate rounded bg-blue-100 px-1 py-0.5 text-left text-xs text-blue-800 hover:line-through dark:bg-blue-950 dark:text-blue-300"
-                    >
-                      {e.start_time ? e.start_time.slice(0, 5) + " " : ""}
-                      {e.title}
-                    </button>
-                  </form>
+                  <EventForm key={e.id} event={e} />
                 ))}
                 {cell.tasks.map((t) => (
                   <div
@@ -222,7 +186,7 @@ export default async function CalendarPage({
         <span className="rounded bg-orange-100 px-1 dark:bg-orange-950">
           narandžasto
         </span>{" "}
-        = računi (sve automatski) · klik na događaj briše ga
+        = računi (sve automatski) · klik na događaj za uređivanje
         {household ? "" : " · pokreni migraciju 0003"}
       </p>
     </main>
