@@ -12,6 +12,7 @@ import {
   Settings,
   Users,
   Zap,
+  UserCircle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -30,6 +31,7 @@ const ICONS: Record<string, LucideIcon> = {
   settings: Settings,
   members: Users,
   automations: Zap,
+  profile: UserCircle,
 };
 
 export function AppIcon({

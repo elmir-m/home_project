@@ -34,7 +34,10 @@ export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
     },
     {
       label: "Postavke",
-      items: [{ href: "/settings", label: "Postavke", slug: "settings" }],
+      items: [
+        { href: "/profile", label: "Moj profil", slug: "profile" },
+        { href: "/settings", label: "Postavke", slug: "settings" },
+      ],
     },
   ];
 

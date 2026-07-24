@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Search, LogOut } from "lucide-react";
 import QuickCapture from "@/components/quick-capture";
 import ThemeToggle from "@/components/theme-toggle";
@@ -30,8 +31,12 @@ export default async function TopBar() {
         />
       </form>
 
-      {/* Identitet prijavljenog korisnika */}
-      <div className="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 dark:border-zinc-800 dark:bg-[#20242c]">
+      {/* Identitet prijavljenog korisnika (klik → profil) */}
+      <Link
+        href="/profile"
+        title="Moj profil"
+        className="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#20242c] dark:hover:bg-[#2a2f39]"
+      >
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
           {initial}
         </span>
@@ -44,7 +49,7 @@ export default async function TopBar() {
             {household ? ` · ${household.name}` : ""}
           </span>
         </span>
-      </div>
+      </Link>
 
       <ThemeToggle />
       <QuickCapture />
