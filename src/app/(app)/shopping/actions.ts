@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
 import { emitEvent } from "@/lib/platform";
@@ -77,4 +78,5 @@ export async function remindShopping() {
     created_by: user.id,
   });
   revalidatePath("/shopping");
+  redirect("/shopping?reminded=1");
 }

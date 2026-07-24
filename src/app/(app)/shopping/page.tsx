@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -15,12 +16,18 @@ type Item = {
   done: boolean;
 };
 
-export default async function ShoppingPage() {
+export default async function ShoppingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reminded?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const reminded = (await searchParams).reminded === "1";
 
   const { data } = await supabase
     .from("shopping_items")
@@ -55,6 +62,15 @@ export default async function ShoppingPage() {
           </form>
         </div>
       </div>
+
+      {reminded && (
+        <div className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300">
+          ✓ Podsjetnik za kupovinu je napravljen (za 2h, uz email).{" "}
+          <Link href="/reminders" className="font-medium underline">
+            Otvori Podsjetnike
+          </Link>
+        </div>
+      )}
 
       <form
         action={addShoppingItem}
