@@ -33,6 +33,21 @@ export async function addShoppingItem(formData: FormData) {
   revalidatePath("/shopping");
 }
 
+export async function editShoppingItem(formData: FormData) {
+  const { supabase } = await ctx();
+  const id = String(formData.get("id"));
+  const text = String(formData.get("text") ?? "").trim();
+  if (!id || !text) return;
+  await supabase
+    .from("shopping_items")
+    .update({
+      text,
+      quantity: String(formData.get("quantity") ?? "").trim() || null,
+    })
+    .eq("id", id);
+  revalidatePath("/shopping");
+}
+
 export async function toggleShoppingItem(formData: FormData) {
   const { supabase } = await ctx();
   const id = String(formData.get("id"));

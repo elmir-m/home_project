@@ -2,12 +2,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
-  addShoppingItem,
   toggleShoppingItem,
   deleteShoppingItem,
   clearDone,
   remindShopping,
 } from "./actions";
+import ShoppingForm from "./shopping-form";
+import SubmitButton from "@/components/submit-button";
 
 type Item = {
   id: string;
@@ -49,17 +50,24 @@ export default async function ShoppingPage({
             {openCount} za kupiti · dijeljeno s cijelim domaćinstvom
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <form action={remindShopping}>
-            <button className="rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+            <SubmitButton
+              className="rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              pendingText="Pravim…"
+            >
               🔔 Podsjeti me
-            </button>
+            </SubmitButton>
           </form>
           <form action={clearDone}>
-            <button className="rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+            <SubmitButton
+              className="rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              pendingText="Čistim…"
+            >
               Očisti kupljeno
-            </button>
+            </SubmitButton>
           </form>
+          <ShoppingForm />
         </div>
       </div>
 
@@ -72,46 +80,29 @@ export default async function ShoppingPage({
         </div>
       )}
 
-      <form
-        action={addShoppingItem}
-        className="flex gap-2 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
-      >
-        <input
-          name="text"
-          required
-          placeholder="Šta treba kupiti?"
-          className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <input
-          name="quantity"
-          placeholder="Količina"
-          className="w-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500">
-          Dodaj
-        </button>
-      </form>
+      {items.length === 0 && (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-[#20242c]/40">
+          <span className="text-3xl">🛒</span>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Lista je prazna. Klikni „Nova stavka".
+          </p>
+        </div>
+      )}
 
       <ul className="flex flex-col gap-1.5">
-        {items.length === 0 && (
-          <li className="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Lista je prazna. (Ako ostane prazno nakon dodavanja, pokreni migraciju
-            0012.)
-          </li>
-        )}
         {items.map((i) => (
           <li
             key={i.id}
-            className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
+            className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
           >
             <form action={toggleShoppingItem}>
               <input type="hidden" name="id" value={i.id} />
               <input type="hidden" name="done" value={String(i.done)} />
               <button
-                className={`flex h-5 w-5 items-center justify-center rounded border text-xs ${
+                className={`flex h-6 w-6 items-center justify-center rounded-md border text-xs transition active:scale-90 ${
                   i.done
                     ? "border-green-600 bg-green-600 text-white"
-                    : "border-zinc-400"
+                    : "border-zinc-300 hover:border-indigo-500 dark:border-zinc-600"
                 }`}
               >
                 {i.done ? "✓" : ""}
@@ -120,8 +111,8 @@ export default async function ShoppingPage({
             <span
               className={
                 i.done
-                  ? "text-zinc-500 line-through"
-                  : "text-black dark:text-zinc-50"
+                  ? "text-zinc-400 line-through"
+                  : "text-zinc-900 dark:text-zinc-50"
               }
             >
               {i.text}
@@ -131,10 +122,15 @@ export default async function ShoppingPage({
                 {i.quantity}
               </span>
             )}
-            <form action={deleteShoppingItem} className="ml-auto">
-              <input type="hidden" name="id" value={i.id} />
-              <button className="text-zinc-300 hover:text-red-600">✕</button>
-            </form>
+            <div className="ml-auto flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+              <ShoppingForm item={i} />
+              <form action={deleteShoppingItem}>
+                <input type="hidden" name="id" value={i.id} />
+                <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                  ✕
+                </button>
+              </form>
+            </div>
           </li>
         ))}
       </ul>
