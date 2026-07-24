@@ -65,7 +65,7 @@ export default async function LifePage() {
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-8 p-8">
       <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-        Life admin
+        Kućna evidencija
       </h1>
 
       {/* EVIDENCIJA */}

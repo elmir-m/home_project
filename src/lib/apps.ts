@@ -19,6 +19,6 @@ export const BUILTIN_APPS: AppManifest[] = [
   { slug: "notes", name: "Bilješke", icon: "📝", href: "/notes", description: "Bilješke, tagovi, dnevnik, veze.", emits: ["note.created"], capabilities: ["links"] },
   { slug: "finance", name: "Finansije", icon: "💰", href: "/finance", description: "Troškovi, prihodi, računi, podjela.", emits: ["bill.created", "transaction.created"], capabilities: ["members", "calendar"] },
   { slug: "reminders", name: "Podsjetnici", icon: "🔔", href: "/reminders", description: "Jednokratni i ponavljajući, email.", emits: ["reminder.created"], capabilities: ["email", "members"] },
-  { slug: "life", name: "Life admin", icon: "🗂️", href: "/life", description: "Evidencija, kontakti, liste.", emits: ["record.created"], capabilities: ["reminders"] },
+  { slug: "life", name: "Kućna evidencija", icon: "🗂️", href: "/life", description: "Dokumenti, garancije, obnove, kontakti i liste.", emits: ["record.created"], capabilities: ["reminders"] },
   { slug: "shopping", name: "Kupovina", icon: "🛒", href: "/shopping", description: "Zajednička lista za kupovinu — nova aplikacija na platformi.", emits: ["shopping.added"], capabilities: ["members", "reminders"] },
 ];

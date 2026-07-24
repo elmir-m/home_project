@@ -11,7 +11,7 @@ export const EVENT_TYPES: { type: string; label: string }[] = [
   { type: "bill.created", label: "Račun dodan" },
   { type: "transaction.created", label: "Transakcija dodana" },
   { type: "note.created", label: "Bilješka kreirana" },
-  { type: "record.created", label: "Zapis dodan (Life admin)" },
+  { type: "record.created", label: "Zapis dodan (Kućna evidencija)" },
   { type: "shopping.added", label: "Stavka za kupovinu dodana" },
 ];
 
