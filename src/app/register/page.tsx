@@ -68,7 +68,7 @@ export default async function RegisterPage({
                       name="full_name"
                       required
                       autoComplete="name"
-                      placeholder="Elmir Murgić"
+                      placeholder="John Doe"
                       className={inputCls}
                     />
                   </div>
