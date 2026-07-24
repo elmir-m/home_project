@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
+import { Bell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
-import { createReminder, completeReminder, deleteReminder } from "./actions";
-import RemindAtField from "./remind-at-field";
+import { completeReminder, deleteReminder } from "./actions";
+import ReminderForm from "./reminder-form";
 
 type Reminder = {
   id: string;
@@ -57,31 +58,25 @@ export default async function RemindersPage() {
     return m?.profiles?.display_name ?? m?.profiles?.email ?? "?";
   };
 
-  // Default vrijeme: sad + 1h.
-  const def = new Date(now + 3600_000);
-  const defStr = `${def.getFullYear()}-${pad(def.getMonth() + 1)}-${pad(
-    def.getDate(),
-  )}T${pad(def.getHours())}:${pad(def.getMinutes())}`;
-
   const Row = ({ r, overdue }: { r: Reminder; overdue?: boolean }) => (
     <li
-      className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm ${
+      className={`group flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm shadow-sm ${
         overdue
           ? "border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/40"
-          : "border-zinc-200 dark:border-zinc-800 dark:bg-[#20242c]"
+          : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#20242c]"
       }`}
     >
       <form action={completeReminder}>
         <input type="hidden" name="id" value={r.id} />
         <button
           title="Označi obavljeno"
-          className="flex h-5 w-5 items-center justify-center rounded border border-zinc-400 text-xs hover:bg-green-600 hover:text-white"
+          className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-400 text-xs transition hover:bg-green-600 hover:text-white active:scale-90"
         >
           ✓
         </button>
       </form>
-      <div className="flex-1">
-        <p className="text-black dark:text-zinc-50">
+      <div className="min-w-0 flex-1">
+        <p className="font-medium text-zinc-900 dark:text-zinc-50">
           {overdue && "🔔 "}
           {r.title}
         </p>
@@ -92,63 +87,40 @@ export default async function RemindersPage() {
           {r.notify_email && <span>· ✉️ email</span>}
         </div>
       </div>
-      <form action={deleteReminder}>
-        <input type="hidden" name="id" value={r.id} />
-        <button className="text-zinc-300 hover:text-red-600">✕</button>
-      </form>
+      <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+        <ReminderForm members={members} reminder={r} />
+        <form action={deleteReminder}>
+          <input type="hidden" name="id" value={r.id} />
+          <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+            ✕
+          </button>
+        </form>
+      </div>
     </li>
   );
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
-      <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-        Podsjetnici
-      </h1>
-
-      <form
-        action={createReminder}
-        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]"
-      >
-        <input
-          name="title"
-          required
-          placeholder="Na šta te podsjetiti?"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-        />
-        <div className="flex flex-wrap gap-3">
-          <RemindAtField defaultValue={defStr} />
-          <select
-            name="recurrence"
-            defaultValue="none"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-          >
-            <option value="none">Jednokratno</option>
-            <option value="daily">Dnevno</option>
-            <option value="weekly">Sedmično</option>
-            <option value="monthly">Mjesečno</option>
-            <option value="yearly">Godišnje</option>
-          </select>
-          <select
-            name="target_user_id"
-            defaultValue=""
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
-          >
-            <option value="">Cijelo domaćinstvo</option>
-            {members.map((m) => (
-              <option key={m.user_id} value={m.user_id}>
-                {m.profiles?.display_name ?? m.profiles?.email}
-              </option>
-            ))}
-          </select>
-          <label className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-500">
-            <input type="checkbox" name="notify_email" defaultChecked />
-            email
-          </label>
-          <button className="ml-auto rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
-            Dodaj
-          </button>
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-8">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+            Podsjetnici
+          </h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            {pending.length} aktivnih
+          </p>
         </div>
-      </form>
+        <ReminderForm members={members} />
+      </header>
+
+      {all.length === 0 && (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-[#20242c]/40">
+          <Bell className="h-8 w-8 text-zinc-400" />
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Još nema podsjetnika. Klikni „Novi podsjetnik".
+          </p>
+        </div>
+      )}
 
       {due.length > 0 && (
         <section>

@@ -32,6 +32,27 @@ export async function createReminder(formData: FormData) {
   revalidatePath("/reminders");
 }
 
+export async function editReminder(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id"));
+  const title = String(formData.get("title") ?? "").trim();
+  const remindAt = String(formData.get("remind_at") ?? "");
+  if (!id || !title || !remindAt) return;
+
+  await supabase
+    .from("reminders")
+    .update({
+      title,
+      remind_at: new Date(remindAt).toISOString(),
+      recurrence: String(formData.get("recurrence") ?? "none"),
+      target_user_id: String(formData.get("target_user_id") ?? "") || null,
+      notify_email: formData.get("notify_email") === "on",
+    })
+    .eq("id", id);
+
+  revalidatePath("/reminders");
+}
+
 export async function completeReminder(formData: FormData) {
   const supabase = await createClient();
   await supabase
