@@ -105,12 +105,12 @@ export default async function DashboardPage() {
         <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           {title}
         </h2>
-        <Link href={href} className="text-xs text-zinc-500 hover:text-indigo-600">
+        <Link href={href} className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-indigo-600">
           otvori →
         </Link>
       </div>
       {empty ? (
-        <p className="py-2 text-sm text-zinc-500">Ništa za sad 🎉</p>
+        <p className="py-2 text-sm text-zinc-500 dark:text-zinc-400">Ništa za sad 🎉</p>
       ) : (
         <ul className="flex flex-col gap-1.5 text-sm">{children}</ul>
       )}
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
       <div>
         <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Danas</h1>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {now.toLocaleDateString("bs-BA", {
             weekday: "long",
             day: "numeric",
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
             <li key={e.id} className="flex items-center justify-between gap-2">
               <span className="text-black dark:text-zinc-50">{e.title}</span>
               {e.start_time && (
-                <span className="text-xs text-zinc-500">
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
                   {String(e.start_time).slice(0, 5)}
                 </span>
               )}
@@ -178,7 +178,7 @@ export default async function DashboardPage() {
           {soonBills?.map((b) => (
             <li key={b.id} className="flex items-center justify-between gap-2">
               <span className="text-black dark:text-zinc-50">{b.name}</span>
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 {money(Number(b.amount))} · {b.due_date}
               </span>
             </li>
@@ -193,7 +193,7 @@ export default async function DashboardPage() {
           {dueReminders?.map((r) => (
             <li key={r.id} className="flex items-center justify-between gap-2">
               <span className="text-black dark:text-zinc-50">{r.title}</span>
-              <span className="text-xs text-zinc-500">{timeOf(r.remind_at)}</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">{timeOf(r.remind_at)}</span>
             </li>
           ))}
         </Card>
@@ -207,7 +207,7 @@ export default async function DashboardPage() {
           </h2>
           <Link
             href="/members"
-            className="text-xs text-zinc-500 hover:text-indigo-600"
+            className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-indigo-600"
           >
             članovi / pozovi →
           </Link>
@@ -227,7 +227,7 @@ export default async function DashboardPage() {
             ))}
           </div>
         ) : (
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Nema domaćinstva. Pokreni migraciju 0001.
           </p>
         )}

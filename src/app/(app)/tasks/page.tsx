@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
+import { Calendar, User, ListChecks } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
-import { createTask, toggleTask, deleteTask } from "./actions";
+import { toggleTask, deleteTask } from "./actions";
+import TaskForm from "./task-form";
 
 type Task = {
   id: string;
@@ -12,10 +14,19 @@ type Task = {
   assignee_id: string | null;
 };
 
-const PRIORITY_STYLE: Record<string, string> = {
-  low: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300",
-  medium: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
-  high: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+const PRIORITY: Record<string, { label: string; cls: string }> = {
+  low: {
+    label: "Nizak",
+    cls: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300",
+  },
+  medium: {
+    label: "Srednji",
+    cls: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+  },
+  high: {
+    label: "Visok",
+    cls: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+  },
 };
 
 export default async function TasksPage() {
@@ -35,145 +46,135 @@ export default async function TasksPage() {
     .order("created_at", { ascending: false });
 
   const list = (tasks as Task[]) ?? [];
+  const open = list.filter((t) => t.status !== "done");
+  const done = list.filter((t) => t.status === "done");
   const today = new Date().toISOString().slice(0, 10);
   const nameOf = (id: string | null) => {
     const m = members.find((x) => x.user_id === id);
     return m?.profiles?.display_name ?? m?.profiles?.email ?? null;
   };
 
+  const Row = ({ t }: { t: Task }) => {
+    const isDone = t.status === "done";
+    const overdue = !isDone && t.due_date && t.due_date < today;
+    const assignee = nameOf(t.assignee_id);
+    return (
+      <li className="group flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
+        <form action={toggleTask}>
+          <input type="hidden" name="id" value={t.id} />
+          <input type="hidden" name="done" value={String(isDone)} />
+          <button
+            title={isDone ? "Vrati u nezavršeno" : "Označi završeno"}
+            className={`flex h-6 w-6 items-center justify-center rounded-md border text-xs transition active:scale-90 ${
+              isDone
+                ? "border-green-600 bg-green-600 text-white"
+                : "border-zinc-300 hover:border-indigo-500 dark:border-zinc-600"
+            }`}
+          >
+            {isDone ? "✓" : ""}
+          </button>
+        </form>
+
+        <div className="min-w-0 flex-1">
+          <p
+            className={`truncate text-[15px] font-medium ${
+              isDone
+                ? "text-zinc-400 line-through"
+                : "text-zinc-900 dark:text-zinc-50"
+            }`}
+          >
+            {t.title}
+          </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+            <span
+              className={`rounded-full px-2 py-0.5 font-medium ${PRIORITY[t.priority].cls}`}
+            >
+              {PRIORITY[t.priority].label}
+            </span>
+            {t.due_date && (
+              <span
+                className={`inline-flex items-center gap-1 ${
+                  overdue
+                    ? "font-medium text-red-600"
+                    : "text-zinc-500 dark:text-zinc-400"
+                }`}
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                {t.due_date}
+                {overdue && " · kasni"}
+              </span>
+            )}
+            {assignee && (
+              <span className="inline-flex items-center gap-1 text-zinc-500 dark:text-zinc-400">
+                <User className="h-3.5 w-3.5" />
+                {assignee}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+          <TaskForm members={members} task={t} />
+          <form action={deleteTask}>
+            <input type="hidden" name="id" value={t.id} />
+            <button
+              title="Obriši"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40"
+            >
+              ✕
+            </button>
+          </form>
+        </div>
+      </li>
+    );
+  };
+
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 p-8">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-8">
       <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-          Zadaci
-        </h1>
-        <span className="text-xs text-zinc-500">{household?.name}</span>
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+            Zadaci
+          </h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            {open.length} aktivnih · {household?.name}
+          </p>
+        </div>
+        <TaskForm members={members} />
       </header>
 
-      {/* Forma za dodavanje */}
-      <form
-        action={createTask}
-        className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
-      >
-        <input
-          name="title"
-          required
-          placeholder="Novi zadatak…"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-black outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-        />
-        <div className="flex flex-wrap gap-3">
-          <select
-            name="priority"
-            defaultValue="medium"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-          >
-            <option value="low">Nizak</option>
-            <option value="medium">Srednji</option>
-            <option value="high">Visok</option>
-          </select>
-          <input
-            type="date"
-            name="due_date"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-          />
-          <select
-            name="assignee_id"
-            defaultValue=""
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-          >
-            <option value="">Bez zaduženja</option>
-            {members.map((m) => (
-              <option key={m.user_id} value={m.user_id}>
-                {m.profiles?.display_name ?? m.profiles?.email}
-              </option>
-            ))}
-          </select>
-          <button className="ml-auto rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white dark:hover:bg-zinc-200">
-            Dodaj
-          </button>
+      {list.length === 0 && (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-zinc-900/40">
+          <ListChecks className="h-8 w-8 text-zinc-400" />
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Još nema zadataka. Klikni „Novi zadatak".
+          </p>
+          <p className="text-xs text-zinc-400">
+            (Ako ostane prazno i nakon dodavanja, pokreni migraciju 0002.)
+          </p>
         </div>
-      </form>
+      )}
 
-      {/* Lista */}
-      <ul className="flex flex-col gap-2">
-        {list.length === 0 && (
-          <li className="py-8 text-center text-sm text-zinc-500">
-            Nema zadataka. Dodaj prvi gore. (Ako je prazno i nakon dodavanja,
-            pokreni migraciju 0002 u Supabase.)
-          </li>
-        )}
-        {list.map((t) => {
-          const done = t.status === "done";
-          const overdue = !done && t.due_date && t.due_date < today;
-          return (
-            <li
-              key={t.id}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <form action={toggleTask}>
-                <input type="hidden" name="id" value={t.id} />
-                <input type="hidden" name="done" value={String(done)} />
-                <button
-                  title={done ? "Vrati u nezavršeno" : "Označi završeno"}
-                  className={`flex h-5 w-5 items-center justify-center rounded border text-xs ${
-                    done
-                      ? "border-green-600 bg-green-600 text-white"
-                      : "border-zinc-400"
-                  }`}
-                >
-                  {done ? "✓" : ""}
-                </button>
-              </form>
+      {open.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {open.map((t) => (
+            <Row key={t.id} t={t} />
+          ))}
+        </ul>
+      )}
 
-              <div className="flex-1">
-                <p
-                  className={`text-sm ${
-                    done
-                      ? "text-zinc-500 line-through"
-                      : "text-black dark:text-zinc-50"
-                  }`}
-                >
-                  {t.title}
-                </p>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
-                  <span
-                    className={`rounded px-1.5 py-0.5 ${PRIORITY_STYLE[t.priority]}`}
-                  >
-                    {t.priority}
-                  </span>
-                  {t.due_date && (
-                    <span
-                      className={
-                        overdue
-                          ? "font-medium text-red-600"
-                          : "text-zinc-500"
-                      }
-                    >
-                      {overdue ? "⚠ " : ""}
-                      {t.due_date}
-                    </span>
-                  )}
-                  {t.assignee_id && (
-                    <span className="text-zinc-500">
-                      👤 {nameOf(t.assignee_id)}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <form action={deleteTask}>
-                <input type="hidden" name="id" value={t.id} />
-                <button
-                  title="Obriši"
-                  className="text-zinc-300 hover:text-red-600"
-                >
-                  ✕
-                </button>
-              </form>
-            </li>
-          );
-        })}
-      </ul>
+      {done.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Završeno ({done.length})
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {done.map((t) => (
+              <Row key={t.id} t={t} />
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }

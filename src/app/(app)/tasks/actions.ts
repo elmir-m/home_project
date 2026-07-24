@@ -66,6 +66,26 @@ export async function toggleTask(formData: FormData) {
   revalidatePath("/tasks");
 }
 
+export async function editTask(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id"));
+  const title = String(formData.get("title") ?? "").trim();
+  if (!id || !title) return;
+
+  await supabase
+    .from("tasks")
+    .update({
+      title,
+      priority: String(formData.get("priority") ?? "medium"),
+      due_date: String(formData.get("due_date") ?? "") || null,
+      assignee_id: String(formData.get("assignee_id") ?? "") || null,
+    })
+    .eq("id", id);
+
+  revalidatePath("/tasks");
+  revalidatePath("/kanban");
+}
+
 export async function deleteTask(formData: FormData) {
   const supabase = await createClient();
   await supabase.from("tasks").delete().eq("id", String(formData.get("id")));

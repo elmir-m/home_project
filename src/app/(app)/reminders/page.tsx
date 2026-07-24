@@ -85,7 +85,7 @@ export default async function RemindersPage() {
           {overdue && "🔔 "}
           {r.title}
         </p>
-        <div className="mt-0.5 flex flex-wrap gap-2 text-xs text-zinc-500">
+        <div className="mt-0.5 flex flex-wrap gap-2 text-xs text-zinc-500 dark:text-zinc-400">
           <span>{fmt(r.remind_at)}</span>
           <span>· {RECUR_LABEL[r.recurrence]}</span>
           <span>· 👤 {nameOf(r.target_user_id)}</span>
@@ -164,12 +164,12 @@ export default async function RemindersPage() {
       )}
 
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Nadolazeći
         </h2>
         <ul className="flex flex-col gap-2">
           {upcoming.length === 0 && (
-            <li className="py-4 text-center text-sm text-zinc-500">
+            <li className="py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
               Nema nadolazećih podsjetnika. (Ako ostane prazno, pokreni migraciju
               0006.)
             </li>

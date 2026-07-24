@@ -89,15 +89,15 @@ export default async function FinancePage() {
       {/* Sažetak */}
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs text-zinc-500">Prihodi (mjesec)</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Prihodi (mjesec)</p>
           <p className="mt-1 text-lg font-semibold text-green-600">{money(income)}</p>
         </div>
         <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs text-zinc-500">Troškovi (mjesec)</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Troškovi (mjesec)</p>
           <p className="mt-1 text-lg font-semibold text-red-600">{money(expenses)}</p>
         </div>
         <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs text-zinc-500">Neto</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Neto</p>
           <p
             className={`mt-1 text-lg font-semibold ${
               net >= 0 ? "text-green-600" : "text-red-600"
@@ -111,7 +111,7 @@ export default async function FinancePage() {
       {/* Ko je platio / ko duguje */}
       {members.length > 1 && expenses > 0 && (
         <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
             Ko je platio · pravedan udio {money(fairShare)}
           </p>
           <ul className="flex flex-col gap-1">
@@ -192,12 +192,12 @@ export default async function FinancePage() {
 
       {/* Transakcije */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Transakcije ovog mjeseca
         </h2>
         <ul className="flex flex-col gap-1">
           {txList.length === 0 && (
-            <li className="py-4 text-center text-sm text-zinc-500">
+            <li className="py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
               Nema transakcija. (Ako ostane prazno, pokreni migraciju 0005.)
             </li>
           )}
@@ -218,11 +218,11 @@ export default async function FinancePage() {
                 {t.description || t.category || "—"}
               </span>
               {t.category && (
-                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:bg-zinc-800">
+                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-zinc-800">
                   {t.category}
                 </span>
               )}
-              <span className="ml-auto text-xs text-zinc-500">
+              <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
                 {t.occurred_on} · {nameOf(t.paid_by)}
               </span>
               <form action={deleteTransaction}>
@@ -236,7 +236,7 @@ export default async function FinancePage() {
 
       {/* Računi / pretplate */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Računi i pretplate
         </h2>
         <form
@@ -294,7 +294,7 @@ export default async function FinancePage() {
                   {b.name}
                 </span>
                 <span className="text-zinc-500">{money(Number(b.amount))}</span>
-                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:bg-zinc-800">
+                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-zinc-800">
                   {b.recurrence === "monthly"
                     ? "mjesečno"
                     : b.recurrence === "yearly"
@@ -318,7 +318,7 @@ export default async function FinancePage() {
             );
           })}
           {billList.length === 0 && (
-            <li className="py-4 text-center text-sm text-zinc-500">
+            <li className="py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
               Nema računa.
             </li>
           )}

@@ -212,7 +212,7 @@ export default async function CalendarPage({
         })}
       </div>
 
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-zinc-500 dark:text-zinc-400">
         <span className="rounded bg-blue-100 px-1 dark:bg-blue-950">plavo</span>{" "}
         = događaji ·{" "}
         <span className="rounded bg-green-100 px-1 dark:bg-green-950">

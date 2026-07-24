@@ -45,7 +45,7 @@ export default async function ShoppingPage({
           <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
             🛒 Kupovina
           </h1>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {openCount} za kupiti · dijeljeno s cijelim domaćinstvom
           </p>
         </div>
@@ -94,7 +94,7 @@ export default async function ShoppingPage({
 
       <ul className="flex flex-col gap-1.5">
         {items.length === 0 && (
-          <li className="py-8 text-center text-sm text-zinc-500">
+          <li className="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
             Lista je prazna. (Ako ostane prazno nakon dodavanja, pokreni migraciju
             0012.)
           </li>
@@ -127,7 +127,7 @@ export default async function ShoppingPage({
               {i.text}
             </span>
             {i.quantity && (
-              <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:bg-zinc-800">
+              <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-zinc-800">
                 {i.quantity}
               </span>
             )}

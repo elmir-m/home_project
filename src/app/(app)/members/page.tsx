@@ -67,7 +67,7 @@ export default async function MembersPage() {
 
       {/* Naziv domaćinstva */}
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Naziv domaćinstva
         </h2>
         <form action={renameHousehold} className="flex gap-2">
@@ -84,7 +84,7 @@ export default async function MembersPage() {
 
       {/* Članovi */}
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Članovi ({members.length})
         </h2>
         <ul className="flex flex-col gap-1">
@@ -96,7 +96,7 @@ export default async function MembersPage() {
               <span className="text-black dark:text-zinc-50">
                 {m.profiles?.display_name ?? m.profiles?.email}
               </span>
-              <span className="text-xs text-zinc-500">{m.role}</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">{m.role}</span>
             </li>
           ))}
         </ul>
@@ -104,7 +104,7 @@ export default async function MembersPage() {
 
       {/* Pozovi člana */}
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
           Pozovi člana
         </h2>
         <form action={inviteMember} className="flex gap-2">
@@ -131,7 +131,7 @@ export default async function MembersPage() {
                   <span className="text-black dark:text-zinc-50">{inv.email}</span>
                   <form action={revokeInvite}>
                     <input type="hidden" name="id" value={inv.id} />
-                    <button className="text-xs text-zinc-500 hover:text-red-600">
+                    <button className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-red-600">
                       opozovi
                     </button>
                   </form>
@@ -139,13 +139,13 @@ export default async function MembersPage() {
                 <input
                   readOnly
                   value={`${base}/invite/${inv.token}`}
-                  className="mt-1 w-full rounded bg-zinc-50 px-2 py-1 text-xs text-zinc-500 dark:bg-zinc-900"
+                  className="mt-1 w-full rounded bg-zinc-50 px-2 py-1 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-zinc-900"
                 />
               </li>
             ))}
           </ul>
         )}
-        <p className="mt-3 text-xs text-zinc-500">
+        <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
           Poziv se šalje mejlom na adresu pozvane osobe. Link iznad možeš i ručno
           proslijediti ako želiš.
         </p>
