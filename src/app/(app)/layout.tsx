@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/sidebar";
 import TopBar from "@/components/top-bar";
+import RealtimeRefresh from "@/components/realtime-refresh";
 
 // Layout za sve prijavljene stranice: sidebar + gornja traka + provjera sesije.
 export default async function AppLayout({
@@ -17,6 +18,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-screen">
+      <RealtimeRefresh />
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar />
