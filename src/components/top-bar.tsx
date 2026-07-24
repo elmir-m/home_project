@@ -20,6 +20,11 @@ export default async function TopBar() {
   const role = me?.role === "owner" ? "vlasnik" : "član";
   const initial = (name || email).charAt(0).toUpperCase();
 
+  const { data: prof } = user
+    ? await supabase.from("profiles").select("avatar_url").eq("id", user.id).single()
+    : { data: null };
+  const avatarUrl = prof?.avatar_url ?? null;
+
   return (
     <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-zinc-200 bg-[var(--background)]/80 px-4 py-3 backdrop-blur sm:px-6 dark:border-zinc-800">
       <form action="/search" className="relative flex-1">
@@ -37,9 +42,18 @@ export default async function TopBar() {
         title="Moj profil"
         className="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#20242c] dark:hover:bg-[#2a2f39]"
       >
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
-          {initial}
-        </span>
+        {avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={avatarUrl}
+            alt="avatar"
+            className="h-7 w-7 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
+            {initial}
+          </span>
+        )}
         <span className="hidden leading-tight sm:block">
           <span className="block text-sm font-medium text-zinc-900 dark:text-zinc-50">
             {name}

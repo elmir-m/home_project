@@ -26,13 +26,28 @@ export async function updateProfile(formData: FormData) {
 
 export async function changePassword(formData: FormData) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email) redirect("/login");
+
+  const oldPw = String(formData.get("old_password") ?? "");
   const pw = String(formData.get("password") ?? "");
   const pw2 = String(formData.get("password2") ?? "");
 
   if (pw.length < 6)
-    redirect("/profile?error=" + enc("Lozinka mora imati najmanje 6 znakova."));
+    redirect("/profile?error=" + enc("Nova lozinka mora imati najmanje 6 znakova."));
   if (pw !== pw2)
-    redirect("/profile?error=" + enc("Lozinke se ne poklapaju."));
+    redirect("/profile?error=" + enc("Nove lozinke se ne poklapaju."));
+
+  // Provjeri staru lozinku (re-autentikacija).
+  const { error: signErr } = await supabase.auth.signInWithPassword({
+    email: user!.email!,
+    password: oldPw,
+  });
+  if (signErr) {
+    redirect("/profile?error=" + enc("Trenutna (stara) lozinka nije tačna."));
+  }
 
   let errorMsg: string | null = null;
   try {
