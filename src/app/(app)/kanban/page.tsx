@@ -20,7 +20,7 @@ export default async function KanbanPage() {
         <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
           Kanban
         </h1>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-500">
           Isti zadaci kao na stranici Zadaci — prevuci kartice između kolona.
         </p>
       </header>

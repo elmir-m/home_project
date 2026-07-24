@@ -65,7 +65,7 @@ export default function Board({ initial }: { initial: KanbanTask[] }) {
                 : "border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900"
             }`}
           >
-            <h2 className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-zinc-400">
+            <h2 className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-zinc-500">
               {col.label}
               <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-zinc-500 dark:bg-zinc-800">
                 {items.length}
@@ -86,13 +86,13 @@ export default function Board({ initial }: { initial: KanbanTask[] }) {
                 <p
                   className={`text-sm ${
                     t.status === "done"
-                      ? "text-zinc-400 line-through"
+                      ? "text-zinc-500 line-through"
                       : "text-black dark:text-zinc-50"
                   }`}
                 >
                   {t.title}
                 </p>
-                <div className="mt-2 flex items-center gap-2 text-xs text-zinc-400">
+                <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500">
                   <span
                     className={`h-2 w-2 rounded-full ${PRIORITY_DOT[t.priority]}`}
                   />

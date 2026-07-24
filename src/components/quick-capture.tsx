@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Plus } from "lucide-react";
 import { quickAdd } from "@/app/(app)/quick-actions";
+import SubmitButton from "@/components/submit-button";
 
 const TYPES = [
   { v: "task", l: "Zadatak" },
@@ -19,9 +21,10 @@ export default function QuickCapture() {
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white dark:hover:bg-zinc-200"
+        className="flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-sm font-medium text-white transition hover:bg-indigo-700 active:scale-[0.98]"
       >
-        + Brzo
+        <Plus className="h-4 w-4" />
+        <span className="hidden sm:inline">Brzi upis</span>
       </button>
 
       {open && (
@@ -67,9 +70,9 @@ export default function QuickCapture() {
                 ? "Podsjetnik se postavlja za 1h (uredi u modulu)."
                 : "Kreira se odmah u odabranom modulu."}
             </p>
-            <button className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
+            <SubmitButton className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">
               Dodaj
-            </button>
+            </SubmitButton>
           </form>
         </>
       )}

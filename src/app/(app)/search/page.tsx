@@ -98,7 +98,7 @@ export default async function SearchPage({
       </form>
 
       {q && (
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-500">
           {total} rezultata za &quot;{q}&quot;
         </p>
       )}
@@ -108,7 +108,7 @@ export default async function SearchPage({
           .filter((g) => g.hits.length > 0)
           .map((g) => (
             <section key={g.title}>
-              <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+              <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
                 {g.title}
               </h2>
               <ul className="flex flex-col gap-1">
@@ -120,7 +120,7 @@ export default async function SearchPage({
                     >
                       <span className="text-black dark:text-zinc-50">{h.label}</span>
                       {h.sub && (
-                        <span className="ml-2 truncate text-xs text-zinc-400">
+                        <span className="ml-2 truncate text-xs text-zinc-500">
                           {h.sub}
                         </span>
                       )}
@@ -131,7 +131,7 @@ export default async function SearchPage({
             </section>
           ))}
         {q && total === 0 && (
-          <p className="py-8 text-center text-sm text-zinc-400">
+          <p className="py-8 text-center text-sm text-zinc-500">
             Nema rezultata.
           </p>
         )}

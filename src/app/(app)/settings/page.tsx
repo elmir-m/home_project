@@ -46,7 +46,7 @@ export default async function SettingsPage() {
         <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
           Postavke
         </h1>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-500">
           Prijavljen kao {user.email}. Ove postavke vrijede samo za tebe.
         </p>
       </div>
@@ -55,7 +55,7 @@ export default async function SettingsPage() {
         action={saveNotificationPrefs}
         className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
       >
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Email obavijesti
         </h2>
 
@@ -74,7 +74,7 @@ export default async function SettingsPage() {
               <span className="block text-sm font-medium text-black dark:text-zinc-50">
                 {c.label}
               </span>
-              <span className="block text-xs text-zinc-400">{c.desc}</span>
+              <span className="block text-xs text-zinc-500">{c.desc}</span>
             </span>
           </label>
         ))}
@@ -83,7 +83,7 @@ export default async function SettingsPage() {
           <label className="block text-sm font-medium text-black dark:text-zinc-50">
             Sažetak (digest)
           </label>
-          <p className="mb-1 text-xs text-zinc-400">
+          <p className="mb-1 text-xs text-zinc-500">
             Povremeni email s pregledom onoga što slijedi.
           </p>
           <select
@@ -102,7 +102,7 @@ export default async function SettingsPage() {
         </button>
       </form>
 
-      <p className="text-xs text-zinc-400">
+      <p className="text-xs text-zinc-500">
         Emailove šaljemo s verifikovanog domena (emurgic.info) — stižu svim
         članovima.
       </p>

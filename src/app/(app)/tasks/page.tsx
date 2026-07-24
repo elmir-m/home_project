@@ -47,7 +47,7 @@ export default async function TasksPage() {
         <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
           Zadaci
         </h1>
-        <span className="text-xs text-zinc-400">{household?.name}</span>
+        <span className="text-xs text-zinc-500">{household?.name}</span>
       </header>
 
       {/* Forma za dodavanje */}
@@ -97,7 +97,7 @@ export default async function TasksPage() {
       {/* Lista */}
       <ul className="flex flex-col gap-2">
         {list.length === 0 && (
-          <li className="py-8 text-center text-sm text-zinc-400">
+          <li className="py-8 text-center text-sm text-zinc-500">
             Nema zadataka. Dodaj prvi gore. (Ako je prazno i nakon dodavanja,
             pokreni migraciju 0002 u Supabase.)
           </li>
@@ -129,7 +129,7 @@ export default async function TasksPage() {
                 <p
                   className={`text-sm ${
                     done
-                      ? "text-zinc-400 line-through"
+                      ? "text-zinc-500 line-through"
                       : "text-black dark:text-zinc-50"
                   }`}
                 >
@@ -146,7 +146,7 @@ export default async function TasksPage() {
                       className={
                         overdue
                           ? "font-medium text-red-600"
-                          : "text-zinc-400"
+                          : "text-zinc-500"
                       }
                     >
                       {overdue ? "⚠ " : ""}
@@ -154,7 +154,7 @@ export default async function TasksPage() {
                     </span>
                   )}
                   {t.assignee_id && (
-                    <span className="text-zinc-400">
+                    <span className="text-zinc-500">
                       👤 {nameOf(t.assignee_id)}
                     </span>
                   )}

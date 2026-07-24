@@ -125,7 +125,7 @@ export default async function NotesPage() {
 
       <ul className="flex flex-col gap-3">
         {noteList.length === 0 && (
-          <li className="py-8 text-center text-sm text-zinc-400">
+          <li className="py-8 text-center text-sm text-zinc-500">
             Nema bilješki. (Ako ostane prazno, pokreni migraciju 0004.)
           </li>
         )}
@@ -149,7 +149,7 @@ export default async function NotesPage() {
                     </span>
                   )}
                   {n.body && (
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-600 dark:text-zinc-500">
                       {n.body}
                     </p>
                   )}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { BUILTIN_APPS } from "@/lib/apps";
+import { AppIcon } from "@/components/app-icon";
 
 type MemberRow = {
   role: string;
@@ -13,7 +14,8 @@ const pad = (n: number) => String(n).padStart(2, "0");
 // Pločice se izvode iz manifesta — nova aplikacija se pojavi automatski.
 const TILES = BUILTIN_APPS.map((a) => ({
   href: a.href,
-  label: `${a.icon} ${a.name}`,
+  slug: a.slug,
+  name: a.name,
 }));
 
 export default async function DashboardPage() {
@@ -100,15 +102,15 @@ export default async function DashboardPage() {
   }) => (
     <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
           {title}
         </h2>
-        <Link href={href} className="text-xs text-zinc-400 hover:text-zinc-600">
+        <Link href={href} className="text-xs text-zinc-500 hover:text-zinc-600">
           otvori →
         </Link>
       </div>
       {empty ? (
-        <p className="py-2 text-sm text-zinc-400">Ništa za sad 🎉</p>
+        <p className="py-2 text-sm text-zinc-500">Ništa za sad 🎉</p>
       ) : (
         <ul className="flex flex-col gap-1.5 text-sm">{children}</ul>
       )}
@@ -119,7 +121,7 @@ export default async function DashboardPage() {
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
       <div>
         <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Danas</h1>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-500">
           {now.toLocaleDateString("bs-BA", {
             weekday: "long",
             day: "numeric",
@@ -141,7 +143,7 @@ export default async function DashboardPage() {
               <li key={t.id} className="flex items-center justify-between gap-2">
                 <span className="text-black dark:text-zinc-50">{t.title}</span>
                 <span
-                  className={`text-xs ${overdue ? "font-medium text-red-600" : "text-zinc-400"}`}
+                  className={`text-xs ${overdue ? "font-medium text-red-600" : "text-zinc-500"}`}
                 >
                   {overdue ? "⚠ " : ""}
                   {t.due_date}
@@ -160,7 +162,7 @@ export default async function DashboardPage() {
             <li key={e.id} className="flex items-center justify-between gap-2">
               <span className="text-black dark:text-zinc-50">{e.title}</span>
               {e.start_time && (
-                <span className="text-xs text-zinc-400">
+                <span className="text-xs text-zinc-500">
                   {String(e.start_time).slice(0, 5)}
                 </span>
               )}
@@ -176,7 +178,7 @@ export default async function DashboardPage() {
           {soonBills?.map((b) => (
             <li key={b.id} className="flex items-center justify-between gap-2">
               <span className="text-black dark:text-zinc-50">{b.name}</span>
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-zinc-500">
                 {money(Number(b.amount))} · {b.due_date}
               </span>
             </li>
@@ -191,7 +193,7 @@ export default async function DashboardPage() {
           {dueReminders?.map((r) => (
             <li key={r.id} className="flex items-center justify-between gap-2">
               <span className="text-black dark:text-zinc-50">{r.title}</span>
-              <span className="text-xs text-zinc-400">{timeOf(r.remind_at)}</span>
+              <span className="text-xs text-zinc-500">{timeOf(r.remind_at)}</span>
             </li>
           ))}
         </Card>
@@ -200,12 +202,12 @@ export default async function DashboardPage() {
       {/* Domaćinstvo */}
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
             Domaćinstvo
           </h2>
           <Link
             href="/members"
-            className="text-xs text-zinc-400 hover:text-zinc-600"
+            className="text-xs text-zinc-500 hover:text-zinc-600"
           >
             članovi / pozovi →
           </Link>
@@ -232,21 +234,27 @@ export default async function DashboardPage() {
       </section>
 
       {/* Moduli */}
-      <nav className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <nav className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {visibleTiles.map((t) => (
           <Link
             key={t.href}
             href={t.href}
-            className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 text-sm font-medium text-black transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-900"
+            className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 text-sm font-medium text-zinc-800 shadow-sm transition hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-indigo-700"
           >
-            {t.label}
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+              <AppIcon slug={t.slug} className="h-[18px] w-[18px]" />
+            </span>
+            {t.name}
           </Link>
         ))}
         <Link
           href="/apps"
-          className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm font-medium text-zinc-500 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          className="flex items-center gap-3 rounded-xl border border-dashed border-zinc-300 p-4 text-sm font-medium text-zinc-500 transition hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-700 dark:hover:border-indigo-700"
         >
-          🧩 Aplikacije
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+            <AppIcon slug="apps" className="h-[18px] w-[18px]" />
+          </span>
+          Aplikacije
         </Link>
       </nav>
     </main>

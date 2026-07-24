@@ -1,4 +1,6 @@
+import { Home, Mail, Lock } from "lucide-react";
 import { login, signup } from "./actions";
+import SubmitButton from "@/components/submit-button";
 
 export default async function LoginPage({
   searchParams,
@@ -7,64 +9,99 @@ export default async function LoginPage({
 }) {
   const { error, message } = await searchParams;
 
+  const inputCls =
+    "w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-3 text-sm text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50";
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-black">
-      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white shadow-sm bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:bg-zinc-900">
-        <h1 className="mb-1 text-2xl font-bold text-black dark:text-zinc-50">
-          Home OS
-        </h1>
-        <p className="mb-6 text-sm text-zinc-500">Prijava ili registracija</p>
-
-        {error && (
-          <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-            {error}
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-zinc-50 to-zinc-100 p-4 dark:from-zinc-950 dark:to-black">
+      <div className="w-full max-w-sm">
+        <div className="mb-6 flex flex-col items-center text-center">
+          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
+            <Home className="h-6 w-6" />
+          </span>
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Moj dom
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Prijavi se ili napravi nalog za svoje domaćinstvo
           </p>
-        )}
-        {message && (
-          <p className="mb-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950 dark:text-green-300">
-            {message}
-          </p>
-        )}
+        </div>
 
-        <form className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-zinc-600 dark:text-zinc-400">Email</span>
-            <input
-              type="email"
-              name="email"
-              required
-              autoComplete="email"
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-black outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-            />
-          </label>
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900">
+          {error && (
+            <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/60 dark:text-red-300">
+              {error}
+            </p>
+          )}
+          {message && (
+            <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950/60 dark:text-green-300">
+              {message}
+            </p>
+          )}
 
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-zinc-600 dark:text-zinc-400">Lozinka</span>
-            <input
-              type="password"
-              name="password"
-              required
-              minLength={6}
-              autoComplete="current-password"
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-black outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-            />
-          </label>
+          <form className="flex flex-col gap-4">
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Email
+              </span>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  autoComplete="email"
+                  placeholder="ti@primjer.com"
+                  className={inputCls}
+                />
+              </div>
+            </label>
 
-          <div className="mt-2 flex gap-3">
-            <button
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Lozinka
+              </span>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  minLength={6}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  className={inputCls}
+                />
+              </div>
+            </label>
+
+            <SubmitButton
               formAction={login}
-              className="flex-1 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white dark:hover:bg-zinc-200"
+              className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+              pendingText="Prijava…"
             >
               Prijava
-            </button>
-            <button
+            </SubmitButton>
+
+            <div className="flex items-center gap-3 text-xs text-zinc-400">
+              <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+              ili
+              <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            </div>
+
+            <SubmitButton
               formAction={signup}
-              className="flex-1 rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-indigo-700"
+              className="w-full rounded-lg border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              pendingText="Kreiram nalog…"
             >
-              Registracija
-            </button>
-          </div>
-        </form>
+              Registruj se
+            </SubmitButton>
+          </form>
+        </div>
+
+        <p className="mt-4 text-center text-xs text-zinc-400">
+          Zajednički kućni sistem — zadaci, kalendar, finansije i još.
+        </p>
       </div>
     </main>
   );

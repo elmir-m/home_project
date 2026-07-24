@@ -70,7 +70,7 @@ export default async function LifePage() {
 
       {/* EVIDENCIJA */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Evidencija (dokumenti, garancije, obnove)
         </h2>
         <form
@@ -101,7 +101,7 @@ export default async function LifePage() {
                   {CAT_LABEL[r.category]}
                 </span>
                 <span className="text-black dark:text-zinc-50">{r.title}</span>
-                {r.notes && <span className="text-xs text-zinc-400">{r.notes}</span>}
+                {r.notes && <span className="text-xs text-zinc-500">{r.notes}</span>}
                 {r.expiry_date && (
                   <span
                     className={`ml-auto text-xs ${
@@ -109,7 +109,7 @@ export default async function LifePage() {
                         ? "font-medium text-red-600"
                         : soon
                           ? "text-amber-600"
-                          : "text-zinc-400"
+                          : "text-zinc-500"
                     }`}
                   >
                     {expired ? "isteklo " : "ističe "}
@@ -124,19 +124,19 @@ export default async function LifePage() {
             );
           })}
           {recList.length === 0 && (
-            <li className="py-3 text-center text-sm text-zinc-400">
+            <li className="py-3 text-center text-sm text-zinc-500">
               Nema zapisa. (Ako ostane prazno, pokreni migraciju 0008.)
             </li>
           )}
         </ul>
-        <p className="mt-1 text-xs text-zinc-400">
+        <p className="mt-1 text-xs text-zinc-500">
           Ako uneseš rok isteka, automatski se pravi podsjetnik 7 dana ranije.
         </p>
       </section>
 
       {/* KONTAKTI */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Važni kontakti
         </h2>
         <form
@@ -156,7 +156,7 @@ export default async function LifePage() {
               className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white shadow-sm px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
             >
               <span className="font-medium text-black dark:text-zinc-50">{c.name}</span>
-              {c.role && <span className="text-xs text-zinc-400">{c.role}</span>}
+              {c.role && <span className="text-xs text-zinc-500">{c.role}</span>}
               <span className="ml-auto text-xs text-zinc-500">
                 {[c.phone, c.email].filter(Boolean).join(" · ")}
               </span>
@@ -167,14 +167,14 @@ export default async function LifePage() {
             </li>
           ))}
           {contactList.length === 0 && (
-            <li className="py-3 text-center text-sm text-zinc-400">Nema kontakata.</li>
+            <li className="py-3 text-center text-sm text-zinc-500">Nema kontakata.</li>
           )}
         </ul>
       </section>
 
       {/* LISTE */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Dijeljene liste
         </h2>
         <form action={createList} className="mb-3 flex gap-2">
@@ -220,7 +220,7 @@ export default async function LifePage() {
                       <span
                         className={
                           i.done
-                            ? "text-zinc-400 line-through"
+                            ? "text-zinc-500 line-through"
                             : "text-black dark:text-zinc-50"
                         }
                       >
@@ -250,7 +250,7 @@ export default async function LifePage() {
           })}
         </div>
         {listList.length === 0 && (
-          <p className="py-3 text-center text-sm text-zinc-400">Nema lista.</p>
+          <p className="py-3 text-center text-sm text-zinc-500">Nema lista.</p>
         )}
       </section>
     </main>

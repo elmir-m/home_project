@@ -2,36 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { logout } from "@/app/login/actions";
+import { Home } from "lucide-react";
 import { BUILTIN_APPS } from "@/lib/apps";
+import { AppIcon } from "@/components/app-icon";
 
 export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
   const pathname = usePathname();
 
   // Navigacija se izvodi iz manifesta; deinstalirane aplikacije se izostave.
-  const LINKS = [
-    { href: "/dashboard", label: "Danas", icon: "🏠" },
+  const links = [
+    { href: "/dashboard", label: "Danas", slug: "dashboard" },
     ...BUILTIN_APPS.filter((a) => !hidden.includes(a.slug)).map((a) => ({
       href: a.href,
       label: a.name,
-      icon: a.icon,
+      slug: a.slug,
     })),
-    { href: "/apps", label: "Aplikacije", icon: "🧩" },
-    { href: "/settings", label: "Postavke", icon: "⚙️" },
+    { href: "/apps", label: "Aplikacije", slug: "apps" },
+    { href: "/settings", label: "Postavke", slug: "settings" },
   ];
 
   return (
-    <aside className="sticky top-0 flex h-screen w-16 flex-col bg-[#151823] px-2 py-4 text-zinc-300 md:w-60 md:px-3">
+    <aside className="sticky top-0 flex h-screen w-16 flex-col border-r border-zinc-800/60 bg-[#12141c] px-2 py-4 md:w-60 md:px-3">
       <Link
         href="/dashboard"
-        className="mb-6 flex items-center gap-2 px-2 text-white"
+        className="mb-6 flex items-center gap-2.5 px-2 text-white"
       >
-        <span className="text-xl">🏡</span>
-        <span className="hidden text-lg font-bold md:inline">Home OS</span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+          <Home className="h-4 w-4" strokeWidth={2} />
+        </span>
+        <span className="hidden text-[15px] font-semibold tracking-tight md:inline">
+          Moj dom
+        </span>
       </Link>
 
-      <nav className="flex flex-1 flex-col gap-1">
-        {LINKS.map((l) => {
+      <nav className="flex flex-1 flex-col gap-0.5">
+        {links.map((l) => {
           const active = pathname === l.href;
           return (
             <Link
@@ -44,22 +49,12 @@ export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
                   : "text-zinc-400 hover:bg-white/5 hover:text-white"
               }`}
             >
-              <span className="text-base">{l.icon}</span>
+              <AppIcon slug={l.slug} className="h-[18px] w-[18px] shrink-0" />
               <span className="hidden md:inline">{l.label}</span>
             </Link>
           );
         })}
       </nav>
-
-      <form action={logout} className="mt-2 border-t border-white/10 pt-3">
-        <button
-          title="Odjava"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
-        >
-          <span className="text-base">🚪</span>
-          <span className="hidden md:inline">Odjava</span>
-        </button>
-      </form>
     </aside>
   );
 }

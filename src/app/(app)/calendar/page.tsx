@@ -166,7 +166,7 @@ export default async function CalendarPage({
                 className={`mb-1 text-xs ${
                   isToday
                     ? "inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 font-bold text-white dark:bg-indigo-500 dark:text-white"
-                    : "text-zinc-400"
+                    : "text-zinc-500"
                 }`}
               >
                 {day}
@@ -190,7 +190,7 @@ export default async function CalendarPage({
                     title="Zadatak s rokom"
                     className={`truncate rounded px-1 py-0.5 text-[11px] ${
                       t.status === "done"
-                        ? "bg-zinc-100 text-zinc-400 line-through dark:bg-zinc-900"
+                        ? "bg-zinc-100 text-zinc-500 line-through dark:bg-zinc-900"
                         : "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300"
                     }`}
                   >
@@ -212,7 +212,7 @@ export default async function CalendarPage({
         })}
       </div>
 
-      <p className="text-xs text-zinc-400">
+      <p className="text-xs text-zinc-500">
         <span className="rounded bg-blue-100 px-1 dark:bg-blue-950">plavo</span>{" "}
         = događaji ·{" "}
         <span className="rounded bg-green-100 px-1 dark:bg-green-950">

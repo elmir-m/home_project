@@ -12,6 +12,7 @@ import {
   deleteAutomation,
   toggleApp,
 } from "./actions";
+import { AppIcon } from "@/components/app-icon";
 
 type Automation = {
   id: string;
@@ -59,7 +60,7 @@ export default async function AppsPage() {
         <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
           Aplikacije i platforma
         </h1>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-500">
           Sve gradi na dijeljenim sposobnostima. Nove aplikacije se dodaju na
           isti način i odmah rade uz postojeće.
         </p>
@@ -67,7 +68,7 @@ export default async function AppsPage() {
 
       {/* REGISTAR */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Instalirane aplikacije
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -83,9 +84,11 @@ export default async function AppsPage() {
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <span className="text-lg">
-                    {app.icon}{" "}
-                    <span className="font-semibold text-black dark:text-zinc-50">
+                  <span className="flex items-center gap-2">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                      <AppIcon slug={app.slug} className="h-[18px] w-[18px]" />
+                    </span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-50">
                       {app.name}
                     </span>
                   </span>
@@ -132,14 +135,14 @@ export default async function AppsPage() {
 
       {/* AUTOMATIZACIJE */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Automatizacije — &quot;kad ovo → onda ono&quot;
         </h2>
         <form
           action={createAutomation}
           className="mb-3 flex flex-wrap items-end gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-zinc-900"
         >
-          <span className="text-sm text-zinc-400">Kada</span>
+          <span className="text-sm text-zinc-500">Kada</span>
           <select
             name="trigger_type"
             className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
@@ -150,7 +153,7 @@ export default async function AppsPage() {
               </option>
             ))}
           </select>
-          <span className="text-sm text-zinc-400">onda</span>
+          <span className="text-sm text-zinc-500">onda</span>
           <select
             name="action_type"
             className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
@@ -201,7 +204,7 @@ export default async function AppsPage() {
             </li>
           ))}
           {autoList.length === 0 && (
-            <li className="py-3 text-center text-sm text-zinc-400">
+            <li className="py-3 text-center text-sm text-zinc-500">
               Nema automatizacija. Npr: kada &quot;Zadatak završen&quot; → &quot;Pošalji
               email domaćinstvu&quot;. (Prazno i nakon dodavanja? Pokreni migraciju 0009.)
             </li>
@@ -211,7 +214,7 @@ export default async function AppsPage() {
 
       {/* EVENT FEED */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Nedavni događaji (event bus)
         </h2>
         <ul className="flex flex-col gap-1">
@@ -221,16 +224,16 @@ export default async function AppsPage() {
               className="flex items-center justify-between rounded-md bg-zinc-50 px-3 py-1.5 text-sm dark:bg-zinc-900"
             >
               <span className="text-black dark:text-zinc-50">
-                <span className="text-zinc-400">{eventLabel(e.type)}:</span>{" "}
+                <span className="text-zinc-500">{eventLabel(e.type)}:</span>{" "}
                 {e.payload?.title ?? ""}
               </span>
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-zinc-500">
                 {new Date(e.created_at).toLocaleString("bs-BA")}
               </span>
             </li>
           ))}
           {eventList.length === 0 && (
-            <li className="py-3 text-center text-sm text-zinc-400">
+            <li className="py-3 text-center text-sm text-zinc-500">
               Još nema događaja. Napravi/završi zadatak pa osvježi.
             </li>
           )}
