@@ -9,6 +9,7 @@ import {
   editTransaction,
   createBill,
   editBill,
+  saveBudget,
 } from "./actions";
 
 type Member = {
@@ -32,6 +33,7 @@ type Bill = {
   recurrence: string;
   category: string | null;
 };
+type Budget = { category: string; monthly_limit: number };
 
 const input =
   "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50";
@@ -172,6 +174,63 @@ export function TransactionForm({
             pendingText="Čuvam…"
           >
             {editing ? "Sačuvaj" : "Dodaj transakciju"}
+          </SubmitButton>
+        </form>
+      )}
+    </Modal>
+  );
+}
+
+export function BudgetForm({ budget }: { budget?: Budget }) {
+  const editing = !!budget;
+  const formRef = useRef<HTMLFormElement>(null);
+  return (
+    <Modal
+      title={editing ? "Uredi budžet" : "Novi budžet"}
+      trigger={(open) =>
+        editing ? <EditBtn open={open} /> : <AddBtn open={open} label="Novi budžet" />
+      }
+    >
+      {(close) => (
+        <form
+          ref={formRef}
+          action={saveBudget}
+          onSubmit={() =>
+            setTimeout(() => {
+              if (!editing) formRef.current?.reset();
+              close();
+            }, 50)
+          }
+          className="flex flex-col gap-4"
+        >
+          <Field label="Kategorija">
+            <input
+              name="category"
+              required
+              autoFocus={!editing}
+              readOnly={editing}
+              defaultValue={budget?.category ?? ""}
+              placeholder="npr. Hrana"
+              className={`${input} ${editing ? "opacity-70" : ""}`}
+            />
+          </Field>
+          <Field label="Mjesečni limit (KM)">
+            <input
+              name="monthly_limit"
+              type="number"
+              step="0.01"
+              min="0"
+              required
+              autoFocus={editing}
+              defaultValue={budget?.monthly_limit ?? ""}
+              className={input}
+            />
+          </Field>
+          <SubmitButton
+            className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+            pendingText="Čuvam…"
+          >
+            {editing ? "Sačuvaj" : "Dodaj budžet"}
           </SubmitButton>
         </form>
       )}

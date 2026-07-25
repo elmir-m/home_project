@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
-import { deleteTransaction, deleteBill } from "./actions";
-import { TransactionForm, BillForm } from "./finance-forms";
+import { deleteTransaction, deleteBill, deleteBudget } from "./actions";
+import { TransactionForm, BillForm, BudgetForm } from "./finance-forms";
 
 type Tx = {
   id: string;
@@ -21,6 +21,7 @@ type Bill = {
   recurrence: string;
   category: string | null;
 };
+type Budget = { id: string; category: string; monthly_limit: number };
 
 const money = (n: number) =>
   new Intl.NumberFormat("bs-BA", { minimumFractionDigits: 2 }).format(n) + " KM";
@@ -43,7 +44,7 @@ export default async function FinancePage() {
   )}`;
   const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 
-  const [{ data: txs }, { data: bills }] = await Promise.all([
+  const [{ data: txs }, { data: bills }, { data: budgets }] = await Promise.all([
     supabase
       .from("transactions")
       .select("id, kind, amount, category, description, occurred_on, paid_by")
@@ -51,10 +52,23 @@ export default async function FinancePage() {
       .lte("occurred_on", monthEnd)
       .order("occurred_on", { ascending: false }),
     supabase.from("bills").select("*").order("due_date", { ascending: true }),
+    supabase.from("budgets").select("id, category, monthly_limit").order("category"),
   ]);
 
   const txList = (txs as Tx[]) ?? [];
   const billList = (bills as Bill[]) ?? [];
+  const budgetList = (budgets as Budget[]) ?? [];
+
+  // Potrošeno po kategoriji (troškovi ovog mjeseca).
+  const spentByCat = new Map<string, number>();
+  txList
+    .filter((t) => t.kind === "expense" && t.category)
+    .forEach((t) =>
+      spentByCat.set(
+        t.category!,
+        (spentByCat.get(t.category!) ?? 0) + Number(t.amount),
+      ),
+    );
 
   const income = txList
     .filter((t) => t.kind === "income")
@@ -131,6 +145,83 @@ export default async function FinancePage() {
           </ul>
         </div>
       )}
+
+      {/* Budžeti */}
+      <section>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            Budžeti po kategoriji (ovaj mjesec)
+          </h2>
+          <BudgetForm />
+        </div>
+        {budgetList.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-zinc-300 bg-white/50 py-4 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:bg-[#20242c]/40 dark:text-zinc-400">
+            Nema budžeta. Postavi limit po kategoriji (npr. Hrana) da pratiš
+            potrošnju.
+          </p>
+        ) : (
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {budgetList.map((b) => {
+              const spent = spentByCat.get(b.category) ?? 0;
+              const pct = Math.min(
+                100,
+                Math.round((spent / Number(b.monthly_limit)) * 100),
+              );
+              const over = spent > Number(b.monthly_limit);
+              const bar = over
+                ? "bg-red-500"
+                : pct >= 80
+                  ? "bg-amber-500"
+                  : "bg-indigo-500";
+              return (
+                <li
+                  key={b.id}
+                  className="group rounded-xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
+                >
+                  <div className="mb-1.5 flex items-center justify-between text-sm">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                      {b.category}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span
+                        className={
+                          over
+                            ? "font-medium text-red-600"
+                            : "text-zinc-500 dark:text-zinc-400"
+                        }
+                      >
+                        {money(spent)} / {money(Number(b.monthly_limit))}
+                      </span>
+                      <span className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                        <BudgetForm
+                          budget={{
+                            category: b.category,
+                            monthly_limit: Number(b.monthly_limit),
+                          }}
+                        />
+                        <form action={deleteBudget}>
+                          <input type="hidden" name="id" value={b.id} />
+                          <button className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                            ✕
+                          </button>
+                        </form>
+                      </span>
+                    </span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-[#2a2f39]">
+                    <div className={`h-full ${bar}`} style={{ width: `${pct}%` }} />
+                  </div>
+                  {over && (
+                    <p className="mt-1 text-xs font-medium text-red-600">
+                      Prekoračeno za {money(spent - Number(b.monthly_limit))}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
 
       {/* Transakcije */}
       <section>

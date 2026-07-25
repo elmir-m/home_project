@@ -117,3 +117,28 @@ export async function deleteBill(formData: FormData) {
   await supabase.from("bills").delete().eq("id", String(formData.get("id")));
   revalidatePath("/finance");
 }
+
+export async function saveBudget(formData: FormData) {
+  const { supabase, user, household } = await ctx();
+  if (!user || !household) return;
+  const category = String(formData.get("category") ?? "").trim();
+  const limit = Number(formData.get("monthly_limit"));
+  if (!category || !limit || limit <= 0) return;
+
+  await supabase.from("budgets").upsert(
+    {
+      household_id: household.id,
+      category,
+      monthly_limit: limit,
+      created_by: user.id,
+    },
+    { onConflict: "household_id,category" },
+  );
+  revalidatePath("/finance");
+}
+
+export async function deleteBudget(formData: FormData) {
+  const { supabase } = await ctx();
+  await supabase.from("budgets").delete().eq("id", String(formData.get("id")));
+  revalidatePath("/finance");
+}
