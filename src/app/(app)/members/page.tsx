@@ -13,6 +13,7 @@ import {
 import { BUILTIN_APPS } from "@/lib/apps";
 import { AppIcon } from "@/components/app-icon";
 import SubmitButton from "@/components/submit-button";
+import MemberDetail from "./member-detail";
 
 type Invitation = {
   id: string;
@@ -135,10 +136,8 @@ export default async function MembersPage({
               key={m.user_id}
               className="rounded-lg border border-zinc-100 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-[#2a2f39]/40"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-black dark:text-zinc-50">
-                  {m.profiles?.display_name ?? m.profiles?.email}
-                </span>
+              <div className="flex items-center justify-between gap-2">
+                <MemberDetail member={m} householdName={household?.name ?? null} />
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                     m.role === "owner"

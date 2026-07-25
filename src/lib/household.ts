@@ -4,7 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 export type Member = {
   user_id: string;
   role: string;
-  profiles: { display_name: string | null; email: string | null } | null;
+  profiles: {
+    display_name: string | null;
+    email: string | null;
+    avatar_url?: string | null;
+  } | null;
 };
 
 export type Household = { id: string; name: string };
@@ -31,7 +35,7 @@ export async function getCurrentHousehold() {
 
   const { data } = await supabase
     .from("household_members")
-    .select("user_id, role, profiles(display_name, email)")
+    .select("user_id, role, profiles(display_name, email, avatar_url)")
     .eq("household_id", household.id);
 
   return {
