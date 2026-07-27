@@ -21,4 +21,5 @@ export const BUILTIN_APPS: AppManifest[] = [
   { slug: "reminders", name: "Podsjetnici", icon: "🔔", href: "/reminders", description: "Jednokratni i ponavljajući, email.", emits: ["reminder.created"], capabilities: ["email", "members"] },
   { slug: "life", name: "Kućna evidencija", icon: "🗂️", href: "/life", description: "Dokumenti, garancije, obnove, kontakti i liste.", emits: ["record.created"], capabilities: ["reminders"] },
   { slug: "shopping", name: "Kupovina", icon: "🛒", href: "/shopping", description: "Zajednička lista za kupovinu — nova aplikacija na platformi.", emits: ["shopping.added"], capabilities: ["members", "reminders"] },
+  { slug: "chat", name: "Chat", icon: "💬", href: "/chat", description: "Poruke među članovima domaćinstva, u realnom vremenu.", emits: [], capabilities: ["members"] },
 ];
