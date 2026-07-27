@@ -56,7 +56,7 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
         title={`${t("topbar.logout")} (${email})`}
         className={
           full
-            ? "flex h-11 w-full items-center justify-center rounded-lg text-red-400 transition hover:bg-white/5 hover:text-red-300 active:bg-indigo-600 active:text-white"
+            ? "flex h-11 w-full items-center justify-center rounded-lg text-zinc-400 transition hover:bg-white/5 hover:text-red-400 active:bg-indigo-600 active:text-white"
             : "flex h-9 items-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-600 transition hover:bg-zinc-100 active:scale-[0.98] dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
         }
       >
