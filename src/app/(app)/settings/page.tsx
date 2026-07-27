@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { saveNotificationPrefs } from "./actions";
 import Appearance from "./appearance";
+import { getT } from "@/lib/i18n-server";
 
 type Prefs = {
   email_reminders: boolean;
@@ -19,11 +20,11 @@ const DEFAULTS: Prefs = {
   digest: "none",
 };
 
-const CATEGORIES: { key: keyof Prefs; label: string; desc: string }[] = [
-  { key: "email_reminders", label: "Podsjetnici", desc: "Kada podsjetnik dospije." },
-  { key: "email_tasks", label: "Zadaci", desc: "Kada ti je zadatak dodijeljen." },
-  { key: "email_bills", label: "Računi", desc: "Kada račun uskoro dospijeva." },
-  { key: "email_shared", label: "Dijeljenje", desc: "Kada je nešto podijeljeno s tobom." },
+const CATEGORIES: { key: keyof Prefs; i18n: string }[] = [
+  { key: "email_reminders", i18n: "reminders" },
+  { key: "email_tasks", i18n: "tasks" },
+  { key: "email_bills", i18n: "bills" },
+  { key: "email_shared", i18n: "shared" },
 ];
 
 export default async function SettingsPage() {
@@ -32,6 +33,8 @@ export default async function SettingsPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const t = await getT();
 
   const { data } = await supabase
     .from("notification_prefs")
@@ -50,11 +53,11 @@ export default async function SettingsPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <div>
-        <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-          Postavke
+        <h1 className="text-2xl font-bold text-black sm:text-3xl dark:text-zinc-50">
+          {t("settings.title")}
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Prijavljen kao {user.email}. Ove postavke vrijede samo za tebe.
+          {t("settings.loggedAs", { email: user.email ?? "" })}
         </p>
       </div>
 
@@ -68,7 +71,7 @@ export default async function SettingsPage() {
         className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
       >
         <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Email obavijesti
+          {t("notif.title")}
         </h2>
 
         {CATEGORIES.map((c) => (
@@ -84,39 +87,40 @@ export default async function SettingsPage() {
             />
             <span>
               <span className="block text-sm font-medium text-black dark:text-zinc-50">
-                {c.label}
+                {t(`notif.${c.i18n}`)}
               </span>
-              <span className="block text-xs text-zinc-500 dark:text-zinc-400">{c.desc}</span>
+              <span className="block text-xs text-zinc-500 dark:text-zinc-400">
+                {t(`notif.${c.i18n}.desc`)}
+              </span>
             </span>
           </label>
         ))}
 
         <div className="mt-2">
           <label className="block text-sm font-medium text-black dark:text-zinc-50">
-            Sažetak (digest)
+            {t("notif.digest")}
           </label>
           <p className="mb-1 text-xs text-zinc-500 dark:text-zinc-400">
-            Povremeni email s pregledom onoga što slijedi.
+            {t("notif.digest.desc")}
           </p>
           <select
             name="digest"
             defaultValue={prefs.digest}
             className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
           >
-            <option value="none">Isključeno</option>
-            <option value="daily">Dnevni</option>
-            <option value="weekly">Sedmični</option>
+            <option value="none">{t("digest.none")}</option>
+            <option value="daily">{t("digest.daily")}</option>
+            <option value="weekly">{t("digest.weekly")}</option>
           </select>
         </div>
 
         <button className="mt-2 self-start rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
-          Sačuvaj
+          {t("common.save")}
         </button>
       </form>
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        Emailove šaljemo s verifikovanog domena (emurgic.info) — stižu svim
-        članovima.
+        {t("settings.emailFooter")}
       </p>
     </main>
   );

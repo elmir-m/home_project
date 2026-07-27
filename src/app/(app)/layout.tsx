@@ -5,8 +5,10 @@ import TopBar from "@/components/top-bar";
 import RealtimeRefresh from "@/components/realtime-refresh";
 import HouseholdOnboarding from "@/components/household-onboarding";
 import HelpTour from "@/components/help-tour";
+import { LocaleProvider } from "@/components/locale-provider";
 import { getHiddenSlugs } from "@/lib/visibility";
 import { getCurrentHousehold } from "@/lib/household";
+import { getLocale } from "@/lib/i18n-server";
 
 // Layout za sve prijavljene stranice: sidebar + gornja traka + provjera sesije.
 export default async function AppLayout({
@@ -21,6 +23,7 @@ export default async function AppLayout({
   if (!user) redirect("/login");
 
   const { households } = await getCurrentHousehold();
+  const locale = await getLocale();
 
   // Korisnik još nije član nijednog domaćinstva -> onboarding (napravi ili se pridruži).
   if (households.length === 0) {
@@ -30,14 +33,16 @@ export default async function AppLayout({
       .eq("id", user.id)
       .single();
     return (
-      <div className="flex min-h-screen flex-col">
-        <RealtimeRefresh />
-        <TopBar minimal />
-        <HouseholdOnboarding
-          name={prof?.display_name ?? ""}
-          email={user.email ?? ""}
-        />
-      </div>
+      <LocaleProvider locale={locale}>
+        <div className="flex min-h-screen flex-col">
+          <RealtimeRefresh />
+          <TopBar minimal />
+          <HouseholdOnboarding
+            name={prof?.display_name ?? ""}
+            email={user.email ?? ""}
+          />
+        </div>
+      </LocaleProvider>
     );
   }
 
@@ -45,14 +50,16 @@ export default async function AppLayout({
   const hidden = await getHiddenSlugs();
 
   return (
-    <div className="flex min-h-screen">
-      <RealtimeRefresh />
-      <HelpTour />
-      <Sidebar hidden={hidden} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar />
-        <div className="flex-1">{children}</div>
+    <LocaleProvider locale={locale}>
+      <div className="flex min-h-screen">
+        <RealtimeRefresh />
+        <HelpTour />
+        <Sidebar hidden={hidden} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <TopBar />
+          <div className="flex-1">{children}</div>
+        </div>
       </div>
-    </div>
+    </LocaleProvider>
   );
 }

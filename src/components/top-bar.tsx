@@ -9,6 +9,7 @@ import { logout } from "@/app/login/actions";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
 import { getHiddenSlugs } from "@/lib/visibility";
+import { getT } from "@/lib/i18n-server";
 
 // Gornja traka: hamburger (mobilni) + pretraga (lijevo); identitet, notifikacije,
 // pomoć, tema, brzi upis, odjava (desno). `minimal` = onboarding (bez navigacije).
@@ -19,10 +20,11 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
   } = await supabase.auth.getUser();
 
   const { household, members } = await getCurrentHousehold();
+  const t = await getT();
   const me = members.find((m) => m.user_id === user?.id);
   const name = me?.profiles?.display_name ?? user?.email ?? "";
   const email = user?.email ?? "";
-  const role = me?.role === "owner" ? "vlasnik" : "član";
+  const role = me?.role === "owner" ? t("role.owner") : t("role.member");
   const initial = (name || email).charAt(0).toUpperCase();
 
   const { data: prof } = user
@@ -53,7 +55,7 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
               <Search className="h-4 w-4 shrink-0 text-zinc-400" />
               <input
                 name="q"
-                placeholder="Traži kroz sve…"
+                placeholder={t("topbar.search")}
                 className="w-full border-0 bg-transparent py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-50"
               />
             </div>
@@ -64,7 +66,7 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
       {/* Identitet prijavljenog korisnika (klik → profil) */}
       <Link
         href="/profile"
-        title="Moj profil"
+        title={t("topbar.myProfile")}
         className="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#20242c] dark:hover:bg-[#2a2f39]"
       >
         {avatarUrl ? (
@@ -99,11 +101,11 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
 
       <form action={logout}>
         <button
-          title={`Odjava (${email})`}
+          title={`${t("topbar.logout")} (${email})`}
           className="flex h-9 items-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-600 transition hover:bg-zinc-100 active:scale-[0.98] dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
         >
           <LogOut className="h-4 w-4" />
-          <span className="hidden sm:inline">Odjava</span>
+          <span className="hidden sm:inline">{t("topbar.logout")}</span>
         </button>
       </form>
     </header>

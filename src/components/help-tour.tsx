@@ -3,64 +3,29 @@
 import { useEffect, useState } from "react";
 import { HelpCircle, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { AppIcon } from "@/components/app-icon";
+import { useT } from "@/components/locale-provider";
 
 const SEEN_KEY = "tourSeenV1";
 
-type Step = { slug: string; title: string; body: string };
-
-const STEPS: Step[] = [
-  {
-    slug: "dashboard",
-    title: "Dobrodošao u „Moj dom“",
-    body: "Ovo je zajednički sistem za cijelo domaćinstvo — zadaci, kalendar, finansije, podsjetnici, chat i još mnogo toga, sve na jednom mjestu i dijeljeno među ukućanima.",
-  },
-  {
-    slug: "dashboard",
-    title: "Danas",
-    body: "Početni ekran ti pokazuje šta te čeka danas: dospjele zadatke, događaje, račune i podsjetnike na jednom pogledu.",
-  },
-  {
-    slug: "tasks",
-    title: "Zadaci i Kanban",
-    body: "Dodaj zadatke s rokom, prioritetom i zaduženom osobom. Ista lista se vidi i kao Kanban tabla za lakše praćenje.",
-  },
-  {
-    slug: "calendar",
-    title: "Kalendar",
-    body: "Događaji, zadaci s rokom i računi se automatski pojavljuju po danima. Klik na dan ili događaj za dodavanje/uređivanje.",
-  },
-  {
-    slug: "finance",
-    title: "Finansije",
-    body: "Prati troškove i prihode, računi s rokovima i budžeti s napretkom. Dospjeli računi te podsjete i emailom.",
-  },
-  {
-    slug: "reminders",
-    title: "Podsjetnici i Kućna evidencija",
-    body: "Postavi jednokratne ili ponavljajuće podsjetnike (stižu i mejlom), te čuvaj dokumente, garancije i kontakte.",
-  },
-  {
-    slug: "chat",
-    title: "Chat",
-    body: "Dopisuj se s ukućanima u realnom vremenu — poruke stižu odmah svima u domaćinstvu.",
-  },
-  {
-    slug: "members",
-    title: "Članovi",
-    body: "Pozovi ukućane u domaćinstvo (na njihov email). Kao vlasnik možeš i birati koje aplikacije ko vidi.",
-  },
-  {
-    slug: "settings",
-    title: "Postavke po tvojoj mjeri",
-    body: "U Postavkama biraš temu (svijetlo/tamno), veličinu slova i akcentnu boju — vezano za tvoj nalog. Ovaj vodič uvijek možeš ponovo otvoriti klikom na „?“ gore.",
-  },
+// slug (ikona) + prefiks ključa u rječniku (.t naslov, .b tekst)
+const STEPS: { slug: string; k: string }[] = [
+  { slug: "dashboard", k: "help.s1" },
+  { slug: "dashboard", k: "help.s2" },
+  { slug: "tasks", k: "help.s3" },
+  { slug: "calendar", k: "help.s4" },
+  { slug: "finance", k: "help.s5" },
+  { slug: "reminders", k: "help.s6" },
+  { slug: "chat", k: "help.s7" },
+  { slug: "members", k: "help.s8" },
+  { slug: "settings", k: "help.s9" },
 ];
 
 export function HelpButton() {
+  const t = useT();
   return (
     <button
       onClick={() => window.dispatchEvent(new Event("open-help-tour"))}
-      title="Vodič / pomoć"
+      title={t("topbar.help")}
       className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
     >
       <HelpCircle className="h-4.5 w-4.5" strokeWidth={1.75} />
@@ -69,6 +34,7 @@ export function HelpButton() {
 }
 
 export default function HelpTour() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [i, setI] = useState(0);
 
@@ -103,7 +69,7 @@ export default function HelpTour() {
       <div className="relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-[#20242c]">
         <button
           onClick={close}
-          title="Zatvori"
+          title={t("common.close")}
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
         >
           <X className="h-4 w-4" />
@@ -114,10 +80,10 @@ export default function HelpTour() {
         </span>
 
         <h2 className="text-lg font-bold text-black dark:text-zinc-50">
-          {step.title}
+          {t(`${step.k}.t`)}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-          {step.body}
+          {t(`${step.k}.b`)}
         </p>
 
         {/* Tačkice */}
@@ -138,7 +104,7 @@ export default function HelpTour() {
             disabled={i === 0}
             className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-zinc-600 disabled:opacity-40 dark:text-zinc-300"
           >
-            <ChevronLeft className="h-4 w-4" /> Nazad
+            <ChevronLeft className="h-4 w-4" /> {t("help.back")}
           </button>
 
           {last ? (
@@ -146,14 +112,14 @@ export default function HelpTour() {
               onClick={close}
               className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
-              Završi
+              {t("help.finish")}
             </button>
           ) : (
             <button
               onClick={() => setI((v) => Math.min(STEPS.length - 1, v + 1))}
               className="flex items-center gap-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
-              Dalje <ChevronRight className="h-4 w-4" />
+              {t("help.next")} <ChevronRight className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -162,7 +128,7 @@ export default function HelpTour() {
           onClick={close}
           className="mt-3 w-full text-center text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
         >
-          Preskoči vodič
+          {t("help.skip")}
         </button>
       </div>
     </div>

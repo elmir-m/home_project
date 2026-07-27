@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { saveAppearance } from "./actions";
+import { useRouter } from "next/navigation";
+import { saveAppearance, saveLocale } from "./actions";
+import { useT, useLocale } from "@/components/locale-provider";
+import { LOCALES } from "@/lib/i18n";
 
-const FONTS: { key: string; label: string; sample: string }[] = [
-  { key: "sm", label: "Mala", sample: "text-sm" },
-  { key: "md", label: "Srednja", sample: "text-base" },
-  { key: "lg", label: "Velika", sample: "text-xl" },
+const FONTS: { key: string; sample: string }[] = [
+  { key: "sm", sample: "text-sm" },
+  { key: "md", sample: "text-base" },
+  { key: "lg", sample: "text-xl" },
 ];
 
 // value = ime palete (data-accent); swatch = boja kruga (600 nijansa).
@@ -27,9 +30,19 @@ export default function Appearance({
   initialFont: string;
   initialAccent: string;
 }) {
+  const t = useT();
+  const locale = useLocale();
+  const router = useRouter();
   const [font, setFont] = useState(initialFont);
   const [accent, setAccent] = useState(initialAccent);
   const [saving, startSaving] = useTransition();
+
+  function chooseLocale(v: string) {
+    if (v === locale) return;
+    startSaving(() => {
+      saveLocale(v).then(() => router.refresh());
+    });
+  }
 
   function persist(nextFont: string, nextAccent: string) {
     startSaving(() => {
@@ -54,17 +67,48 @@ export default function Appearance({
     <section className="flex flex-col gap-5 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Izgled
+          {t("appearance.title")}
         </h2>
         {saving && (
-          <span className="text-xs text-zinc-400 dark:text-zinc-500">Čuvam…</span>
+          <span className="text-xs text-zinc-400 dark:text-zinc-500">
+            {t("common.saving")}
+          </span>
         )}
+      </div>
+
+      {/* Jezik */}
+      <div>
+        <p className="mb-2 text-sm font-medium text-black dark:text-zinc-50">
+          {t("language.title")}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {LOCALES.map((l) => {
+            const active = locale === l.code;
+            return (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => chooseLocale(l.code)}
+                className={`rounded-lg border px-4 py-2 text-sm transition ${
+                  active
+                    ? "border-indigo-600 bg-indigo-50 font-medium text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/40 dark:text-indigo-300"
+                    : "border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:border-zinc-700 dark:text-zinc-300"
+                }`}
+              >
+                {l.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+          {t("language.note")}
+        </p>
       </div>
 
       {/* Veličina fonta */}
       <div>
         <p className="mb-2 text-sm font-medium text-black dark:text-zinc-50">
-          Veličina slova
+          {t("appearance.fontSize")}
         </p>
         <div className="flex flex-wrap gap-2">
           {FONTS.map((f) => {
@@ -92,7 +136,7 @@ export default function Appearance({
                       : "text-zinc-500 dark:text-zinc-400"
                   }`}
                 >
-                  {f.label}
+                  {t(`font.${f.key}`)}
                 </span>
               </button>
             );
@@ -103,7 +147,7 @@ export default function Appearance({
       {/* Akcentna boja */}
       <div>
         <p className="mb-2 text-sm font-medium text-black dark:text-zinc-50">
-          Akcentna boja
+          {t("appearance.accent")}
         </p>
         <div className="flex flex-wrap gap-3">
           {ACCENTS.map((a) => {
@@ -144,7 +188,7 @@ export default function Appearance({
       </div>
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        Vezano za tvoj nalog — vrijedi na svim uređajima. Primjenjuje se odmah.
+        {t("appearance.note")}
       </p>
     </section>
   );

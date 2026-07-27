@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Bell, Check, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useT, useLocale } from "@/components/locale-provider";
+import { localeTag } from "@/lib/i18n";
 import {
   markAllNotificationsRead,
   acceptInviteNotif,
@@ -20,12 +22,16 @@ export type Notif = {
   created_at: string;
 };
 
-function ago(iso: string) {
+function ago(
+  iso: string,
+  t: (k: string, v?: Record<string, string | number>) => string,
+  tag: string,
+) {
   const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (diff < 60) return "upravo sad";
-  if (diff < 3600) return `prije ${Math.floor(diff / 60)} min`;
-  if (diff < 86400) return `prije ${Math.floor(diff / 3600)} h`;
-  return new Date(iso).toLocaleDateString("bs-BA", {
+  if (diff < 60) return t("time.now");
+  if (diff < 3600) return t("time.min", { n: Math.floor(diff / 60) });
+  if (diff < 86400) return t("time.hour", { n: Math.floor(diff / 3600) });
+  return new Date(iso).toLocaleDateString(tag, {
     day: "numeric",
     month: "short",
   });
@@ -38,6 +44,8 @@ export default function NotificationsBell({
   userId: string;
   initial: Notif[];
 }) {
+  const t = useT();
+  const tag = localeTag(useLocale());
   const [items, setItems] = useState<Notif[]>(initial);
   const [open, setOpen] = useState(false);
   const [, startTransition] = useTransition();
@@ -107,7 +115,7 @@ export default function NotificationsBell({
     <div className="relative" ref={boxRef}>
       <button
         onClick={toggle}
-        title="Notifikacije"
+        title={t("topbar.notifications")}
         className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
       >
         <Bell className="h-4.5 w-4.5" strokeWidth={1.75} />
@@ -122,14 +130,14 @@ export default function NotificationsBell({
         <div className="absolute right-0 top-11 z-20 w-80 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-[#20242c]">
           <div className="border-b border-zinc-100 px-4 py-2.5 dark:border-zinc-800">
             <p className="text-sm font-semibold text-black dark:text-zinc-50">
-              Notifikacije
+              {t("topbar.notifications")}
             </p>
           </div>
 
           <div className="max-h-96 overflow-y-auto">
             {items.length === 0 && (
               <p className="px-4 py-8 text-center text-sm text-zinc-400 dark:text-zinc-500">
-                Nemaš notifikacija.
+                {t("notif.empty")}
               </p>
             )}
 
@@ -153,7 +161,7 @@ export default function NotificationsBell({
                       </p>
                     )}
                     <p className="mt-0.5 text-[11px] text-zinc-400 dark:text-zinc-500">
-                      {ago(n.created_at)}
+                      {ago(n.created_at, t, tag)}
                     </p>
 
                     {n.type === "invite" && token && (
@@ -162,14 +170,14 @@ export default function NotificationsBell({
                           <input type="hidden" name="token" value={token} />
                           <input type="hidden" name="notif_id" value={n.id} />
                           <button className="flex items-center gap-1 rounded-md bg-indigo-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-indigo-700">
-                            <Check className="h-3.5 w-3.5" /> Prihvati
+                            <Check className="h-3.5 w-3.5" /> {t("notif.accept")}
                           </button>
                         </form>
                         <form action={declineInviteNotif}>
                           <input type="hidden" name="token" value={token} />
                           <input type="hidden" name="notif_id" value={n.id} />
                           <button className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
-                            Odbij
+                            {t("notif.decline")}
                           </button>
                         </form>
                       </div>
@@ -181,7 +189,7 @@ export default function NotificationsBell({
                     <form action={dismissNotification}>
                       <input type="hidden" name="id" value={n.id} />
                       <button
-                        title="Ukloni"
+                        title={t("notif.remove")}
                         className="mt-0.5 shrink-0 rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800"
                       >
                         <X className="h-3.5 w-3.5" />

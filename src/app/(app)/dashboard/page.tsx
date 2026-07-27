@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { eventLabel } from "@/lib/platform";
+import { getT, getLocale } from "@/lib/i18n-server";
+import { localeTag } from "@/lib/i18n";
 
 type MemberRow = {
   role: string;
@@ -27,6 +29,9 @@ export default async function DashboardPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const t = await getT();
+  const tag = localeTag(await getLocale());
 
   const now = new Date();
   const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
@@ -108,11 +113,11 @@ export default async function DashboardPage({
           {title}
         </h2>
         <Link href={href} className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-indigo-600">
-          otvori →
+          {t("dash.open")}
         </Link>
       </div>
       {empty ? (
-        <p className="py-2 text-sm text-zinc-500 dark:text-zinc-400">Ništa za sad 🎉</p>
+        <p className="py-2 text-sm text-zinc-500 dark:text-zinc-400">{t("dash.empty")}</p>
       ) : (
         <ul className="flex flex-col gap-1.5 text-sm">{children}</ul>
       )}
@@ -123,7 +128,7 @@ export default async function DashboardPage({
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
       {sp.welcome && (
         <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-950/50 dark:text-green-300">
-          ✓ Domaćinstvo je kreirano. Dobrodošao/la! Pozovi ukućane preko „Članovi“.
+          {t("dash.welcome")}
         </p>
       )}
       {sp.error && (
@@ -132,9 +137,9 @@ export default async function DashboardPage({
         </p>
       )}
       <div>
-        <h1 className="text-2xl font-bold text-black sm:text-3xl dark:text-zinc-50">Danas</h1>
+        <h1 className="text-2xl font-bold text-black sm:text-3xl dark:text-zinc-50">{t("nav.dashboard")}</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {now.toLocaleDateString("bs-BA", {
+          {now.toLocaleDateString(tag, {
             weekday: "long",
             day: "numeric",
             month: "long",
@@ -145,7 +150,7 @@ export default async function DashboardPage({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Card
-          title="Zadaci — dospjeli / danas"
+          title={t("dash.card.tasks")}
           href="/tasks"
           empty={!dueTasks?.length}
         >
@@ -166,7 +171,7 @@ export default async function DashboardPage({
         </Card>
 
         <Card
-          title="Danas u kalendaru"
+          title={t("dash.card.calendar")}
           href="/calendar"
           empty={!todayEvents?.length}
         >
@@ -183,7 +188,7 @@ export default async function DashboardPage({
         </Card>
 
         <Card
-          title="Računi — narednih 7 dana"
+          title={t("dash.card.bills")}
           href="/finance"
           empty={!soonBills?.length}
         >
@@ -198,7 +203,7 @@ export default async function DashboardPage({
         </Card>
 
         <Card
-          title="Podsjetnici — uskoro"
+          title={t("dash.card.reminders")}
           href="/reminders"
           empty={!dueReminders?.length}
         >
@@ -215,13 +220,13 @@ export default async function DashboardPage({
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Domaćinstvo
+            {t("dash.household")}
           </h2>
           <Link
             href="/members"
             className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-indigo-600"
           >
-            članovi / pozovi →
+            {t("dash.household.link")}
           </Link>
         </div>
         {household ? (
@@ -240,7 +245,7 @@ export default async function DashboardPage({
           </div>
         ) : (
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Nema domaćinstva. Pokreni migraciju 0001.
+            {t("dash.household.none")}
           </p>
         )}
       </section>
@@ -248,12 +253,11 @@ export default async function DashboardPage({
       {/* Nedavna aktivnost */}
       <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Nedavna aktivnost
+          {t("dash.activity")}
         </h2>
         {((recentEvents as ActEvent[]) ?? []).length === 0 ? (
           <p className="py-2 text-sm text-zinc-500 dark:text-zinc-400">
-            Još nema aktivnosti. Kad neko doda zadatak, račun ili bilješku,
-            pojaviće se ovdje.
+            {t("dash.activity.empty")}
           </p>
         ) : (
           <ul className="flex flex-col gap-1.5 text-sm">

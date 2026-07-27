@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyAuthError } from "@/lib/auth-errors";
 
@@ -42,6 +42,23 @@ export async function login(formData: FormData) {
   if (errorMsg) {
     redirect("/login?error=" + encodeURIComponent(errorMsg));
   }
+
+  // Postavi jezik iz profila (da prati nalog na ovom uređaju).
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("locale")
+        .eq("id", user.id)
+        .single();
+      const loc = p?.locale === "en" ? "en" : "bs";
+      const cookieStore = await cookies();
+      cookieStore.set("locale", loc, { path: "/", maxAge: 60 * 60 * 24 * 365 });
+    }
+  } catch {}
 
   revalidatePath("/", "layout");
   redirect("/dashboard");

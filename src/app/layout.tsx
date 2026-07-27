@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
+import { getLocale } from "@/lib/i18n-server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,9 +61,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { font, accent } = await getAppearance();
+  const locale = await getLocale();
   return (
     <html
-      lang="bs"
+      lang={locale}
       suppressHydrationWarning
       data-font={font}
       data-accent={accent === "indigo" ? undefined : accent}

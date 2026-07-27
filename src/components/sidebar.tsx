@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 import { Home, PanelLeftClose, PanelLeft } from "lucide-react";
 import { BUILTIN_APPS } from "@/lib/apps";
 import { AppIcon } from "@/components/app-icon";
+import { useT } from "@/components/locale-provider";
 
 type Item = { href: string; label: string; slug: string };
 
 export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
   const pathname = usePathname();
+  const t = useT();
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -31,27 +33,27 @@ export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
     {
       label: null,
       items: [
-        { href: "/dashboard", label: "Danas", slug: "dashboard" },
+        { href: "/dashboard", label: t("nav.dashboard"), slug: "dashboard" },
         ...BUILTIN_APPS.filter((a) => !hidden.includes(a.slug)).map((a) => ({
           href: a.href,
-          label: a.name,
+          label: t(`app.${a.slug}`),
           slug: a.slug,
         })),
       ],
     },
     {
-      label: "Administracija",
+      label: t("group.admin"),
       items: [
-        { href: "/members", label: "Članovi", slug: "members" },
-        { href: "/apps", label: "Aplikacije", slug: "apps" },
-        { href: "/automations", label: "Automatizacije", slug: "automations" },
+        { href: "/members", label: t("nav.members"), slug: "members" },
+        { href: "/apps", label: t("nav.apps"), slug: "apps" },
+        { href: "/automations", label: t("nav.automations"), slug: "automations" },
       ],
     },
     {
-      label: "Postavke",
+      label: t("group.settings"),
       items: [
-        { href: "/profile", label: "Moj profil", slug: "profile" },
-        { href: "/settings", label: "Postavke", slug: "settings" },
+        { href: "/profile", label: t("nav.profile"), slug: "profile" },
+        { href: "/settings", label: t("nav.settings"), slug: "settings" },
       ],
     },
   ];
