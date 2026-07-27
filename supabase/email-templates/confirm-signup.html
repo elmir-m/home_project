@@ -1,0 +1,34 @@
+<!--
+  Supabase Auth — "Confirm signup" template (brendiran: Moj dom).
+  Zalijepi u: Supabase Dashboard -> Authentication -> Email Templates -> Confirm signup.
+  Subject (preporuka): Potvrdi svoju email adresu — Moj dom
+  Varijable koje Supabase podržava ovdje: {{ .ConfirmationURL }}, {{ .SiteURL }}, {{ .Email }}, {{ .Token }}.
+  Stil usklađen sa src/lib/email.ts (emailLayout).
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:24px 12px;">
+  <tr><td align="center">
+    <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="width:520px;max-width:100%;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e6e7ea;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+      <tr><td style="background:#4f46e5;padding:22px 28px;">
+        <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.01em;">🏠 Moj dom</span>
+      </td></tr>
+      <tr><td style="padding:28px;">
+        <h1 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#18181b;">Potvrdi svoju email adresu</h1>
+        <div style="color:#3f3f46;font-size:15px;line-height:1.6;">
+          <p style="margin:0;">Dobrodošao/la u <b>Moj dom</b> 👋</p>
+          <p style="margin:12px 0 0;">Klikni na dugme ispod da potvrdiš adresu <b>{{ .Email }}</b> i završiš registraciju. Nakon toga se možeš prijaviti i pridružiti svom domaćinstvu.</p>
+        </div>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0 4px;">
+          <tr><td style="border-radius:10px;background:#4f46e5;">
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:12px 24px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;">Potvrdi email adresu</a>
+          </td></tr>
+        </table>
+        <p style="margin:8px 0 0;font-size:12px;color:#a1a1aa;">Ako dugme ne radi, kopiraj ovaj link u pretraživač:<br/>
+          <a href="{{ .ConfirmationURL }}" style="color:#4f46e5;word-break:break-all;">{{ .ConfirmationURL }}</a></p>
+        <p style="margin:16px 0 0;font-size:13px;color:#71717a;">Ako se nisi registrovao/la na Moj dom, slobodno zanemari ovu poruku.</p>
+      </td></tr>
+      <tr><td style="padding:16px 28px;background:#fafafa;border-top:1px solid #eee;">
+        <p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.5;">Automatska poruka — <b style="color:#71717a;">Moj dom</b>, zajednički kućni sistem.<br/>Ovaj link ističe iz sigurnosnih razloga; ako istekne, zatraži novu potvrdu u aplikaciji.</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
