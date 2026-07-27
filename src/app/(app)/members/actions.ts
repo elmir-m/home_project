@@ -9,6 +9,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentHousehold } from "@/lib/household";
 import { sendEmail, basicEmail } from "@/lib/email";
 import { notify } from "@/lib/notifications";
+import { getT } from "@/lib/i18n-server";
 
 const enc = (s: string) => encodeURIComponent(s);
 
@@ -34,8 +35,9 @@ async function ownerCtx() {
 export async function inviteMember(formData: FormData) {
   const { user, household, isOwner } = await ownerCtx();
   if (!user || !household) return;
+  const t = await getT();
   if (!isOwner)
-    redirect("/members?error=" + enc("Samo vlasnik može pozivati članove."));
+    redirect("/members?error=" + enc(t("members.err.ownerOnlyInvite")));
 
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!email) return;
@@ -49,13 +51,7 @@ export async function inviteMember(formData: FormData) {
     .maybeSingle();
 
   if (!prof) {
-    redirect(
-      "/members?error=" +
-        enc(
-          "Taj email nije registrovan u aplikaciji. Koristi „Kreiraj člana" +
-            "“ ili neka se osoba prvo sama registruje.",
-        ),
-    );
+    redirect("/members?error=" + enc(t("members.err.notRegistered")));
   }
 
   const { data: already } = await admin
@@ -65,7 +61,7 @@ export async function inviteMember(formData: FormData) {
     .eq("user_id", prof!.id)
     .maybeSingle();
   if (already) {
-    redirect("/members?error=" + enc("Ta osoba je već član domaćinstva."));
+    redirect("/members?error=" + enc(t("members.err.alreadyMember")));
   }
 
   const token = randomUUID();
@@ -103,8 +99,9 @@ export async function inviteMember(formData: FormData) {
 export async function createMember(formData: FormData) {
   const { household, isOwner } = await ownerCtx();
   if (!household) return;
+  const t = await getT();
   if (!isOwner)
-    redirect("/members?error=" + enc("Samo vlasnik može kreirati članove."));
+    redirect("/members?error=" + enc(t("members.err.ownerOnlyCreate")));
 
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
@@ -112,7 +109,7 @@ export async function createMember(formData: FormData) {
 
   if (!email || password.length < 6) {
     redirect(
-      "/members?error=" + enc("Email i lozinka (najmanje 6 znakova) su obavezni."),
+      "/members?error=" + enc(t("members.err.emailPasswordRequired")),
     );
   }
 
@@ -127,8 +124,8 @@ export async function createMember(formData: FormData) {
   if (error || !data.user) {
     const m = (error?.message ?? "").toLowerCase();
     const msg = m.includes("already")
-      ? "Korisnik s tim emailom već postoji."
-      : "Nije moguće kreirati člana. Pokušaj ponovo ili kontaktiraj administratora.";
+      ? t("members.err.userExists")
+      : t("members.err.createFailed");
     redirect("/members?error=" + enc(msg));
   }
 

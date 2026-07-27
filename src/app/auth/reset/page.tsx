@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Home, Lock, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useT } from "@/components/locale-provider";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const t = useT();
   const [ready, setReady] = useState(false);
   const [valid, setValid] = useState(false);
   const [pw, setPw] = useState("");
@@ -27,14 +29,14 @@ export default function ResetPasswordPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null);
-    if (pw.length < 6) return setMsg("Lozinka mora imati najmanje 6 znakova.");
-    if (pw !== pw2) return setMsg("Lozinke se ne poklapaju.");
+    if (pw.length < 6) return setMsg(t("auth.reset.tooShort"));
+    if (pw !== pw2) return setMsg(t("auth.reset.mismatch"));
     setLoading(true);
     const supabase = createClient();
     const { error } = await supabase.auth.updateUser({ password: pw });
     setLoading(false);
     if (error) {
-      setMsg("Link je istekao ili nije važeći. Zatraži novi.");
+      setMsg(t("auth.reset.expired"));
     } else {
       router.push("/dashboard");
     }
@@ -51,25 +53,25 @@ export default function ResetPasswordPage() {
             <Home className="h-6 w-6" />
           </span>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Nova lozinka
+            {t("auth.reset.title")}
           </h1>
         </div>
 
         <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-[#20242c]">
           {!ready ? (
             <p className="flex items-center justify-center gap-2 py-6 text-sm text-zinc-500">
-              <Loader2 className="h-4 w-4 animate-spin" /> Učitavam…
+              <Loader2 className="h-4 w-4 animate-spin" /> {t("auth.reset.loading")}
             </p>
           ) : !valid ? (
             <div className="text-center">
               <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                Link nije važeći ili je istekao.
+                {t("auth.reset.invalid")}
               </p>
               <Link
                 href="/forgot"
                 className="mt-4 inline-block rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
               >
-                Zatraži novi link
+                {t("auth.reset.requestNew")}
               </Link>
             </div>
           ) : (
@@ -81,7 +83,7 @@ export default function ResetPasswordPage() {
               )}
               <label className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Nova lozinka
+                  {t("auth.newPassword")}
                 </span>
                 <div className="relative">
                   <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -91,14 +93,14 @@ export default function ResetPasswordPage() {
                     onChange={(e) => setPw(e.target.value)}
                     required
                     minLength={6}
-                    placeholder="Najmanje 6 znakova"
+                    placeholder={t("auth.passwordMin")}
                     className={inputCls}
                   />
                 </div>
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Ponovi lozinku
+                  {t("auth.reset.repeat")}
                 </span>
                 <div className="relative">
                   <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -118,7 +120,7 @@ export default function ResetPasswordPage() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 active:scale-[0.98] disabled:opacity-70"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                Postavi lozinku
+                {t("auth.reset.submit")}
               </button>
             </form>
           )}

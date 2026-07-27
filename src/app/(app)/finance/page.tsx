@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentHousehold } from "@/lib/household";
+import { getCurrentHousehold, canManage } from "@/lib/household";
+import { getT } from "@/lib/i18n-server";
 import { deleteTransaction, deleteBill, deleteBudget } from "./actions";
 import { TransactionForm, BillForm, BudgetForm } from "./finance-forms";
 
@@ -12,6 +13,7 @@ type Tx = {
   description: string | null;
   occurred_on: string;
   paid_by: string | null;
+  created_by: string | null;
 };
 type Bill = {
   id: string;
@@ -20,8 +22,14 @@ type Bill = {
   due_date: string;
   recurrence: string;
   category: string | null;
+  created_by: string | null;
 };
-type Budget = { id: string; category: string; monthly_limit: number };
+type Budget = {
+  id: string;
+  category: string;
+  monthly_limit: number;
+  created_by: string | null;
+};
 
 const money = (n: number) =>
   new Intl.NumberFormat("bs-BA", { minimumFractionDigits: 2 }).format(n) + " KM";
@@ -30,12 +38,13 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 export default async function FinancePage() {
   const supabase = await createClient();
+  const t = await getT();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { members } = await getCurrentHousehold();
+  const { members, userId, isOwner } = await getCurrentHousehold();
 
   const now = new Date();
   const monthStart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-01`;
@@ -47,12 +56,12 @@ export default async function FinancePage() {
   const [{ data: txs }, { data: bills }, { data: budgets }] = await Promise.all([
     supabase
       .from("transactions")
-      .select("id, kind, amount, category, description, occurred_on, paid_by")
+      .select("id, kind, amount, category, description, occurred_on, paid_by, created_by")
       .gte("occurred_on", monthStart)
       .lte("occurred_on", monthEnd)
       .order("occurred_on", { ascending: false }),
     supabase.from("bills").select("*").order("due_date", { ascending: true }),
-    supabase.from("budgets").select("id, category, monthly_limit").order("category"),
+    supabase.from("budgets").select("id, category, monthly_limit, created_by").order("category"),
   ]);
 
   const txList = (txs as Tx[]) ?? [];
@@ -94,20 +103,20 @@ export default async function FinancePage() {
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
-      <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Finansije</h1>
+      <h1 className="text-3xl font-bold text-black dark:text-zinc-50">{t("finance.title")}</h1>
 
       {/* Sažetak */}
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Prihodi (mjesec)</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("finance.incomeMonth")}</p>
           <p className="mt-1 text-lg font-semibold text-green-600">{money(income)}</p>
         </div>
         <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Troškovi (mjesec)</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("finance.expensesMonth")}</p>
           <p className="mt-1 text-lg font-semibold text-red-600">{money(expenses)}</p>
         </div>
         <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Neto</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("finance.net")}</p>
           <p
             className={`mt-1 text-lg font-semibold ${
               net >= 0 ? "text-green-600" : "text-red-600"
@@ -122,7 +131,7 @@ export default async function FinancePage() {
       {members.length > 1 && expenses > 0 && (
         <div className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 text-sm dark:border-zinc-800 dark:bg-[#20242c]">
           <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Ko je platio · pravedan udio {money(fairShare)}
+            {t("finance.whoPaidFairShare", { amount: money(fairShare) })}
           </p>
           <ul className="flex flex-col gap-1">
             {members.map((m) => {
@@ -134,9 +143,9 @@ export default async function FinancePage() {
                     {m.profiles?.display_name ?? m.profiles?.email}
                   </span>
                   <span className="text-zinc-500">
-                    platio {money(paid)} ·{" "}
+                    {t("finance.paid")} {money(paid)} ·{" "}
                     <span className={balance >= 0 ? "text-green-600" : "text-red-600"}>
-                      {balance >= 0 ? "dobija" : "duguje"} {money(Math.abs(balance))}
+                      {balance >= 0 ? t("finance.getsBack") : t("finance.owes")} {money(Math.abs(balance))}
                     </span>
                   </span>
                 </li>
@@ -150,14 +159,13 @@ export default async function FinancePage() {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Budžeti po kategoriji (ovaj mjesec)
+            {t("finance.budgetsByCategory")}
           </h2>
           <BudgetForm />
         </div>
         {budgetList.length === 0 ? (
           <p className="rounded-lg border border-dashed border-zinc-300 bg-white/50 py-4 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:bg-[#20242c]/40 dark:text-zinc-400">
-            Nema budžeta. Postavi limit po kategoriji (npr. Hrana) da pratiš
-            potrošnju.
+            {t("finance.budgetsEmpty")}
           </p>
         ) : (
           <ul className="grid gap-2 sm:grid-cols-2">
@@ -168,6 +176,7 @@ export default async function FinancePage() {
                 Math.round((spent / Number(b.monthly_limit)) * 100),
               );
               const over = spent > Number(b.monthly_limit);
+              const canEdit = canManage(b.created_by, userId, isOwner);
               const bar = over
                 ? "bg-red-500"
                 : pct >= 80
@@ -192,20 +201,22 @@ export default async function FinancePage() {
                       >
                         {money(spent)} / {money(Number(b.monthly_limit))}
                       </span>
-                      <span className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
-                        <BudgetForm
-                          budget={{
-                            category: b.category,
-                            monthly_limit: Number(b.monthly_limit),
-                          }}
-                        />
-                        <form action={deleteBudget}>
-                          <input type="hidden" name="id" value={b.id} />
-                          <button className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
-                            ✕
-                          </button>
-                        </form>
-                      </span>
+                      {canEdit && (
+                        <span className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                          <BudgetForm
+                            budget={{
+                              category: b.category,
+                              monthly_limit: Number(b.monthly_limit),
+                            }}
+                          />
+                          <form action={deleteBudget}>
+                            <input type="hidden" name="id" value={b.id} />
+                            <button className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                              ✕
+                            </button>
+                          </form>
+                        </span>
+                      )}
                     </span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-[#2a2f39]">
@@ -213,7 +224,7 @@ export default async function FinancePage() {
                   </div>
                   {over && (
                     <p className="mt-1 text-xs font-medium text-red-600">
-                      Prekoračeno za {money(spent - Number(b.monthly_limit))}
+                      {t("finance.overBy", { amount: money(spent - Number(b.monthly_limit)) })}
                     </p>
                   )}
                 </li>
@@ -227,17 +238,19 @@ export default async function FinancePage() {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Transakcije ovog mjeseca
+            {t("finance.txThisMonth")}
           </h2>
           <TransactionForm members={members} userId={user.id} today={today} />
         </div>
         <ul className="flex flex-col gap-1.5">
           {txList.length === 0 && (
             <li className="py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              Nema transakcija ovog mjeseca.
+              {t("finance.txEmpty")}
             </li>
           )}
-          {txList.map((t) => (
+          {txList.map((t) => {
+            const canEdit = canManage(t.created_by, userId, isOwner);
+            return (
             <li
               key={t.id}
               className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
@@ -261,22 +274,25 @@ export default async function FinancePage() {
               <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
                 {t.occurred_on} · {nameOf(t.paid_by)}
               </span>
-              <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
-                <TransactionForm
-                  members={members}
-                  userId={user.id}
-                  today={today}
-                  tx={t}
-                />
-                <form action={deleteTransaction}>
-                  <input type="hidden" name="id" value={t.id} />
-                  <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
-                    ✕
-                  </button>
-                </form>
-              </div>
+              {canEdit && (
+                <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                  <TransactionForm
+                    members={members}
+                    userId={user.id}
+                    today={today}
+                    tx={t}
+                  />
+                  <form action={deleteTransaction}>
+                    <input type="hidden" name="id" value={t.id} />
+                    <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                      ✕
+                    </button>
+                  </form>
+                </div>
+              )}
             </li>
-          ))}
+            );
+          })}
         </ul>
       </section>
 
@@ -284,7 +300,7 @@ export default async function FinancePage() {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Računi i pretplate
+            {t("finance.billsSubs")}
           </h2>
           <BillForm today={today} />
         </div>
@@ -295,6 +311,7 @@ export default async function FinancePage() {
                 86400000,
             );
             const soon = daysLeft <= 3;
+            const canEdit = canManage(b.created_by, userId, isOwner);
             return (
               <li
                 key={b.id}
@@ -308,10 +325,10 @@ export default async function FinancePage() {
                 </span>
                 <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-[#2a2f39]">
                   {b.recurrence === "monthly"
-                    ? "mjesečno"
+                    ? t("finance.recurBadge.monthly")
                     : b.recurrence === "yearly"
-                      ? "godišnje"
-                      : "jednokratno"}
+                      ? t("finance.recurBadge.yearly")
+                      : t("finance.recurBadge.once")}
                 </span>
                 <span
                   className={`ml-auto text-xs ${
@@ -320,23 +337,25 @@ export default async function FinancePage() {
                 >
                   {soon ? "⚠ " : ""}
                   {b.due_date}
-                  {daysLeft >= 0 ? ` (za ${daysLeft}d)` : " (isteklo)"}
+                  {daysLeft >= 0 ? ` ${t("finance.dueInDays", { n: daysLeft })}` : ` ${t("finance.expired")}`}
                 </span>
-                <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
-                  <BillForm today={today} bill={b} />
-                  <form action={deleteBill}>
-                    <input type="hidden" name="id" value={b.id} />
-                    <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
-                      ✕
-                    </button>
-                  </form>
-                </div>
+                {canEdit && (
+                  <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                    <BillForm today={today} bill={b} />
+                    <form action={deleteBill}>
+                      <input type="hidden" name="id" value={b.id} />
+                      <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                        ✕
+                      </button>
+                    </form>
+                  </div>
+                )}
               </li>
             );
           })}
           {billList.length === 0 && (
             <li className="py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              Nema računa.
+              {t("finance.billsEmpty")}
             </li>
           )}
         </ul>

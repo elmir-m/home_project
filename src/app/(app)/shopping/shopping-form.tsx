@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Plus, Pencil } from "lucide-react";
 import Modal from "@/components/modal";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 import { addShoppingItem, editShoppingItem } from "./actions";
 
 type Item = { id: string; text: string; quantity: string | null };
@@ -23,17 +24,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export default function ShoppingForm({ item }: { item?: Item }) {
+  const t = useT();
   const editing = !!item;
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
     <Modal
-      title={editing ? "Uredi stavku" : "Nova stavka"}
+      title={editing ? t("shopping.edit") : t("shopping.new")}
       trigger={(open) =>
         editing ? (
           <button
             onClick={open}
-            title="Uredi"
+            title={t("common.edit")}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-indigo-600 dark:hover:bg-zinc-800"
           >
             <Pencil className="h-4 w-4" />
@@ -44,7 +46,7 @@ export default function ShoppingForm({ item }: { item?: Item }) {
             className="flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 text-sm font-medium text-white transition hover:bg-indigo-700 active:scale-[0.98]"
           >
             <Plus className="h-4 w-4" />
-            Nova stavka
+            {t("shopping.new")}
           </button>
         )
       }
@@ -62,29 +64,29 @@ export default function ShoppingForm({ item }: { item?: Item }) {
           className="flex flex-col gap-4"
         >
           {editing && <input type="hidden" name="id" value={item!.id} />}
-          <Field label="Šta treba kupiti?">
+          <Field label={t("shopping.textLabel")}>
             <input
               name="text"
               required
               autoFocus
               defaultValue={item?.text ?? ""}
-              placeholder="npr. Mlijeko"
+              placeholder={t("shopping.textPlaceholder")}
               className={input}
             />
           </Field>
-          <Field label="Količina (opciono)">
+          <Field label={t("shopping.quantity")}>
             <input
               name="quantity"
               defaultValue={item?.quantity ?? ""}
-              placeholder="npr. 2 l"
+              placeholder={t("shopping.quantityPlaceholder")}
               className={input}
             />
           </Field>
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Čuvam…"
+            pendingText={t("common.saving")}
           >
-            {editing ? "Sačuvaj" : "Dodaj"}
+            {editing ? t("common.save") : t("common.add")}
           </SubmitButton>
         </form>
       )}

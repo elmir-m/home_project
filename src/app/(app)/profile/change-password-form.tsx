@@ -3,6 +3,7 @@
 import { KeyRound } from "lucide-react";
 import Modal from "@/components/modal";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 import { changePassword } from "./actions";
 
 const input =
@@ -20,42 +21,43 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export default function ChangePasswordForm() {
+  const t = useT();
   return (
     <Modal
-      title="Promjena lozinke"
+      title={t("pwd.title")}
       trigger={(open) => (
         <button
           onClick={open}
           className="flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 px-3.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 active:scale-[0.98] dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-[#2a2f39]"
         >
           <KeyRound className="h-4 w-4" />
-          Promijeni lozinku
+          {t("pwd.change")}
         </button>
       )}
     >
       {() => (
         <form action={changePassword} className="flex flex-col gap-4">
-          <Field label="Trenutna (stara) lozinka">
+          <Field label={t("pwd.current")}>
             <input type="password" name="old_password" required autoFocus className={input} />
           </Field>
-          <Field label="Nova lozinka">
+          <Field label={t("pwd.new")}>
             <input
               type="password"
               name="password"
               required
               minLength={6}
-              placeholder="Najmanje 6 znakova"
+              placeholder={t("pwd.min")}
               className={input}
             />
           </Field>
-          <Field label="Ponovi novu lozinku">
+          <Field label={t("pwd.repeat")}>
             <input type="password" name="password2" required minLength={6} className={input} />
           </Field>
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Mijenjam…"
+            pendingText={t("pwd.changing")}
           >
-            Promijeni lozinku
+            {t("pwd.change")}
           </SubmitButton>
         </form>
       )}

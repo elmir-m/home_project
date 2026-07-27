@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Home, Mail, Lock } from "lucide-react";
 import { login } from "./actions";
 import SubmitButton from "@/components/submit-button";
+import { getT } from "@/lib/i18n-server";
 
 export default async function LoginPage({
   searchParams,
@@ -9,6 +10,7 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string; message?: string }>;
 }) {
   const { error, message } = await searchParams;
+  const t = await getT();
 
   const inputCls =
     "w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50 dark:placeholder:text-zinc-500";
@@ -24,7 +26,7 @@ export default async function LoginPage({
             Moj dom
           </h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Prijavi se ili napravi nalog za svoje domaćinstvo
+            {t("auth.login.subtitle")}
           </p>
         </div>
 
@@ -43,7 +45,7 @@ export default async function LoginPage({
           <form className="flex flex-col gap-4">
             <label className="flex flex-col gap-1.5">
               <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Email
+                {t("auth.email")}
               </span>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -52,7 +54,7 @@ export default async function LoginPage({
                   name="email"
                   required
                   autoComplete="email"
-                  placeholder="ti@primjer.com"
+                  placeholder={t("auth.emailPlaceholder")}
                   className={inputCls}
                 />
               </div>
@@ -60,7 +62,7 @@ export default async function LoginPage({
 
             <label className="flex flex-col gap-1.5">
               <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Lozinka
+                {t("auth.password")}
               </span>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -81,21 +83,21 @@ export default async function LoginPage({
                 href="/forgot"
                 className="text-xs text-indigo-600 hover:underline dark:text-indigo-400"
               >
-                Zaboravljena lozinka?
+                {t("auth.forgot")}
               </Link>
             </div>
 
             <SubmitButton
               formAction={login}
               className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
-              pendingText="Prijava…"
+              pendingText={t("auth.loginPending")}
             >
-              Prijava
+              {t("auth.login")}
             </SubmitButton>
 
             <div className="flex items-center gap-3 text-xs text-zinc-400">
               <span className="h-px flex-1 bg-zinc-200 dark:bg-[#2a2f39]" />
-              ili
+              {t("auth.or")}
               <span className="h-px flex-1 bg-zinc-200 dark:bg-[#2a2f39]" />
             </div>
 
@@ -103,13 +105,13 @@ export default async function LoginPage({
               href="/register"
               className="w-full rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-semibold text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800"
             >
-              Napravi novi nalog
+              {t("auth.createAccount")}
             </Link>
           </form>
         </div>
 
         <p className="mt-4 text-center text-xs text-zinc-400">
-          Zajednički kućni sistem — zadaci, kalendar, finansije i još.
+          {t("auth.tagline")}
         </p>
       </div>
     </main>

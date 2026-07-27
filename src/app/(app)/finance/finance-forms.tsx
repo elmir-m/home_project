@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Plus, Pencil } from "lucide-react";
 import Modal from "@/components/modal";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 import {
   createTransaction,
   editTransaction,
@@ -62,10 +63,11 @@ function AddBtn({ open, label }: { open: () => void; label: string }) {
 }
 
 function EditBtn({ open }: { open: () => void }) {
+  const t = useT();
   return (
     <button
       onClick={open}
-      title="Uredi"
+      title={t("common.edit")}
       className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-indigo-600 dark:hover:bg-zinc-800"
     >
       <Pencil className="h-4 w-4" />
@@ -85,15 +87,16 @@ export function TransactionForm({
   tx?: Tx;
 }) {
   const editing = !!tx;
+  const t = useT();
   const formRef = useRef<HTMLFormElement>(null);
   return (
     <Modal
-      title={editing ? "Uredi transakciju" : "Nova transakcija"}
+      title={editing ? t("finance.editTx") : t("finance.newTx")}
       trigger={(open) =>
         editing ? (
           <EditBtn open={open} />
         ) : (
-          <AddBtn open={open} label="Nova transakcija" />
+          <AddBtn open={open} label={t("finance.newTx")} />
         )
       }
     >
@@ -111,13 +114,13 @@ export function TransactionForm({
         >
           {editing && <input type="hidden" name="id" value={tx!.id} />}
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Vrsta">
+            <Field label={t("finance.kind")}>
               <select name="kind" defaultValue={tx?.kind ?? "expense"} className={input}>
-                <option value="expense">Trošak</option>
-                <option value="income">Prihod</option>
+                <option value="expense">{t("finance.expense")}</option>
+                <option value="income">{t("finance.income")}</option>
               </select>
             </Field>
-            <Field label="Iznos (KM)">
+            <Field label={t("finance.amountKm")}>
               <input
                 name="amount"
                 type="number"
@@ -130,24 +133,24 @@ export function TransactionForm({
               />
             </Field>
           </div>
-          <Field label="Opis">
+          <Field label={t("finance.description")}>
             <input
               name="description"
               defaultValue={tx?.description ?? ""}
-              placeholder="npr. Kupovina namirnica"
+              placeholder={t("finance.txDescPlaceholder")}
               className={input}
             />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Kategorija">
+            <Field label={t("field.category")}>
               <input
                 name="category"
                 defaultValue={tx?.category ?? ""}
-                placeholder="npr. Hrana"
+                placeholder={t("finance.categoryPlaceholder")}
                 className={input}
               />
             </Field>
-            <Field label="Datum">
+            <Field label={t("field.date")}>
               <input
                 type="date"
                 name="occurred_on"
@@ -156,7 +159,7 @@ export function TransactionForm({
               />
             </Field>
           </div>
-          <Field label="Platio/la">
+          <Field label={t("finance.paidBy")}>
             <select
               name="paid_by"
               defaultValue={tx?.paid_by ?? userId}
@@ -171,9 +174,9 @@ export function TransactionForm({
           </Field>
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Čuvam…"
+            pendingText={t("common.saving")}
           >
-            {editing ? "Sačuvaj" : "Dodaj transakciju"}
+            {editing ? t("common.save") : t("finance.addTx")}
           </SubmitButton>
         </form>
       )}
@@ -183,12 +186,13 @@ export function TransactionForm({
 
 export function BudgetForm({ budget }: { budget?: Budget }) {
   const editing = !!budget;
+  const t = useT();
   const formRef = useRef<HTMLFormElement>(null);
   return (
     <Modal
-      title={editing ? "Uredi budžet" : "Novi budžet"}
+      title={editing ? t("finance.editBudget") : t("finance.newBudget")}
       trigger={(open) =>
-        editing ? <EditBtn open={open} /> : <AddBtn open={open} label="Novi budžet" />
+        editing ? <EditBtn open={open} /> : <AddBtn open={open} label={t("finance.newBudget")} />
       }
     >
       {(close) => (
@@ -203,18 +207,18 @@ export function BudgetForm({ budget }: { budget?: Budget }) {
           }
           className="flex flex-col gap-4"
         >
-          <Field label="Kategorija">
+          <Field label={t("field.category")}>
             <input
               name="category"
               required
               autoFocus={!editing}
               readOnly={editing}
               defaultValue={budget?.category ?? ""}
-              placeholder="npr. Hrana"
+              placeholder={t("finance.categoryPlaceholder")}
               className={`${input} ${editing ? "opacity-70" : ""}`}
             />
           </Field>
-          <Field label="Mjesečni limit (KM)">
+          <Field label={t("finance.monthlyLimit")}>
             <input
               name="monthly_limit"
               type="number"
@@ -228,9 +232,9 @@ export function BudgetForm({ budget }: { budget?: Budget }) {
           </Field>
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Čuvam…"
+            pendingText={t("common.saving")}
           >
-            {editing ? "Sačuvaj" : "Dodaj budžet"}
+            {editing ? t("common.save") : t("finance.addBudget")}
           </SubmitButton>
         </form>
       )}
@@ -240,12 +244,13 @@ export function BudgetForm({ budget }: { budget?: Budget }) {
 
 export function BillForm({ today, bill }: { today: string; bill?: Bill }) {
   const editing = !!bill;
+  const t = useT();
   const formRef = useRef<HTMLFormElement>(null);
   return (
     <Modal
-      title={editing ? "Uredi račun" : "Novi račun"}
+      title={editing ? t("finance.editBill") : t("finance.newBill")}
       trigger={(open) =>
-        editing ? <EditBtn open={open} /> : <AddBtn open={open} label="Novi račun" />
+        editing ? <EditBtn open={open} /> : <AddBtn open={open} label={t("finance.newBill")} />
       }
     >
       {(close) => (
@@ -261,18 +266,18 @@ export function BillForm({ today, bill }: { today: string; bill?: Bill }) {
           className="flex flex-col gap-4"
         >
           {editing && <input type="hidden" name="id" value={bill!.id} />}
-          <Field label="Naziv">
+          <Field label={t("field.name")}>
             <input
               name="name"
               required
               autoFocus
               defaultValue={bill?.name ?? ""}
-              placeholder="npr. Struja"
+              placeholder={t("finance.billNamePlaceholder")}
               className={input}
             />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Iznos (KM)">
+            <Field label={t("finance.amountKm")}>
               <input
                 name="amount"
                 type="number"
@@ -283,7 +288,7 @@ export function BillForm({ today, bill }: { today: string; bill?: Bill }) {
                 className={input}
               />
             </Field>
-            <Field label="Rok dospijeća">
+            <Field label={t("field.dueDate")}>
               <input
                 type="date"
                 name="due_date"
@@ -294,31 +299,31 @@ export function BillForm({ today, bill }: { today: string; bill?: Bill }) {
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Ponavljanje">
+            <Field label={t("finance.recurrenceLabel")}>
               <select
                 name="recurrence"
                 defaultValue={bill?.recurrence ?? "monthly"}
                 className={input}
               >
-                <option value="monthly">Mjesečno</option>
-                <option value="yearly">Godišnje</option>
-                <option value="none">Jednokratno</option>
+                <option value="monthly">{t("finance.recur.monthly")}</option>
+                <option value="yearly">{t("finance.recur.yearly")}</option>
+                <option value="none">{t("finance.recur.once")}</option>
               </select>
             </Field>
-            <Field label="Kategorija">
+            <Field label={t("field.category")}>
               <input
                 name="category"
                 defaultValue={bill?.category ?? ""}
-                placeholder="npr. Režije"
+                placeholder={t("finance.billCategoryPlaceholder")}
                 className={input}
               />
             </Field>
           </div>
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Čuvam…"
+            pendingText={t("common.saving")}
           >
-            {editing ? "Sačuvaj" : "Dodaj račun"}
+            {editing ? t("common.save") : t("finance.addBill")}
           </SubmitButton>
         </form>
       )}

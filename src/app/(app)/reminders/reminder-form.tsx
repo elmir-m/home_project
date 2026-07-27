@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Plus, Pencil } from "lucide-react";
 import Modal from "@/components/modal";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 import { createReminder, editReminder } from "./actions";
 
 type Member = {
@@ -47,6 +48,7 @@ export default function ReminderForm({
   members: Member[];
   reminder?: Reminder;
 }) {
+  const t = useT();
   const editing = !!reminder;
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -57,12 +59,12 @@ export default function ReminderForm({
 
   return (
     <Modal
-      title={editing ? "Uredi podsjetnik" : "Novi podsjetnik"}
+      title={editing ? t("reminders.edit") : t("reminders.new")}
       trigger={(open) =>
         editing ? (
           <button
             onClick={open}
-            title="Uredi"
+            title={t("common.edit")}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-indigo-600 dark:hover:bg-zinc-800"
           >
             <Pencil className="h-4 w-4" />
@@ -73,7 +75,7 @@ export default function ReminderForm({
             className="flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 text-sm font-medium text-white transition hover:bg-indigo-700 active:scale-[0.98]"
           >
             <Plus className="h-4 w-4" />
-            Novi podsjetnik
+            {t("reminders.new")}
           </button>
         )
       }
@@ -92,19 +94,19 @@ export default function ReminderForm({
           {editing && <input type="hidden" name="id" value={reminder!.id} />}
           <input type="hidden" name="remind_at" value={iso} />
 
-          <Field label="Na šta te podsjetiti?">
+          <Field label={t("reminders.titleLabel")}>
             <input
               name="title"
               required
               autoFocus
               defaultValue={reminder?.title ?? ""}
-              placeholder="npr. Platiti kiriju"
+              placeholder={t("reminders.titlePlaceholder")}
               className={input}
             />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Kada">
+            <Field label={t("reminders.when")}>
               <input
                 type="datetime-local"
                 required
@@ -115,28 +117,28 @@ export default function ReminderForm({
                 className={input}
               />
             </Field>
-            <Field label="Ponavljanje">
+            <Field label={t("reminders.recurrence")}>
               <select
                 name="recurrence"
                 defaultValue={reminder?.recurrence ?? "none"}
                 className={input}
               >
-                <option value="none">Jednokratno</option>
-                <option value="daily">Dnevno</option>
-                <option value="weekly">Sedmično</option>
-                <option value="monthly">Mjesečno</option>
-                <option value="yearly">Godišnje</option>
+                <option value="none">{t("reminders.recur.none")}</option>
+                <option value="daily">{t("reminders.recur.daily")}</option>
+                <option value="weekly">{t("reminders.recur.weekly")}</option>
+                <option value="monthly">{t("reminders.recur.monthly")}</option>
+                <option value="yearly">{t("reminders.recur.yearly")}</option>
               </select>
             </Field>
           </div>
 
-          <Field label="Za koga">
+          <Field label={t("reminders.forWhom")}>
             <select
               name="target_user_id"
               defaultValue={reminder?.target_user_id ?? ""}
               className={input}
             >
-              <option value="">Cijelo domaćinstvo</option>
+              <option value="">{t("reminders.wholeHousehold")}</option>
               {members.map((m) => (
                 <option key={m.user_id} value={m.user_id}>
                   {m.profiles?.display_name ?? m.profiles?.email}
@@ -152,14 +154,14 @@ export default function ReminderForm({
               defaultChecked={reminder?.notify_email ?? true}
               className="h-4 w-4"
             />
-            Pošalji i email obavijest
+            {t("reminders.notifyEmail")}
           </label>
 
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Čuvam…"
+            pendingText={t("common.saving")}
           >
-            {editing ? "Sačuvaj" : "Dodaj podsjetnik"}
+            {editing ? t("common.save") : t("reminders.add")}
           </SubmitButton>
         </form>
       )}

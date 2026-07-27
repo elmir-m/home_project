@@ -14,6 +14,7 @@ import { BUILTIN_APPS } from "@/lib/apps";
 import { AppIcon } from "@/components/app-icon";
 import SubmitButton from "@/components/submit-button";
 import MemberDetail from "./member-detail";
+import { getT } from "@/lib/i18n-server";
 
 type Invitation = {
   id: string;
@@ -28,6 +29,7 @@ export default async function MembersPage({
   searchParams: Promise<{ error?: string; invited?: string; created?: string }>;
 }) {
   const sp = await searchParams;
+  const t = await getT();
   const supabase = await createClient();
   const {
     data: { user },
@@ -62,7 +64,7 @@ export default async function MembersPage({
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-        Domaćinstvo i članovi
+        {t("members.pageTitle")}
       </h1>
 
       {sp.error && (
@@ -72,20 +74,19 @@ export default async function MembersPage({
       )}
       {sp.invited && (
         <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-950/50 dark:text-green-300">
-          ✓ Pozivnica poslana.
+          {t("members.inviteSent")}
         </p>
       )}
       {sp.created && (
         <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-950/50 dark:text-green-300">
-          ✓ Član kreiran ({sp.created}) i dodan u domaćinstvo. Daj mu email i
-          lozinku za prijavu.
+          {t("members.memberCreated", { email: sp.created })}
         </p>
       )}
 
       {/* Prebacivanje aktivnog domaćinstva */}
       {households.length > 1 && (
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white shadow-sm p-3 text-sm dark:border-zinc-800 dark:bg-[#20242c]">
-          <span className="text-zinc-500">Aktivno:</span>
+          <span className="text-zinc-500">{t("members.activeHousehold")}</span>
           {households.map((hh) => (
             <form key={hh.id} action={setActiveHousehold}>
               <input type="hidden" name="id" value={hh.id} />
@@ -107,7 +108,7 @@ export default async function MembersPage({
       {isOwner && (
         <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Naziv domaćinstva
+            {t("members.householdName")}
           </h2>
           <form action={renameHousehold} className="flex gap-2">
             <input
@@ -117,9 +118,9 @@ export default async function MembersPage({
             />
             <SubmitButton
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-              pendingText="Čuvam…"
+              pendingText={t("common.saving")}
             >
-              Sačuvaj
+              {t("common.save")}
             </SubmitButton>
           </form>
         </section>
@@ -128,7 +129,7 @@ export default async function MembersPage({
       {/* Članovi */}
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Članovi ({members.length})
+          {t("members.membersHeading", { n: members.length })}
         </h2>
         <ul className="flex flex-col gap-2">
           {members.map((m) => (
@@ -145,7 +146,7 @@ export default async function MembersPage({
                       : "bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300"
                   }`}
                 >
-                  {m.role === "owner" ? "vlasnik" : "član"}
+                  {m.role === "owner" ? t("role.owner") : t("role.member")}
                 </span>
               </div>
 
@@ -153,7 +154,7 @@ export default async function MembersPage({
               {isOwner && m.role !== "owner" && (
                 <div className="mt-2.5">
                   <p className="mb-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-                    Vidljive aplikacije (klikni za uključi/isključi):
+                    {t("members.visibleApps")}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {BUILTIN_APPS.map((app) => {
@@ -168,7 +169,7 @@ export default async function MembersPage({
                             value={String(!isHidden)}
                           />
                           <button
-                            title={isHidden ? "Uključi" : "Isključi"}
+                            title={isHidden ? t("members.enableApp") : t("members.disableApp")}
                             className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition ${
                               isHidden
                                 ? "border-zinc-200 text-zinc-400 line-through dark:border-zinc-700"
@@ -193,23 +194,22 @@ export default async function MembersPage({
       {isOwner && (
         <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
           <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Kreiraj člana
+            {t("members.createMember")}
           </h2>
           <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
-            Napravi nalog za nekoga ko još nije u aplikaciji (npr. dijete). Odmah
-            se dodaje u domaćinstvo.
+            {t("members.createMemberDesc")}
           </p>
           <form action={createMember} className="flex flex-wrap items-end gap-2">
             <input
               name="full_name"
-              placeholder="Ime i prezime"
+              placeholder={t("members.fullNamePlaceholder")}
               className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
             />
             <input
               name="email"
               type="email"
               required
-              placeholder="email@primjer.com"
+              placeholder={t("members.emailPlaceholder")}
               className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
             />
             <input
@@ -217,14 +217,14 @@ export default async function MembersPage({
               type="text"
               required
               minLength={6}
-              placeholder="Lozinka (min 6)"
+              placeholder={t("members.passwordPlaceholder")}
               className="w-40 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
             />
             <SubmitButton
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-              pendingText="Kreiram…"
+              pendingText={t("members.creating")}
             >
-              Kreiraj
+              {t("members.create")}
             </SubmitButton>
           </form>
         </section>
@@ -234,24 +234,24 @@ export default async function MembersPage({
       {isOwner && (
         <section className="rounded-xl border border-zinc-200 bg-white shadow-sm p-4 dark:border-zinc-800 dark:bg-[#20242c]">
           <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Pozovi postojećeg korisnika
+            {t("members.inviteExisting")}
           </h2>
           <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
-            Za osobu koja se već registrovala u aplikaciji.
+            {t("members.inviteExistingDesc")}
           </p>
           <form action={inviteMember} className="flex gap-2">
             <input
               name="email"
               type="email"
               required
-              placeholder="email@primjer.com"
+              placeholder={t("members.emailPlaceholder")}
               className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
             />
             <SubmitButton
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-              pendingText="Šaljem…"
+              pendingText={t("members.sending")}
             >
-              Pozovi
+              {t("members.invite")}
             </SubmitButton>
           </form>
 
@@ -267,7 +267,7 @@ export default async function MembersPage({
                   <form action={revokeInvite}>
                     <input type="hidden" name="id" value={inv.id} />
                     <button className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-red-600">
-                      opozovi
+                      {t("members.revoke")}
                     </button>
                   </form>
                 </div>
@@ -281,8 +281,7 @@ export default async function MembersPage({
           </ul>
         )}
           <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
-            Poziv se šalje mejlom na adresu pozvane osobe. Link iznad možeš i
-            ručno proslijediti ako želiš.
+            {t("members.inviteNote")}
           </p>
         </section>
       )}

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Plus, Pencil } from "lucide-react";
 import Modal from "@/components/modal";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 import { createNote, editNote } from "./actions";
 
 type Opt = { id: string; title: string };
@@ -40,15 +41,16 @@ export default function NoteForm({
 }) {
   const editing = !!note;
   const formRef = useRef<HTMLFormElement>(null);
+  const tr = useT();
 
   return (
     <Modal
-      title={editing ? "Uredi bilješku" : "Nova bilješka"}
+      title={editing ? tr("notes.editNote") : tr("notes.newNote")}
       trigger={(open) =>
         editing ? (
           <button
             onClick={open}
-            title="Uredi"
+            title={tr("common.edit")}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-indigo-600 dark:hover:bg-zinc-800"
           >
             <Pencil className="h-4 w-4" />
@@ -59,7 +61,7 @@ export default function NoteForm({
             className="flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 text-sm font-medium text-white transition hover:bg-indigo-700 active:scale-[0.98]"
           >
             <Plus className="h-4 w-4" />
-            Nova bilješka
+            {tr("notes.newNote")}
           </button>
         )
       }
@@ -78,53 +80,53 @@ export default function NoteForm({
         >
           {editing && <input type="hidden" name="id" value={note!.id} />}
 
-          <Field label="Naslov">
+          <Field label={tr("field.title")}>
             <input
               name="title"
               autoFocus
               defaultValue={note?.title ?? ""}
-              placeholder="Naslov (opciono)"
+              placeholder={tr("notes.titlePlaceholder")}
               className={input}
             />
           </Field>
 
-          <Field label="Sadržaj">
+          <Field label={tr("notes.body")}>
             <textarea
               name="body"
               rows={4}
               defaultValue={note?.body ?? ""}
-              placeholder="Tekst bilješke…"
+              placeholder={tr("notes.bodyPlaceholder")}
               className={input}
             />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Tagovi (zarezom)">
+            <Field label={tr("notes.tags")}>
               <input
                 name="tags"
                 defaultValue={note?.tags?.join(", ") ?? ""}
-                placeholder="kuća, hitno"
+                placeholder={tr("notes.tagsPlaceholder")}
                 className={input}
               />
             </Field>
-            <Field label="Tip">
+            <Field label={tr("notes.kind")}>
               <select
                 name="kind"
                 defaultValue={note?.kind ?? "note"}
                 className={input}
               >
-                <option value="note">Bilješka</option>
-                <option value="journal">Dnevnik</option>
+                <option value="note">{tr("notes.kindNote")}</option>
+                <option value="journal">{tr("notes.kindJournal")}</option>
               </select>
             </Field>
           </div>
 
           {!editing && (tasks.length > 0 || events.length > 0) && (
-            <Field label="Poveži sa (opciono)">
+            <Field label={tr("notes.linkTo")}>
               <select name="link" defaultValue="" className={input}>
-                <option value="">— ništa —</option>
+                <option value="">{tr("notes.linkNone")}</option>
                 {tasks.length > 0 && (
-                  <optgroup label="Zadaci">
+                  <optgroup label={tr("notes.tasksGroup")}>
                     {tasks.map((t) => (
                       <option key={t.id} value={`task:${t.id}`}>
                         {t.title}
@@ -133,7 +135,7 @@ export default function NoteForm({
                   </optgroup>
                 )}
                 {events.length > 0 && (
-                  <optgroup label="Događaji">
+                  <optgroup label={tr("notes.eventsGroup")}>
                     {events.map((e) => (
                       <option key={e.id} value={`event:${e.id}`}>
                         {e.title}
@@ -147,9 +149,9 @@ export default function NoteForm({
 
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText={editing ? "Čuvam…" : "Čuvam…"}
+            pendingText={tr("common.saving")}
           >
-            {editing ? "Sačuvaj izmjene" : "Sačuvaj bilješku"}
+            {editing ? tr("common.saveChanges") : tr("notes.saveNote")}
           </SubmitButton>
         </form>
       )}

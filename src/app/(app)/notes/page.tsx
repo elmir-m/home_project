@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { StickyNote } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentHousehold, canManage } from "@/lib/household";
+import { getT } from "@/lib/i18n-server";
 import { deleteNote } from "./actions";
 import NoteForm from "./note-form";
 
@@ -11,11 +13,13 @@ type Note = {
   body: string | null;
   tags: string[];
   created_at: string;
+  created_by: string | null;
 };
 type LinkRow = {
   source_id: string;
   target_type: string;
   target_id: string;
+  created_by: string | null;
 };
 
 export default async function NotesPage() {
@@ -25,17 +29,20 @@ export default async function NotesPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { userId, isOwner } = await getCurrentHousehold();
+  const tr = await getT();
+
   const [{ data: notes }, { data: tasks }, { data: events }, { data: links }] =
     await Promise.all([
       supabase
         .from("notes")
-        .select("id, kind, title, body, tags, created_at")
+        .select("id, kind, title, body, tags, created_at, created_by")
         .order("created_at", { ascending: false }),
       supabase.from("tasks").select("id, title"),
       supabase.from("calendar_events").select("id, title"),
       supabase
         .from("links")
-        .select("source_id, target_type, target_id")
+        .select("source_id, target_type, target_id, created_by")
         .eq("source_type", "note"),
     ]);
 
@@ -64,10 +71,10 @@ export default async function NotesPage() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-            Bilješke
+            {tr("notes.title")}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {noteList.length} bilješki
+            {tr("notes.count", { n: noteList.length })}
           </p>
         </div>
         <NoteForm tasks={taskOpts} events={eventOpts} />
@@ -77,7 +84,7 @@ export default async function NotesPage() {
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white/50 py-16 text-center dark:border-zinc-700 dark:bg-[#20242c]/40">
           <StickyNote className="h-8 w-8 text-zinc-400" />
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Još nema bilješki. Klikni „Nova bilješka".
+            {tr("notes.empty")}
           </p>
         </div>
       )}
@@ -85,6 +92,7 @@ export default async function NotesPage() {
       <ul className="grid gap-3 sm:grid-cols-2">
         {noteList.map((n) => {
           const noteLinks = linksByNote.get(n.id) ?? [];
+          const canEdit = canManage(n.created_by, userId, isOwner);
           return (
             <li
               key={n.id}
@@ -94,7 +102,7 @@ export default async function NotesPage() {
                 <div className="min-w-0 flex-1">
                   {n.kind === "journal" && (
                     <span className="mb-1 mr-2 inline-block rounded bg-purple-100 px-1.5 py-0.5 text-[11px] font-medium text-purple-700 dark:bg-purple-950 dark:text-purple-300">
-                      dnevnik
+                      {tr("notes.journalBadge")}
                     </span>
                   )}
                   {n.title && (
@@ -121,23 +129,29 @@ export default async function NotesPage() {
                         key={i}
                         className="rounded bg-blue-100 px-1.5 py-0.5 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
                       >
-                        🔗 {l.type === "task" ? "Zadatak" : "Događaj"}: {l.label}
+                        🔗{" "}
+                        {l.type === "task"
+                          ? tr("notes.linkTask")
+                          : tr("notes.linkEvent")}
+                        : {l.label}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="flex shrink-0 items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
-                  <NoteForm note={n} />
-                  <form action={deleteNote}>
-                    <input type="hidden" name="id" value={n.id} />
-                    <button
-                      title="Obriši"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40"
-                    >
-                      ✕
-                    </button>
-                  </form>
-                </div>
+                {canEdit && (
+                  <div className="flex shrink-0 items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                    <NoteForm note={n} />
+                    <form action={deleteNote}>
+                      <input type="hidden" name="id" value={n.id} />
+                      <button
+                        title={tr("common.delete")}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40"
+                      >
+                        ✕
+                      </button>
+                    </form>
+                  </div>
+                )}
               </div>
             </li>
           );

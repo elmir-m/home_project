@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentHousehold, canManage } from "@/lib/household";
+import { getT } from "@/lib/i18n-server";
 import {
   deleteRecord,
   deleteContact,
@@ -17,6 +19,7 @@ type Rec = {
   category: string;
   expiry_date: string | null;
   notes: string | null;
+  created_by: string | null;
 };
 type Contact = {
   id: string;
@@ -24,15 +27,22 @@ type Contact = {
   role: string | null;
   phone: string | null;
   email: string | null;
+  created_by: string | null;
 };
-type List = { id: string; name: string };
-type Item = { id: string; list_id: string; text: string; done: boolean };
+type List = { id: string; name: string; created_by: string | null };
+type Item = {
+  id: string;
+  list_id: string;
+  text: string;
+  done: boolean;
+  created_by: string | null;
+};
 
-const CAT_LABEL: Record<string, string> = {
-  document: "Dokument",
-  warranty: "Garancija",
-  renewal: "Obnova",
-  other: "Ostalo",
+const CAT_KEY: Record<string, string> = {
+  document: "life.cat.document",
+  warranty: "life.cat.warranty",
+  renewal: "life.cat.renewal",
+  other: "life.cat.other",
 };
 
 const input =
@@ -47,12 +57,15 @@ export default async function LifePage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { userId, isOwner } = await getCurrentHousehold();
+  const t = await getT();
+
   const [{ data: records }, { data: contacts }, { data: lists }, { data: items }] =
     await Promise.all([
-      supabase.from("records").select("*").order("created_at", { ascending: false }),
-      supabase.from("contacts").select("*").order("name"),
-      supabase.from("lists").select("id, name").order("created_at"),
-      supabase.from("list_items").select("id, list_id, text, done").order("created_at"),
+      supabase.from("records").select("id, title, category, expiry_date, notes, created_by").order("created_at", { ascending: false }),
+      supabase.from("contacts").select("id, name, role, phone, email, created_by").order("name"),
+      supabase.from("lists").select("id, name, created_by").order("created_at"),
+      supabase.from("list_items").select("id, list_id, text, done, created_by").order("created_at"),
     ]);
 
   const recList = (records as Rec[]) ?? [];
@@ -64,14 +77,14 @@ export default async function LifePage() {
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-8 p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
-        Kućna evidencija
+        {t("app.life")}
       </h1>
 
       {/* EVIDENCIJA */}
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Evidencija (dokumenti, garancije, obnove)
+            {t("life.records.heading")}
           </h2>
           <RecordForm />
         </div>
@@ -79,13 +92,14 @@ export default async function LifePage() {
           {recList.map((r) => {
             const soon = r.expiry_date && r.expiry_date >= today;
             const expired = r.expiry_date && r.expiry_date < today;
+            const canEdit = canManage(r.created_by, userId, isOwner);
             return (
               <li
                 key={r.id}
                 className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
               >
                 <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 dark:bg-[#2a2f39]">
-                  {CAT_LABEL[r.category]}
+                  {t(CAT_KEY[r.category] ?? "life.cat.other")}
                 </span>
                 <span className="text-zinc-900 dark:text-zinc-50">{r.title}</span>
                 {r.notes && (
@@ -103,29 +117,31 @@ export default async function LifePage() {
                           : "text-zinc-500 dark:text-zinc-400"
                     }`}
                   >
-                    {expired ? "isteklo " : "ističe "}
+                    {expired ? `${t("life.expired")} ` : `${t("life.expires")} `}
                     {r.expiry_date}
                   </span>
                 )}
-                <div
-                  className={`flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100 ${
-                    r.expiry_date ? "" : "ml-auto"
-                  }`}
-                >
-                  <RecordForm record={r} />
-                  <form action={deleteRecord}>
-                    <input type="hidden" name="id" value={r.id} />
-                    <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
-                      ✕
-                    </button>
-                  </form>
-                </div>
+                {canEdit && (
+                  <div
+                    className={`flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100 ${
+                      r.expiry_date ? "" : "ml-auto"
+                    }`}
+                  >
+                    <RecordForm record={r} />
+                    <form action={deleteRecord}>
+                      <input type="hidden" name="id" value={r.id} />
+                      <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                        ✕
+                      </button>
+                    </form>
+                  </div>
+                )}
               </li>
             );
           })}
           {recList.length === 0 && (
             <li className="py-3 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              Nema zapisa. Klikni „Novi zapis".
+              {t("life.records.empty")}
             </li>
           )}
         </ul>
@@ -135,12 +151,14 @@ export default async function LifePage() {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Važni kontakti
+            {t("life.contacts.heading")}
           </h2>
           <ContactForm />
         </div>
         <ul className="flex flex-col gap-1.5">
-          {contactList.map((c) => (
+          {contactList.map((c) => {
+            const canEdit = canManage(c.created_by, userId, isOwner);
+            return (
             <li
               key={c.id}
               className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-sm dark:border-zinc-800 dark:bg-[#20242c]"
@@ -156,20 +174,23 @@ export default async function LifePage() {
               <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
                 {[c.phone, c.email].filter(Boolean).join(" · ")}
               </span>
-              <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
-                <ContactForm contact={c} />
-                <form action={deleteContact}>
-                  <input type="hidden" name="id" value={c.id} />
-                  <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
-                    ✕
-                  </button>
-                </form>
-              </div>
+              {canEdit && (
+                <div className="flex items-center opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100">
+                  <ContactForm contact={c} />
+                  <form action={deleteContact}>
+                    <input type="hidden" name="id" value={c.id} />
+                    <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40">
+                      ✕
+                    </button>
+                  </form>
+                </div>
+              )}
             </li>
-          ))}
+            );
+          })}
           {contactList.length === 0 && (
             <li className="py-3 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              Nema kontakata.
+              {t("life.contacts.empty")}
             </li>
           )}
         </ul>
@@ -178,16 +199,17 @@ export default async function LifePage() {
       {/* LISTE */}
       <section>
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Dijeljene liste
+          {t("life.lists.heading")}
         </h2>
         <form action={createList} className="mb-3 flex gap-2">
-          <input name="name" required placeholder="Nova lista (npr. Kupovina)" className={`flex-1 ${input}`} />
-          <button className={btn}>Napravi listu</button>
+          <input name="name" required placeholder={t("life.lists.newPlaceholder")} className={`flex-1 ${input}`} />
+          <button className={btn}>{t("life.lists.create")}</button>
         </form>
 
         <div className="grid gap-3 sm:grid-cols-2">
           {listList.map((l) => {
             const its = itemList.filter((i) => i.list_id === l.id);
+            const canEditList = canManage(l.created_by, userId, isOwner);
             return (
               <div
                 key={l.id}
@@ -197,20 +219,36 @@ export default async function LifePage() {
                   <span className="font-semibold text-black dark:text-zinc-50">
                     {l.name}
                   </span>
-                  <form action={deleteList}>
-                    <input type="hidden" name="id" value={l.id} />
-                    <button className="text-xs text-zinc-300 hover:text-red-600">
-                      obriši listu
-                    </button>
-                  </form>
+                  {canEditList && (
+                    <form action={deleteList}>
+                      <input type="hidden" name="id" value={l.id} />
+                      <button className="text-xs text-zinc-300 hover:text-red-600">
+                        {t("life.lists.delete")}
+                      </button>
+                    </form>
+                  )}
                 </div>
                 <ul className="flex flex-col gap-1">
-                  {its.map((i) => (
+                  {its.map((i) => {
+                    const canEditItem = canManage(i.created_by, userId, isOwner);
+                    return (
                     <li key={i.id} className="flex items-center gap-2 text-sm">
-                      <form action={toggleListItem}>
-                        <input type="hidden" name="id" value={i.id} />
-                        <input type="hidden" name="done" value={String(i.done)} />
-                        <button
+                      {canEditItem ? (
+                        <form action={toggleListItem}>
+                          <input type="hidden" name="id" value={i.id} />
+                          <input type="hidden" name="done" value={String(i.done)} />
+                          <button
+                            className={`flex h-4 w-4 items-center justify-center rounded border text-[10px] ${
+                              i.done
+                                ? "border-green-600 bg-green-600 text-white"
+                                : "border-zinc-400"
+                            }`}
+                          >
+                            {i.done ? "✓" : ""}
+                          </button>
+                        </form>
+                      ) : (
+                        <span
                           className={`flex h-4 w-4 items-center justify-center rounded border text-[10px] ${
                             i.done
                               ? "border-green-600 bg-green-600 text-white"
@@ -218,8 +256,8 @@ export default async function LifePage() {
                           }`}
                         >
                           {i.done ? "✓" : ""}
-                        </button>
-                      </form>
+                        </span>
+                      )}
                       <span
                         className={
                           i.done
@@ -229,19 +267,22 @@ export default async function LifePage() {
                       >
                         {i.text}
                       </span>
-                      <form action={deleteListItem} className="ml-auto">
-                        <input type="hidden" name="id" value={i.id} />
-                        <button className="text-zinc-300 hover:text-red-600">✕</button>
-                      </form>
+                      {canEditItem && (
+                        <form action={deleteListItem} className="ml-auto">
+                          <input type="hidden" name="id" value={i.id} />
+                          <button className="text-zinc-300 hover:text-red-600">✕</button>
+                        </form>
+                      )}
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
                 <form action={addListItem} className="mt-2 flex gap-1">
                   <input type="hidden" name="list_id" value={l.id} />
                   <input
                     name="text"
                     required
-                    placeholder="Nova stavka…"
+                    placeholder={t("life.item.placeholder")}
                     className={`flex-1 ${input} py-1`}
                   />
                   <button className="rounded-md border border-zinc-300 px-2 text-sm dark:border-zinc-700">
@@ -253,7 +294,7 @@ export default async function LifePage() {
           })}
         </div>
         {listList.length === 0 && (
-          <p className="py-3 text-center text-sm text-zinc-500 dark:text-zinc-400">Nema lista.</p>
+          <p className="py-3 text-center text-sm text-zinc-500 dark:text-zinc-400">{t("life.lists.empty")}</p>
         )}
       </section>
     </main>

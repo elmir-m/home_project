@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send } from "lucide-react";
+import { Send, Smile } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useT, useLocale } from "@/components/locale-provider";
+import { localeTag } from "@/lib/i18n";
 
 export type ChatMessage = {
   id: string;
@@ -13,19 +15,12 @@ export type ChatMessage = {
 
 export type MemberInfo = { name: string; avatar: string | null };
 
-function timeLabel(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleTimeString("bs-BA", { hour: "2-digit", minute: "2-digit" });
-}
-
-function dayLabel(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleDateString("bs-BA", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
+const EMOJIS = [
+  "😀","😁","😂","🤣","😊","😍","😘","😎","🤔","😐",
+  "😢","😭","😡","😴","🥳","🤗","🙌","👍","👎","👏",
+  "🙏","💪","🔥","💯","✅","❌","❤️","🎉","🎂","☕",
+  "🍺","🍕","⚽","🏠","🚗","💸","🛒","📅","⏰","👋",
+];
 
 export default function ChatClient({
   householdId,
@@ -40,11 +35,30 @@ export default function ChatClient({
   initialMessages: ChatMessage[];
   members: Record<string, MemberInfo>;
 }) {
+  const t = useT();
+  const locale = useLocale();
+  const tag = localeTag(locale);
+  const timeLabel = (iso: string) =>
+    new Date(iso).toLocaleTimeString(tag, { hour: "2-digit", minute: "2-digit" });
+  const dayLabel = (iso: string) =>
+    new Date(iso).toLocaleDateString(tag, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const textRef = useRef<HTMLTextAreaElement | null>(null);
   const seen = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)));
+
+  function insertEmoji(emoji: string) {
+    setText((prev) => prev + emoji);
+    textRef.current?.focus();
+  }
 
   // Realtime: nove poruke ovog domaćinstva stižu uživo.
   useEffect(() => {
@@ -91,10 +105,11 @@ export default function ChatClient({
       .single();
     setSending(false);
     if (error) {
-      alert("Slanje nije uspjelo. Pokušaj ponovo.");
+      alert(t("chat.failed"));
       return;
     }
     setText("");
+    setShowEmoji(false);
     if (data && !seen.current.has(data.id)) {
       seen.current.add(data.id);
       setMessages((prev) => [...prev, data as ChatMessage]);
@@ -106,7 +121,9 @@ export default function ChatClient({
   return (
     <main className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-3xl flex-col p-4 sm:p-6">
       <div className="mb-3 shrink-0">
-        <h1 className="text-2xl font-bold text-black dark:text-zinc-50">Chat</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-zinc-50">
+          {t("chat.title")}
+        </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">{householdName}</p>
       </div>
 
@@ -114,13 +131,13 @@ export default function ChatClient({
       <div className="flex-1 space-y-1 overflow-y-auto rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]">
         {messages.length === 0 && (
           <p className="mt-8 text-center text-sm text-zinc-400 dark:text-zinc-500">
-            Još nema poruka. Napiši prvu!
+            {t("chat.empty")}
           </p>
         )}
         {messages.map((m) => {
           const mine = m.user_id === currentUserId;
           const info = m.user_id ? members[m.user_id] : undefined;
-          const name = info?.name ?? "Član";
+          const name = info?.name ?? t("chat.member");
           const day = dayLabel(m.created_at);
           const showDay = day !== lastDay;
           lastDay = day;
@@ -162,9 +179,36 @@ export default function ChatClient({
         <div ref={bottomRef} />
       </div>
 
+      {/* Emoji paleta */}
+      {showEmoji && (
+        <div className="mt-3 grid max-h-32 shrink-0 grid-cols-10 gap-1 overflow-y-auto rounded-xl border border-zinc-200 bg-white p-2 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]">
+          {EMOJIS.map((em) => (
+            <button
+              key={em}
+              type="button"
+              onClick={() => insertEmoji(em)}
+              className="rounded-md p-1 text-lg transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            >
+              {em}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Slanje */}
       <form onSubmit={send} className="mt-3 flex shrink-0 items-end gap-2">
+        <button
+          type="button"
+          onClick={() => setShowEmoji((s) => !s)}
+          title={t("chat.emoji")}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-300 transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800 ${
+            showEmoji ? "text-indigo-600" : "text-zinc-400"
+          }`}
+        >
+          <Smile className="h-5 w-5" />
+        </button>
         <textarea
+          ref={textRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
@@ -174,14 +218,14 @@ export default function ChatClient({
             }
           }}
           rows={1}
-          placeholder="Napiši poruku…"
+          placeholder={t("chat.placeholder")}
           className="max-h-32 flex-1 resize-none rounded-xl border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-black shadow-sm outline-none focus:border-indigo-500 dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <button
           type="submit"
           disabled={sending || !text.trim()}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:opacity-50"
-          title="Pošalji"
+          title={t("chat.send")}
         >
           <Send className="h-5 w-5" strokeWidth={1.75} />
         </button>

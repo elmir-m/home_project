@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Plus, Pencil } from "lucide-react";
 import Modal from "@/components/modal";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 import { createRecord, editRecord, createContact, editContact } from "./actions";
 
 type Rec = {
@@ -48,10 +49,11 @@ function AddBtn({ open, label }: { open: () => void; label: string }) {
 }
 
 function EditBtn({ open }: { open: () => void }) {
+  const t = useT();
   return (
     <button
       onClick={open}
-      title="Uredi"
+      title={t("common.edit")}
       className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-indigo-600 dark:hover:bg-zinc-800"
     >
       <Pencil className="h-4 w-4" />
@@ -61,12 +63,13 @@ function EditBtn({ open }: { open: () => void }) {
 
 export function RecordForm({ record }: { record?: Rec }) {
   const editing = !!record;
+  const t = useT();
   const formRef = useRef<HTMLFormElement>(null);
   return (
     <Modal
-      title={editing ? "Uredi zapis" : "Novi zapis"}
+      title={editing ? t("life.record.edit") : t("life.record.new")}
       trigger={(open) =>
-        editing ? <EditBtn open={open} /> : <AddBtn open={open} label="Novi zapis" />
+        editing ? <EditBtn open={open} /> : <AddBtn open={open} label={t("life.record.new")} />
       }
     >
       {(close) => (
@@ -82,30 +85,30 @@ export function RecordForm({ record }: { record?: Rec }) {
           className="flex flex-col gap-4"
         >
           {editing && <input type="hidden" name="id" value={record!.id} />}
-          <Field label="Naziv">
+          <Field label={t("field.title")}>
             <input
               name="title"
               required
               autoFocus
               defaultValue={record?.title ?? ""}
-              placeholder="npr. Registracija auta"
+              placeholder={t("life.record.titlePlaceholder")}
               className={input}
             />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Vrsta">
+            <Field label={t("life.record.type")}>
               <select
                 name="category"
                 defaultValue={record?.category ?? "document"}
                 className={input}
               >
-                <option value="document">Dokument</option>
-                <option value="warranty">Garancija</option>
-                <option value="renewal">Obnova</option>
-                <option value="other">Ostalo</option>
+                <option value="document">{t("life.cat.document")}</option>
+                <option value="warranty">{t("life.cat.warranty")}</option>
+                <option value="renewal">{t("life.cat.renewal")}</option>
+                <option value="other">{t("life.cat.other")}</option>
               </select>
             </Field>
-            <Field label="Rok isteka (opciono)">
+            <Field label={t("life.record.expiry")}>
               <input
                 type="date"
                 name="expiry_date"
@@ -114,25 +117,25 @@ export function RecordForm({ record }: { record?: Rec }) {
               />
             </Field>
           </div>
-          <Field label="Bilješka">
+          <Field label={t("field.notes")}>
             <textarea
               name="notes"
               rows={2}
               defaultValue={record?.notes ?? ""}
-              placeholder="Dodatne informacije…"
+              placeholder={t("life.record.notesPlaceholder")}
               className={input}
             />
           </Field>
           {!editing && (
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Ako uneseš rok isteka, automatski se pravi podsjetnik 7 dana ranije.
+              {t("life.record.hint")}
             </p>
           )}
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Čuvam…"
+            pendingText={t("common.saving")}
           >
-            {editing ? "Sačuvaj" : "Dodaj zapis"}
+            {editing ? t("common.save") : t("life.record.add")}
           </SubmitButton>
         </form>
       )}
@@ -142,12 +145,13 @@ export function RecordForm({ record }: { record?: Rec }) {
 
 export function ContactForm({ contact }: { contact?: Contact }) {
   const editing = !!contact;
+  const t = useT();
   const formRef = useRef<HTMLFormElement>(null);
   return (
     <Modal
-      title={editing ? "Uredi kontakt" : "Novi kontakt"}
+      title={editing ? t("life.contact.edit") : t("life.contact.new")}
       trigger={(open) =>
-        editing ? <EditBtn open={open} /> : <AddBtn open={open} label="Novi kontakt" />
+        editing ? <EditBtn open={open} /> : <AddBtn open={open} label={t("life.contact.new")} />
       }
     >
       {(close) => (
@@ -163,26 +167,26 @@ export function ContactForm({ contact }: { contact?: Contact }) {
           className="flex flex-col gap-4"
         >
           {editing && <input type="hidden" name="id" value={contact!.id} />}
-          <Field label="Ime">
+          <Field label={t("life.contact.name")}>
             <input
               name="name"
               required
               autoFocus
               defaultValue={contact?.name ?? ""}
-              placeholder="npr. Vodoinstalater Meho"
+              placeholder={t("life.contact.namePlaceholder")}
               className={input}
             />
           </Field>
-          <Field label="Uloga">
+          <Field label={t("life.contact.role")}>
             <input
               name="role"
               defaultValue={contact?.role ?? ""}
-              placeholder="npr. vodoinstalater"
+              placeholder={t("life.contact.rolePlaceholder")}
               className={input}
             />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Telefon">
+            <Field label={t("life.contact.phone")}>
               <input
                 name="phone"
                 defaultValue={contact?.phone ?? ""}
@@ -190,7 +194,7 @@ export function ContactForm({ contact }: { contact?: Contact }) {
                 className={input}
               />
             </Field>
-            <Field label="Email">
+            <Field label={t("life.contact.email")}>
               <input
                 name="email"
                 defaultValue={contact?.email ?? ""}
@@ -201,9 +205,9 @@ export function ContactForm({ contact }: { contact?: Contact }) {
           </div>
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Čuvam…"
+            pendingText={t("common.saving")}
           >
-            {editing ? "Sačuvaj" : "Dodaj kontakt"}
+            {editing ? t("common.save") : t("life.contact.add")}
           </SubmitButton>
         </form>
       )}

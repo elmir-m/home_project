@@ -1,6 +1,7 @@
 "use client";
 
 import Modal from "@/components/modal";
+import { useT } from "@/components/locale-provider";
 
 type Member = {
   user_id: string;
@@ -19,6 +20,7 @@ export default function MemberDetail({
   member: Member;
   householdName: string | null;
 }) {
+  const t = useT();
   const name = member.profiles?.display_name ?? member.profiles?.email ?? "?";
   const email = member.profiles?.email ?? "";
   const avatar = member.profiles?.avatar_url ?? null;
@@ -39,12 +41,12 @@ export default function MemberDetail({
 
   return (
     <Modal
-      title="Profil člana"
+      title={t("members.memberProfile")}
       trigger={(open) => (
         <button
           onClick={open}
           className="flex flex-1 items-center gap-3 text-left"
-          title="Prikaži profil"
+          title={t("members.showProfile")}
         >
           <Avatar size="h-9 w-9 text-sm" />
           <span className="font-medium text-zinc-900 hover:underline dark:text-zinc-50">
@@ -70,7 +72,7 @@ export default function MemberDetail({
                   : "bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300"
               }`}
             >
-              {isOwner ? "vlasnik" : "član"}
+              {isOwner ? t("role.owner") : t("role.member")}
             </span>
             {householdName && (
               <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-zinc-600 dark:bg-[#2a2f39] dark:text-zinc-300">

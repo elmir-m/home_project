@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getT } from "@/lib/i18n-server";
 
 type Hit = { label: string; sub?: string; href: string };
 
@@ -9,6 +10,7 @@ export default async function SearchPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  const tr = await getT();
   const supabase = await createClient();
   const {
     data: { user },
@@ -31,7 +33,7 @@ export default async function SearchPage({
     ]);
 
     groups.push({
-      title: "Zadaci",
+      title: tr("search.cat.tasks"),
       hits: (tasks.data ?? []).map((t) => ({
         label: t.title,
         sub: t.notes ?? undefined,
@@ -39,15 +41,15 @@ export default async function SearchPage({
       })),
     });
     groups.push({
-      title: "Bilješke",
+      title: tr("search.cat.notes"),
       hits: (notes.data ?? []).map((n) => ({
-        label: n.title ?? "(bez naslova)",
+        label: n.title ?? tr("search.untitled"),
         sub: n.body ?? undefined,
         href: "/notes",
       })),
     });
     groups.push({
-      title: "Događaji",
+      title: tr("search.cat.events"),
       hits: (events.data ?? []).map((e) => ({
         label: e.title,
         sub: e.event_date,
@@ -55,7 +57,7 @@ export default async function SearchPage({
       })),
     });
     groups.push({
-      title: "Računi",
+      title: tr("search.cat.bills"),
       hits: (bills.data ?? []).map((b) => ({
         label: b.name,
         sub: `${b.amount} KM`,
@@ -63,14 +65,14 @@ export default async function SearchPage({
       })),
     });
     groups.push({
-      title: "Podsjetnici",
+      title: tr("search.cat.reminders"),
       hits: (reminders.data ?? []).map((r) => ({
         label: r.title,
         href: "/reminders",
       })),
     });
     groups.push({
-      title: "Kupovina",
+      title: tr("search.cat.shopping"),
       hits: (shopping.data ?? []).map((s) => ({
         label: s.text,
         href: "/shopping",
@@ -82,24 +84,26 @@ export default async function SearchPage({
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
-      <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Pretraga</h1>
+      <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
+        {tr("search.title")}
+      </h1>
 
       <form className="flex gap-2">
         <input
           name="q"
           defaultValue={q}
           autoFocus
-          placeholder="Traži kroz sve module…"
+          placeholder={tr("search.placeholder")}
           className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
         />
         <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
-          Traži
+          {tr("search.button")}
         </button>
       </form>
 
       {q && (
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {total} rezultata za &quot;{q}&quot;
+          {tr("search.results", { n: total, q })}
         </p>
       )}
 
@@ -132,7 +136,7 @@ export default async function SearchPage({
           ))}
         {q && total === 0 && (
           <p className="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Nema rezultata.
+            {tr("search.noResults")}
           </p>
         )}
       </div>

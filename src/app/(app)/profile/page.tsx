@@ -4,6 +4,7 @@ import { updateProfile } from "./actions";
 import SubmitButton from "@/components/submit-button";
 import ChangePasswordForm from "./change-password-form";
 import AvatarUpload from "./avatar-upload";
+import { getT } from "@/lib/i18n-server";
 
 const input =
   "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60 dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50";
@@ -21,6 +22,8 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const t = await getT();
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("display_name, avatar_url")
@@ -33,7 +36,7 @@ export default async function ProfilePage({
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-          Moj profil
+          {t("profile.title")}
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">{user.email}</p>
       </div>
@@ -51,34 +54,34 @@ export default async function ProfilePage({
       )}
       {sp.ok === "name" && (
         <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-950/50 dark:text-green-300">
-          ✓ Profil ažuriran.
+          ✓ {t("profile.updated")}
         </p>
       )}
       {sp.ok === "pass" && (
         <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-950/50 dark:text-green-300">
-          ✓ Lozinka promijenjena.
+          ✓ {t("profile.passChanged")}
         </p>
       )}
 
       {/* Podaci */}
       <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Osnovni podaci
+          {t("profile.basic")}
         </h2>
         <form action={updateProfile} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
-            <span className={label}>Ime i prezime</span>
+            <span className={label}>{t("profile.name")}</span>
             <input name="display_name" defaultValue={name} required className={input} />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className={label}>Email (ne može se mijenjati)</span>
+            <span className={label}>{t("profile.email")}</span>
             <input defaultValue={user.email ?? ""} disabled className={input} />
           </label>
           <SubmitButton
             className="self-start rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Čuvam…"
+            pendingText={t("common.saving")}
           >
-            Sačuvaj
+            {t("common.save")}
           </SubmitButton>
         </form>
       </section>
@@ -87,10 +90,10 @@ export default async function ProfilePage({
       <section className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]">
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            Lozinka
+            {t("profile.password")}
           </h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Za promjenu je potrebna trenutna lozinka.
+            {t("profile.passHint")}
           </p>
         </div>
         <ChangePasswordForm />

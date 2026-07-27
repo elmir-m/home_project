@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { acceptInvite } from "../actions";
+import { getT } from "@/lib/i18n-server";
 
 export default async function InvitePage({
   params,
@@ -9,6 +10,7 @@ export default async function InvitePage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
+  const t = await getT();
 
   const supabase = await createClient();
   const {
@@ -37,16 +39,16 @@ export default async function InvitePage({
     return (
       <Shell>
         <h1 className="text-xl font-bold text-black dark:text-zinc-50">
-          Pozivnica nije važeća
+          {t("auth.invite.invalidTitle")}
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
-          Možda je već iskorištena ili opozvana.
+          {t("auth.invite.invalidBody")}
         </p>
         <Link
           href="/dashboard"
           className="mt-4 inline-block text-sm text-blue-600 hover:underline"
         >
-          Na početnu
+          {t("auth.invite.home")}
         </Link>
       </Shell>
     );
@@ -56,17 +58,17 @@ export default async function InvitePage({
     return (
       <Shell>
         <h1 className="text-xl font-bold text-black dark:text-zinc-50">
-          Pozivnica u domaćinstvo{householdName ? ` "${householdName}"` : ""}
+          {t("auth.invite.title")}
+          {householdName ? ` "${householdName}"` : ""}
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
-          Da prihvatiš, prvo se prijavi ili registruj, pa ponovo otvori ovaj
-          link iz mejla.
+          {t("auth.invite.loginFirst")}
         </p>
         <Link
           href="/login"
           className="mt-4 inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white dark:bg-indigo-500 dark:text-white"
         >
-          Prijava / Registracija
+          {t("auth.invite.loginOrRegister")}
         </Link>
       </Shell>
     );
@@ -75,18 +77,18 @@ export default async function InvitePage({
   return (
     <Shell>
       <h1 className="text-xl font-bold text-black dark:text-zinc-50">
-        Pridruži se domaćinstvu
+        {t("auth.invite.joinTitle")}
       </h1>
       <p className="mt-2 text-sm text-zinc-500">
-        Pozvani ste u{" "}
+        {t("auth.invite.invitedTo")}{" "}
         <span className="font-medium text-black dark:text-zinc-50">
-          {householdName ?? "domaćinstvo"}
+          {householdName ?? t("auth.invite.aHousehold")}
         </span>
-        . Pridruživanjem dijelite zadatke, kalendar, finansije i ostalo.
+        {t("auth.invite.shareNote")}
       </p>
       <form action={acceptInvite.bind(null, token)} className="mt-4">
         <button className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:text-white">
-          Prihvati pozivnicu
+          {t("auth.invite.accept")}
         </button>
       </form>
     </Shell>

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Plus } from "lucide-react";
 import Modal from "@/components/modal";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 import { createEvent, editEvent, deleteEvent } from "./actions";
 
 type Ev = {
@@ -35,16 +36,17 @@ export default function EventForm({
   defaultDate?: string;
 }) {
   const editing = !!event;
+  const t = useT();
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
     <Modal
-      title={editing ? "Uredi događaj" : "Novi događaj"}
+      title={editing ? t("cal.editEvent") : t("cal.newEvent")}
       trigger={(open) =>
         editing ? (
           <button
             onClick={open}
-            title="Uredi događaj"
+            title={t("cal.editEvent")}
             className="w-full truncate rounded bg-blue-100 px-1 py-0.5 text-left text-xs text-blue-800 hover:bg-blue-200 dark:bg-blue-950 dark:text-blue-300"
           >
             {event!.start_time ? event!.start_time.slice(0, 5) + " " : ""}
@@ -56,7 +58,7 @@ export default function EventForm({
             className="flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 text-sm font-medium text-white transition hover:bg-indigo-700 active:scale-[0.98]"
           >
             <Plus className="h-4 w-4" />
-            Novi događaj
+            {t("cal.newEvent")}
           </button>
         )
       }
@@ -75,19 +77,19 @@ export default function EventForm({
         >
           {editing && <input type="hidden" name="id" value={event!.id} />}
 
-          <Field label="Naziv">
+          <Field label={t("field.title")}>
             <input
               name="title"
               required
               autoFocus
               defaultValue={event?.title ?? ""}
-              placeholder="npr. Doktor u 10h"
+              placeholder={t("cal.titlePlaceholder")}
               className={input}
             />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Datum">
+            <Field label={t("field.date")}>
               <input
                 type="date"
                 name="event_date"
@@ -96,7 +98,7 @@ export default function EventForm({
                 className={input}
               />
             </Field>
-            <Field label="Vrijeme (opciono)">
+            <Field label={t("field.time")}>
               <input
                 type="time"
                 name="start_time"
@@ -109,17 +111,17 @@ export default function EventForm({
           <div className="mt-1 flex gap-2">
             <SubmitButton
               className="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-              pendingText={editing ? "Čuvam…" : "Dodajem…"}
+              pendingText={editing ? t("common.saving") : t("common.adding")}
             >
-              {editing ? "Sačuvaj" : "Dodaj događaj"}
+              {editing ? t("common.save") : t("cal.addEvent")}
             </SubmitButton>
             {editing && (
               <SubmitButton
                 formAction={deleteEvent}
                 className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950/40"
-                pendingText="Brišem…"
+                pendingText={t("common.deleting")}
               >
-                Obriši
+                {t("common.delete")}
               </SubmitButton>
             )}
           </div>

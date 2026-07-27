@@ -5,8 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 import { BUILTIN_APPS } from "@/lib/platform";
 import { toggleApp } from "./actions";
 import { AppIcon } from "@/components/app-icon";
+import { getT } from "@/lib/i18n-server";
 
 export default async function AppsPage() {
+  const t = await getT();
   const supabase = await createClient();
   const {
     data: { user },
@@ -25,11 +27,10 @@ export default async function AppsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-            Aplikacije
+            {t("apps.title")}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Instaliraj/deinstaliraj module domaćinstva. Nove aplikacije se dodaju
-            na isti način i odmah rade uz postojeće.
+            {t("apps.subtitle")}
           </p>
         </div>
         <Link
@@ -37,7 +38,7 @@ export default async function AppsPage() {
           className="flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 px-3.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
         >
           <Zap className="h-4 w-4" />
-          Automatizacije
+          {t("nav.automations")}
         </Link>
       </div>
 
@@ -72,7 +73,7 @@ export default async function AppsPage() {
                         : "bg-indigo-600 text-white"
                     }`}
                   >
-                    {on ? "Deinstaliraj" : "Instaliraj"}
+                    {on ? t("apps.uninstall") : t("apps.install")}
                   </button>
                 </form>
               </div>
@@ -84,7 +85,7 @@ export default async function AppsPage() {
                   <span
                     key={c}
                     className="rounded bg-zinc-100 px-1.5 py-0.5 text-zinc-500 dark:bg-[#2a2f39] dark:text-zinc-400"
-                    title="koristi sposobnost"
+                    title={t("apps.usesCapability")}
                   >
                     ⚙ {c}
                   </span>

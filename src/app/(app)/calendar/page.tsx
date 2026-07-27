@@ -1,19 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentHousehold } from "@/lib/household";
+import { getCurrentHousehold, canManage } from "@/lib/household";
+import { getT, getLocale } from "@/lib/i18n-server";
+import { localeTag } from "@/lib/i18n";
 import EventForm from "./event-form";
-
-const MONTHS = [
-  "Januar", "Februar", "Mart", "April", "Maj", "Juni",
-  "Juli", "Avgust", "Septembar", "Oktobar", "Novembar", "Decembar",
-];
-const WEEKDAYS = ["Pon", "Uto", "Sri", "Čet", "Pet", "Sub", "Ned"];
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const ymd = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
 
-type EventRow = { id: string; title: string; event_date: string; start_time: string | null };
+type EventRow = { id: string; title: string; event_date: string; start_time: string | null; created_by: string | null };
 type TaskRow = { id: string; title: string; due_date: string; status: string };
 type BillRow = { id: string; name: string; due_date: string; amount: number };
 
@@ -28,7 +24,13 @@ export default async function CalendarPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { household } = await getCurrentHousehold();
+  const { household, userId, isOwner } = await getCurrentHousehold();
+  const t = await getT();
+  const tag = localeTag(await getLocale());
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const weekdays = Array.from({ length: 7 }, (_, i) =>
+    cap(new Date(2024, 0, 1 + i).toLocaleDateString(tag, { weekday: "short" })),
+  );
 
   // Odredi mjesec (iz ?month=YYYY-MM ili trenutni).
   const now = new Date();
@@ -53,7 +55,7 @@ export default async function CalendarPage({
   // Događaji + zadaci s rokom u ovom mjesecu.
   const { data: events } = await supabase
     .from("calendar_events")
-    .select("id, title, event_date, start_time")
+    .select("id, title, event_date, start_time, created_by")
     .gte("event_date", first)
     .lte("event_date", last);
 
@@ -89,7 +91,7 @@ export default async function CalendarPage({
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-black sm:text-3xl dark:text-zinc-50">
-          {MONTHS[month]} {year}
+          {cap(new Date(year, month, 1).toLocaleDateString(tag, { month: "long", year: "numeric" }))}
         </h1>
         <div className="flex items-center gap-2">
           <Link
@@ -102,7 +104,7 @@ export default async function CalendarPage({
             href="/calendar"
             className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
           >
-            Danas
+            {t("cal.today")}
           </Link>
           <Link
             href={`/calendar?month=${next}`}
@@ -117,7 +119,7 @@ export default async function CalendarPage({
       {/* Mreža — na mobilnom klizi horizontalno; vertikalno kliza stranica. */}
       <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div className="grid min-w-[680px] grid-cols-7 gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-[#2a2f39]">
-        {WEEKDAYS.map((w) => (
+        {weekdays.map((w) => (
           <div
             key={w}
             className="bg-zinc-50 py-2.5 text-center text-sm font-semibold text-zinc-600 dark:bg-[#20242c] dark:text-zinc-300"
@@ -146,9 +148,19 @@ export default async function CalendarPage({
                 {day}
               </div>
               <div className="flex flex-col gap-1">
-                {cell.events.map((e) => (
-                  <EventForm key={e.id} event={e} />
-                ))}
+                {cell.events.map((e) =>
+                  canManage(e.created_by, userId, isOwner) ? (
+                    <EventForm key={e.id} event={e} />
+                  ) : (
+                    <div
+                      key={e.id}
+                      className="w-full truncate rounded bg-blue-100 px-1 py-0.5 text-left text-xs text-blue-800 dark:bg-blue-950 dark:text-blue-300"
+                    >
+                      {e.start_time ? e.start_time.slice(0, 5) + " " : ""}
+                      {e.title}
+                    </div>
+                  ),
+                )}
                 {cell.tasks.map((t) => (
                   <div
                     key={t.id}
@@ -179,17 +191,16 @@ export default async function CalendarPage({
       </div>
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        <span className="rounded bg-blue-100 px-1 dark:bg-blue-950">plavo</span>{" "}
-        = događaji ·{" "}
+        <span className="rounded bg-blue-100 px-1 dark:bg-blue-950">{t("cal.leg.blue")}</span>{" "}
+        = {t("cal.leg.events")} ·{" "}
         <span className="rounded bg-green-100 px-1 dark:bg-green-950">
-          zeleno
+          {t("cal.leg.green")}
         </span>{" "}
-        = zadaci ·{" "}
+        = {t("cal.leg.tasks")} ·{" "}
         <span className="rounded bg-orange-100 px-1 dark:bg-orange-950">
-          narandžasto
+          {t("cal.leg.orange")}
         </span>{" "}
-        = računi (sve automatski) · klik na događaj za uređivanje
-        {household ? "" : " · pokreni migraciju 0003"}
+        = {t("cal.leg.bills")} {t("cal.leg.note")}
       </p>
     </main>
   );

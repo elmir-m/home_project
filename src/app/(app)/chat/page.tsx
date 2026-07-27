@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
+import { getT } from "@/lib/i18n-server";
 import ChatClient, { type ChatMessage, type MemberInfo } from "./chat-client";
 
 export default async function ChatPage() {
@@ -11,13 +12,16 @@ export default async function ChatPage() {
   if (!user) redirect("/login");
 
   const { household, members } = await getCurrentHousehold();
+  const t = await getT();
 
   if (!household) {
     return (
       <main className="mx-auto max-w-3xl p-8">
-        <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Chat</h1>
+        <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
+          {t("chat.title")}
+        </h1>
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-          Nemaš aktivno domaćinstvo.
+          {t("chat.noHousehold")}
         </p>
       </main>
     );

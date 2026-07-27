@@ -11,7 +11,14 @@ import { useT } from "@/components/locale-provider";
 type Item = { href: string; label: string; slug: string };
 
 // Hamburger + klizni meni za mobilne uređaje (skriveno na md+ gdje je sidebar).
-export default function MobileNav({ hidden = [] }: { hidden?: string[] }) {
+// `children` = pomoćne kontrole (jezik, tema, pomoć, odjava) prikazane u podnožju.
+export default function MobileNav({
+  hidden = [],
+  children,
+}: {
+  hidden?: string[];
+  children?: React.ReactNode;
+}) {
   const pathname = usePathname();
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -69,7 +76,7 @@ export default function MobileNav({ hidden = [] }: { hidden?: string[] }) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-40 md:hidden">
+        <div className="fixed inset-0 z-[60] md:hidden">
           {/* Zatamnjenje */}
           <div
             className="absolute inset-0 bg-black/50"
@@ -131,6 +138,12 @@ export default function MobileNav({ hidden = [] }: { hidden?: string[] }) {
                 </div>
               ))}
             </nav>
+
+            {children && (
+              <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
+                {children}
+              </div>
+            )}
           </aside>
         </div>
       )}

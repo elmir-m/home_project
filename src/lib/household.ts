@@ -29,8 +29,19 @@ export async function getCurrentHousehold() {
   const active = cookieStore.get("hh")?.value;
   const household = list.find((h) => h.id === active) ?? list[0] ?? null;
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const userId = user?.id ?? null;
+
   if (!household) {
-    return { household: null, households: list, members: [] as Member[] };
+    return {
+      household: null,
+      households: list,
+      members: [] as Member[],
+      userId,
+      isOwner: false,
+    };
   }
 
   const { data } = await supabase
@@ -38,9 +49,26 @@ export async function getCurrentHousehold() {
     .select("user_id, role, profiles(display_name, email, avatar_url)")
     .eq("household_id", household.id);
 
+  const members = (data as unknown as Member[]) ?? [];
+  const isOwner = members.some(
+    (m) => m.user_id === userId && m.role === "owner",
+  );
+
   return {
     household,
     households: list,
-    members: (data as unknown as Member[]) ?? [],
+    members,
+    userId,
+    isOwner,
   };
+}
+
+// Pomoćnik za UI: smije li trenutni korisnik uređivati/brisati stavku.
+// Pravilo (usklađeno s RLS 0021): autor stavke ILI vlasnik domaćinstva.
+export function canManage(
+  createdBy: string | null | undefined,
+  userId: string | null,
+  isOwner: boolean,
+): boolean {
+  return isOwner || (!!userId && createdBy === userId);
 }

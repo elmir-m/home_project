@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Plus } from "lucide-react";
 import Modal from "@/components/modal";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 import { createAutomation } from "../apps/actions";
 
 type Opt = { type: string; label: string };
@@ -19,17 +20,18 @@ export default function AutomationForm({
   actions: Opt[];
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const t = useT();
 
   return (
     <Modal
-      title="Nova automatizacija"
+      title={t("automations.new")}
       trigger={(open) => (
         <button
           onClick={open}
           className="flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 text-sm font-medium text-white transition hover:bg-indigo-700 active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" />
-          Nova automatizacija
+          {t("automations.new")}
         </button>
       )}
     >
@@ -47,12 +49,12 @@ export default function AutomationForm({
         >
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Kada se desi
+              {t("automations.trigger")}
             </span>
             <select name="trigger_type" className={input}>
               {events.map((e) => (
                 <option key={e.type} value={e.type}>
-                  {e.label}
+                  {t(e.label)}
                 </option>
               ))}
             </select>
@@ -60,12 +62,12 @@ export default function AutomationForm({
 
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Onda uradi
+              {t("automations.action")}
             </span>
             <select name="action_type" className={input}>
               {actions.map((a) => (
                 <option key={a.type} value={a.type}>
-                  {a.label}
+                  {t(a.label)}
                 </option>
               ))}
             </select>
@@ -73,20 +75,20 @@ export default function AutomationForm({
 
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Tekst (naslov podsjetnika/zadatka ili predmet emaila)
+              {t("automations.textLabel")}
             </span>
             <input
               name="text"
-              placeholder="npr. Provjeri stanje"
+              placeholder={t("automations.textPlaceholder")}
               className={input}
             />
           </label>
 
           <SubmitButton
             className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            pendingText="Dodajem…"
+            pendingText={t("common.adding")}
           >
-            Dodaj automatizaciju
+            {t("automations.add")}
           </SubmitButton>
         </form>
       )}

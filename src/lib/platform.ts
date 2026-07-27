@@ -5,22 +5,24 @@ import { sendEmail, basicEmail } from "@/lib/email";
 export { BUILTIN_APPS, type AppManifest } from "@/lib/apps";
 
 // -------- Event tipovi (za automatizacije) --------
+// label = i18n ključ; prevodi se u UI-u (t(label)).
 export const EVENT_TYPES: { type: string; label: string }[] = [
-  { type: "task.created", label: "Zadatak kreiran" },
-  { type: "task.completed", label: "Zadatak završen" },
-  { type: "bill.created", label: "Račun dodan" },
-  { type: "transaction.created", label: "Transakcija dodana" },
-  { type: "note.created", label: "Bilješka kreirana" },
-  { type: "record.created", label: "Zapis dodan (Kućna evidencija)" },
-  { type: "shopping.added", label: "Stavka za kupovinu dodana" },
+  { type: "task.created", label: "auto.ev.taskCreated" },
+  { type: "task.completed", label: "auto.ev.taskCompleted" },
+  { type: "bill.created", label: "auto.ev.billCreated" },
+  { type: "transaction.created", label: "auto.ev.txCreated" },
+  { type: "note.created", label: "auto.ev.noteCreated" },
+  { type: "record.created", label: "auto.ev.recordCreated" },
+  { type: "shopping.added", label: "auto.ev.shoppingAdded" },
 ];
 
 export const ACTION_TYPES: { type: string; label: string }[] = [
-  { type: "create_reminder", label: "Napravi podsjetnik" },
-  { type: "create_task", label: "Napravi zadatak" },
-  { type: "send_email", label: "Pošalji email domaćinstvu" },
+  { type: "create_reminder", label: "auto.act.createReminder" },
+  { type: "create_task", label: "auto.act.createTask" },
+  { type: "send_email", label: "auto.act.sendEmail" },
 ];
 
+// Vrati i18n ključ za tip događaja (UI ga prevodi).
 export function eventLabel(type: string) {
   return EVENT_TYPES.find((e) => e.type === type)?.label ?? type;
 }

@@ -44,14 +44,48 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
 
   const hidden = minimal ? [] : await getHiddenSlugs();
 
+  // Odjava (isti izgled, koristi se i inline i u mobilnom meniju).
+  const logoutButton = (full = false) => (
+    <form action={logout} className={full ? "w-full" : ""}>
+      <button
+        title={`${t("topbar.logout")} (${email})`}
+        className={`flex h-9 items-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-600 transition hover:bg-zinc-100 active:scale-[0.98] dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 ${
+          full ? "w-full justify-center" : ""
+        }`}
+      >
+        <LogOut className="h-4 w-4" />
+        <span className={full ? "" : "hidden sm:inline"}>{t("topbar.logout")}</span>
+      </button>
+    </form>
+  );
+
+  // Pomoćne kontrole (jezik, pomoć, tema, odjava). U onboardingu (minimal)
+  // uvijek vidljive; inače inline tek na md+, a na mobitelu žive u meniju.
+  const utilityGroup = (
+    <>
+      <LanguageSwitcher />
+      {!minimal && <HelpButton />}
+      <ThemeToggle />
+      {logoutButton()}
+    </>
+  );
+
   return (
     <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-zinc-200 bg-[var(--background)]/80 px-3 py-3 backdrop-blur sm:gap-3 sm:px-6 dark:border-zinc-800">
       {minimal ? (
         <div className="flex-1" />
       ) : (
         <>
-          <MobileNav hidden={hidden} />
-          <form action="/search" className="flex-1">
+          <MobileNav hidden={hidden}>
+            {/* Pomoćne kontrole u podnožju mobilnog menija */}
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <HelpButton />
+              <ThemeToggle />
+            </div>
+            {logoutButton(true)}
+          </MobileNav>
+          <form action="/search" className="min-w-0 flex-1">
             <div className="flex w-full max-w-md items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39]">
               <Search className="h-4 w-4 shrink-0 text-zinc-400" />
               <input
@@ -68,7 +102,7 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
       <Link
         href="/profile"
         title={t("topbar.myProfile")}
-        className="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#20242c] dark:hover:bg-[#2a2f39]"
+        className="flex shrink-0 items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#20242c] dark:hover:bg-[#2a2f39]"
       >
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -93,23 +127,16 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
         </span>
       </Link>
 
-      <LanguageSwitcher />
       {user && (
         <NotificationsBell userId={user.id} initial={(notifs as Notif[]) ?? []} />
       )}
-      {!minimal && <HelpButton />}
-      <ThemeToggle />
       {!minimal && <QuickCapture />}
 
-      <form action={logout}>
-        <button
-          title={`${t("topbar.logout")} (${email})`}
-          className="flex h-9 items-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-600 transition hover:bg-zinc-100 active:scale-[0.98] dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-        >
-          <LogOut className="h-4 w-4" />
-          <span className="hidden sm:inline">{t("topbar.logout")}</span>
-        </button>
-      </form>
+      {/* Pomoćne kontrole: u onboardingu uvijek; inače inline samo na md+
+          (na mobitelu su u kliznom meniju iznad). */}
+      <div className={minimal ? "flex items-center gap-2 sm:gap-3" : "hidden items-center gap-2 md:flex sm:gap-3"}>
+        {utilityGroup}
+      </div>
     </header>
   );
 }
