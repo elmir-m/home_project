@@ -3,12 +3,16 @@ import { Search, LogOut } from "lucide-react";
 import QuickCapture from "@/components/quick-capture";
 import ThemeToggle from "@/components/theme-toggle";
 import NotificationsBell, { type Notif } from "@/components/notifications-bell";
+import MobileNav from "@/components/mobile-nav";
+import { HelpButton } from "@/components/help-tour";
 import { logout } from "@/app/login/actions";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
+import { getHiddenSlugs } from "@/lib/visibility";
 
-// Gornja traka: pretraga (lijevo) + identitet, tema, brzi upis, odjava (desno).
-export default async function TopBar() {
+// Gornja traka: hamburger (mobilni) + pretraga (lijevo); identitet, notifikacije,
+// pomoć, tema, brzi upis, odjava (desno). `minimal` = onboarding (bez navigacije).
+export default async function TopBar({ minimal = false }: { minimal?: boolean }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,18 +39,27 @@ export default async function TopBar() {
         .limit(20)
     : { data: [] };
 
+  const hidden = minimal ? [] : await getHiddenSlugs();
+
   return (
-    <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-zinc-200 bg-[var(--background)]/80 px-4 py-3 backdrop-blur sm:px-6 dark:border-zinc-800">
-      <form action="/search" className="flex-1">
-        <div className="flex w-full max-w-md items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39]">
-          <Search className="h-4 w-4 shrink-0 text-zinc-400" />
-          <input
-            name="q"
-            placeholder="Traži kroz sve…"
-            className="w-full border-0 bg-transparent py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-50"
-          />
-        </div>
-      </form>
+    <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-zinc-200 bg-[var(--background)]/80 px-3 py-3 backdrop-blur sm:gap-3 sm:px-6 dark:border-zinc-800">
+      {minimal ? (
+        <div className="flex-1" />
+      ) : (
+        <>
+          <MobileNav hidden={hidden} />
+          <form action="/search" className="flex-1">
+            <div className="flex w-full max-w-md items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39]">
+              <Search className="h-4 w-4 shrink-0 text-zinc-400" />
+              <input
+                name="q"
+                placeholder="Traži kroz sve…"
+                className="w-full border-0 bg-transparent py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-50"
+              />
+            </div>
+          </form>
+        </>
+      )}
 
       {/* Identitet prijavljenog korisnika (klik → profil) */}
       <Link
@@ -80,8 +93,9 @@ export default async function TopBar() {
       {user && (
         <NotificationsBell userId={user.id} initial={(notifs as Notif[]) ?? []} />
       )}
+      {!minimal && <HelpButton />}
       <ThemeToggle />
-      <QuickCapture />
+      {!minimal && <QuickCapture />}
 
       <form action={logout}>
         <button

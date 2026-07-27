@@ -62,7 +62,7 @@ export default function Sidebar({ hidden = [] }: { hidden?: string[] }) {
 
   return (
     <aside
-      className={`sticky top-0 flex h-screen flex-col border-r border-zinc-800/60 bg-[#1b1f29] px-2 py-4 transition-all ${
+      className={`sticky top-0 hidden h-screen flex-col border-r border-zinc-800/60 bg-[#1b1f29] px-2 py-4 transition-all md:flex ${
         collapsed ? "w-16" : "w-16 md:w-60 md:px-3"
       }`}
     >

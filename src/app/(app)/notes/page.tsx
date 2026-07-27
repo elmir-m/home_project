@@ -60,7 +60,7 @@ export default async function NotesPage() {
   const eventOpts = (events ?? []).map((e) => ({ id: e.id, title: e.title }));
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-8">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">

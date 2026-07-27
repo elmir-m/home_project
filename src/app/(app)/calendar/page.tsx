@@ -86,9 +86,9 @@ export default async function CalendarPage({
   ];
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl font-bold text-black dark:text-zinc-50">
+        <h1 className="text-2xl font-bold text-black sm:text-3xl dark:text-zinc-50">
           {MONTHS[month]} {year}
         </h1>
         <div className="flex items-center gap-2">
@@ -114,8 +114,9 @@ export default async function CalendarPage({
         </div>
       </header>
 
-      {/* Mreža */}
-      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-[#2a2f39]">
+      {/* Mreža — na mobilnom klizi horizontalno; vertikalno kliza stranica. */}
+      <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <div className="grid min-w-[680px] grid-cols-7 gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-[#2a2f39]">
         {WEEKDAYS.map((w) => (
           <div
             key={w}
@@ -126,14 +127,14 @@ export default async function CalendarPage({
         ))}
         {cells.map((day, i) => {
           if (day === null)
-            return <div key={i} className="min-h-32 bg-white dark:bg-[#191c23]" />;
+            return <div key={i} className="min-h-24 sm:min-h-32 bg-white dark:bg-[#191c23]" />;
           const key = ymd(year, month, day);
           const cell = byDay[key];
           const isToday = key === todayStr;
           return (
             <div
               key={i}
-              className="min-h-32 bg-white p-2 dark:bg-[#191c23]"
+              className="min-h-24 sm:min-h-32 bg-white p-2 dark:bg-[#191c23]"
             >
               <div
                 className={`mb-1.5 text-sm font-medium ${
@@ -174,6 +175,7 @@ export default async function CalendarPage({
             </div>
           );
         })}
+      </div>
       </div>
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">

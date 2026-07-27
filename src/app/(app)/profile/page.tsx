@@ -30,7 +30,7 @@ export default async function ProfilePage({
   const initial = (name || user.email || "?").charAt(0).toUpperCase();
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
           Moj profil

@@ -16,7 +16,12 @@ type ActEvent = {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welcome?: string; error?: string }>;
+}) {
+  const sp = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -115,9 +120,19 @@ export default async function DashboardPage() {
   );
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
+    <main className="mx-auto flex max-w-5xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
+      {sp.welcome && (
+        <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-950/50 dark:text-green-300">
+          ✓ Domaćinstvo je kreirano. Dobrodošao/la! Pozovi ukućane preko „Članovi“.
+        </p>
+      )}
+      {sp.error && (
+        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+          {sp.error}
+        </p>
+      )}
       <div>
-        <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Danas</h1>
+        <h1 className="text-2xl font-bold text-black sm:text-3xl dark:text-zinc-50">Danas</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {now.toLocaleDateString("bs-BA", {
             weekday: "long",
