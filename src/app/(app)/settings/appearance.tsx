@@ -114,41 +114,29 @@ export default function Appearance({
                 type="button"
                 onClick={() => chooseAccent(a.key)}
                 title={a.label}
-                className="flex flex-col items-center gap-1.5"
+                aria-label={a.label}
+                className={`flex h-10 w-10 items-center justify-center rounded-full transition ${
+                  active
+                    ? "ring-2 ring-offset-2 ring-zinc-900 dark:ring-zinc-100 dark:ring-offset-[#20242c]"
+                    : ""
+                }`}
+                style={{ backgroundColor: a.swatch }}
               >
-                <span
-                  className={`flex h-10 w-10 items-center justify-center rounded-full transition ${
-                    active
-                      ? "ring-2 ring-offset-2 ring-zinc-900 dark:ring-zinc-100 dark:ring-offset-[#20242c]"
-                      : ""
-                  }`}
-                  style={{ backgroundColor: a.swatch }}
-                >
-                  {active && (
-                    <svg
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      className="h-5 w-5 text-white"
-                    >
-                      <path
-                        d="M5 10.5l3.5 3.5L15 6.5"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  )}
-                </span>
-                <span
-                  className={`text-xs ${
-                    active
-                      ? "font-medium text-black dark:text-zinc-50"
-                      : "text-zinc-500 dark:text-zinc-400"
-                  }`}
-                >
-                  {a.label}
-                </span>
+                {active && (
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className="h-5 w-5 text-white"
+                  >
+                    <path
+                      d="M5 10.5l3.5 3.5L15 6.5"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
               </button>
             );
           })}
