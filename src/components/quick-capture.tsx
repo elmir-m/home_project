@@ -4,15 +4,17 @@ import { useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import { quickAdd } from "@/app/(app)/quick-actions";
 import SubmitButton from "@/components/submit-button";
+import { useT } from "@/components/locale-provider";
 
 const TYPES = [
-  { v: "task", l: "Zadatak" },
-  { v: "note", l: "Bilješka" },
-  { v: "reminder", l: "Podsjetnik" },
+  { v: "task", k: "qc.type.task" },
+  { v: "note", k: "qc.type.note" },
+  { v: "reminder", k: "qc.type.reminder" },
 ];
 
 // "+ Brzo" — dodaj zadatak/bilješku/podsjetnik odmah, bez otvaranja modula.
 export default function QuickCapture() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("task");
   const formRef = useRef<HTMLFormElement>(null);
@@ -24,7 +26,7 @@ export default function QuickCapture() {
         className="flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-sm font-medium text-white transition hover:bg-indigo-700 active:scale-[0.98]"
       >
         <Plus className="h-4 w-4" />
-        <span className="hidden sm:inline">Brzi upis</span>
+        <span className="hidden sm:inline">{t("qc.button")}</span>
       </button>
 
       {open && (
@@ -54,7 +56,7 @@ export default function QuickCapture() {
                       : "border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-indigo-700"
                   }`}
                 >
-                  {o.l}
+                  {t(o.k)}
                 </button>
               ))}
             </div>
@@ -62,16 +64,14 @@ export default function QuickCapture() {
               name="text"
               autoFocus
               required
-              placeholder="Upiši i pritisni Enter…"
+              placeholder={t("qc.placeholder")}
               className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-[#2a2f39] dark:text-zinc-50"
             />
             <p className="text-[11px] text-zinc-400">
-              {type === "reminder"
-                ? "Podsjetnik se postavlja za 1h (uredi u modulu)."
-                : "Kreira se odmah u odabranom modulu."}
+              {type === "reminder" ? t("qc.hint.reminder") : t("qc.hint.default")}
             </p>
             <SubmitButton className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">
-              Dodaj
+              {t("qc.add")}
             </SubmitButton>
           </form>
         </>
