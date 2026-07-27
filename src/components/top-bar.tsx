@@ -3,6 +3,7 @@ import { Search, LogOut } from "lucide-react";
 import QuickCapture from "@/components/quick-capture";
 import ThemeToggle from "@/components/theme-toggle";
 import NotificationsBell, { type Notif } from "@/components/notifications-bell";
+import LanguageSwitcher from "@/components/language-switcher";
 import MobileNav from "@/components/mobile-nav";
 import { HelpButton } from "@/components/help-tour";
 import { logout } from "@/app/login/actions";
@@ -92,6 +93,7 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
         </span>
       </Link>
 
+      <LanguageSwitcher />
       {user && (
         <NotificationsBell userId={user.id} initial={(notifs as Notif[]) ?? []} />
       )}
