@@ -91,9 +91,8 @@ export async function inviteMember(formData: FormData) {
     subject: `Pozvani ste u domaćinstvo "${household.name}" — Moj dom`,
     html: basicEmail(
       "Pozivnica u domaćinstvo",
-      `Pozvani ste da se pridružite domaćinstvu <b>${household.name}</b>.<br/><br/>
-       <a href="${link}">Prihvati pozivnicu</a><br/><br/>
-       Ako dugme ne radi, otvori: ${link}`,
+      `Pozvani ste da se pridružite domaćinstvu <b>${household.name}</b>. Klikom na dugme ispod pridružujete se i dijelite zadatke, kalendar, finansije i ostalo.`,
+      { cta: { href: link, label: "Prihvati pozivnicu" }, preview: `Pridruži se domaćinstvu ${household.name}` },
     ),
   });
 

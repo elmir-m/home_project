@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, emailLayout, emailSection } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -16,13 +16,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 const ymd = (d: Date) =>
   `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-function section(title: string, items: string[]): string {
-  if (!items.length) return "";
-  return `<h3 style="margin:16px 0 6px;font-size:14px">${title}</h3>
-    <ul style="margin:0;padding-left:18px;color:#444;font-size:14px;line-height:1.6">
-      ${items.map((i) => `<li>${i}</li>`).join("")}
-    </ul>`;
-}
+const section = emailSection;
 
 export async function GET(req: NextRequest) {
   if (!authorized(req)) {
@@ -125,17 +119,15 @@ export async function GET(req: NextRequest) {
     }
 
     const label = freq === "weekly" ? "Sedmični" : "Dnevni";
-    const html = `<div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;padding:24px">
-      <h2 style="margin:0 0 4px">${label} pregled — Home OS</h2>
-      <p style="color:#888;font-size:13px;margin:0">Pozdrav ${profile.display_name ?? ""}, evo šta slijedi:</p>
-      ${body}
-      <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-      <p style="color:#999;font-size:12px">Digest možeš isključiti u Postavkama.</p>
-    </div>`;
+    const html = emailLayout({
+      heading: `${label} pregled`,
+      contentHtml: `<p style="margin:0 0 4px;">Pozdrav ${profile.display_name ?? ""}, evo šta te čeka:</p>${body}`,
+      preview: `${label} pregled — šta te čeka`,
+    });
 
     const res = await sendEmail({
       to: profile.email,
-      subject: `${label} pregled — Home OS`,
+      subject: `${label} pregled — Moj dom`,
       html,
     });
     results.push({ to: profile.email, ...res });
