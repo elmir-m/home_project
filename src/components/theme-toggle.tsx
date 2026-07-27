@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
 // Prekidač svijetle/tamne teme; pamti izbor u localStorage.
-export default function ThemeToggle() {
+export default function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
@@ -28,7 +28,10 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       title={theme === "dark" ? "Svijetla tema" : "Tamna tema"}
-      className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+      className={
+        className ??
+        "flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+      }
     >
       {theme === "dark" ? (
         <Sun className="h-4 w-4" />

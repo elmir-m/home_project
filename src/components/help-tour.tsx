@@ -20,13 +20,16 @@ const STEPS: { slug: string; k: string }[] = [
   { slug: "settings", k: "help.s9" },
 ];
 
-export function HelpButton() {
+export function HelpButton({ className }: { className?: string }) {
   const t = useT();
   return (
     <button
       onClick={() => window.dispatchEvent(new Event("open-help-tour"))}
       title={t("topbar.help")}
-      className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+      className={
+        className ??
+        "flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+      }
     >
       <HelpCircle className="h-4.5 w-4.5" strokeWidth={1.75} />
     </button>

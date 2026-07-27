@@ -7,7 +7,7 @@ import { useLocale, useT } from "@/components/locale-provider";
 import { saveLocale } from "@/app/(app)/settings/actions";
 
 // Kompaktni prebacivač jezika (bs/en) u gornjoj traci.
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ className }: { className?: string }) {
   const locale = useLocale();
   const t = useT();
   const router = useRouter();
@@ -26,7 +26,10 @@ export default function LanguageSwitcher() {
       onClick={toggle}
       disabled={pending}
       title={`${t("language.title")} — ${next.toUpperCase()}`}
-      className="flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 px-2.5 text-xs font-semibold text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+      className={
+        className ??
+        "flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 px-2.5 text-xs font-semibold text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+      }
     >
       <Globe className="h-4 w-4" strokeWidth={1.75} />
       {locale.toUpperCase()}
