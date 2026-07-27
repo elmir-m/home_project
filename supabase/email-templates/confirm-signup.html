@@ -2,7 +2,10 @@
   Supabase Auth — "Confirm signup" template (brendiran: Moj dom).
   Zalijepi u: Supabase Dashboard -> Authentication -> Email Templates -> Confirm signup.
   Subject (preporuka): Potvrdi svoju email adresu — Moj dom
-  Varijable koje Supabase podržava ovdje: {{ .ConfirmationURL }}, {{ .SiteURL }}, {{ .Email }}, {{ .Token }}.
+  Link koristi {{ .ConfirmationURL }} (Supabase hosted verify -> redirect na Site URL) — radi.
+  Alternativa (ako ikad zatreba direktno kroz našu rutu /auth/confirm):
+    {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/dashboard
+  Varijable: {{ .ConfirmationURL }}, {{ .SiteURL }}, {{ .Email }}.
   Stil usklađen sa src/lib/email.ts (emailLayout).
 -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:24px 12px;">
