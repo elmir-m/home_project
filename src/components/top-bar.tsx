@@ -44,23 +44,23 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
 
   const hidden = minimal ? [] : await getHiddenSlugs();
 
-  // Zajednički stil kontrola u tamnom mobilnom meniju (panel je uvijek taman).
+  // Ikona-dugme u tamnom mobilnom meniju (panel je uvijek taman, dobar kontrast).
   const menuBtn =
-    "flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/15 bg-white/5 text-sm font-semibold text-zinc-100 transition hover:bg-white/10";
+    "flex h-11 flex-1 items-center justify-center rounded-lg border border-white/10 bg-white/10 text-zinc-100 transition hover:bg-white/20 hover:text-white";
 
-  // Odjava. `full` = varijanta za mobilni meni (tamni panel, puna širina).
+  // Odjava. `full` = ikona-dugme za mobilni meni (crveni akcent); inače inline na desktopu.
   const logoutButton = (full = false) => (
-    <form action={logout} className={full ? "w-full" : ""}>
+    <form action={logout} className={full ? "flex-1" : ""}>
       <button
         title={`${t("topbar.logout")} (${email})`}
         className={
           full
-            ? "flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 text-sm font-semibold text-red-300 transition hover:bg-red-500/20"
+            ? "flex h-11 w-full items-center justify-center rounded-lg border border-red-500/40 bg-red-500/15 text-red-300 transition hover:bg-red-500/25 hover:text-red-200"
             : "flex h-9 items-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-600 transition hover:bg-zinc-100 active:scale-[0.98] dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
         }
       >
         <LogOut className="h-4 w-4" />
-        <span className={full ? "" : "hidden sm:inline"}>{t("topbar.logout")}</span>
+        {!full && <span className="hidden sm:inline">{t("topbar.logout")}</span>}
       </button>
     </form>
   );
@@ -83,13 +83,13 @@ export default async function TopBar({ minimal = false }: { minimal?: boolean })
       ) : (
         <>
           <MobileNav hidden={hidden}>
-            {/* Pomoćne kontrole u podnožju mobilnog menija (tamni panel) */}
+            {/* Pomoćne kontrole — sve kao ikone u jednom redu (tamni panel) */}
             <div className="flex items-center gap-2">
-              <LanguageSwitcher className={menuBtn} />
+              <LanguageSwitcher className={menuBtn} iconOnly />
               <HelpButton className={menuBtn} />
               <ThemeToggle className={menuBtn} />
+              {logoutButton(true)}
             </div>
-            {logoutButton(true)}
           </MobileNav>
           <form action="/search" className="min-w-0 flex-1">
             <div className="flex w-full max-w-md items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 dark:border-zinc-700 dark:bg-[#2a2f39]">

@@ -7,7 +7,13 @@ import { useLocale, useT } from "@/components/locale-provider";
 import { saveLocale } from "@/app/(app)/settings/actions";
 
 // Kompaktni prebacivač jezika (bs/en) u gornjoj traci.
-export default function LanguageSwitcher({ className }: { className?: string }) {
+export default function LanguageSwitcher({
+  className,
+  iconOnly = false,
+}: {
+  className?: string;
+  iconOnly?: boolean;
+}) {
   const locale = useLocale();
   const t = useT();
   const router = useRouter();
@@ -32,7 +38,7 @@ export default function LanguageSwitcher({ className }: { className?: string }) 
       }
     >
       <Globe className="h-4 w-4" strokeWidth={1.75} />
-      {locale.toUpperCase()}
+      {!iconOnly && locale.toUpperCase()}
     </button>
   );
 }
