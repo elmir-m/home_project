@@ -41,7 +41,7 @@ export default function QuickCapture() {
                 setOpen(false);
               }, 50);
             }}
-            className="absolute right-0 z-20 mt-2 flex w-72 flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-[#20242c]"
+            className="absolute right-0 z-20 mt-2 flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-[#20242c]"
           >
             <input type="hidden" name="type" value={type} />
             <div className="flex gap-1">

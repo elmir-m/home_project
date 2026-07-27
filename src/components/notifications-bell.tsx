@@ -127,7 +127,7 @@ export default function NotificationsBell({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-20 w-80 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-[#20242c]">
+        <div className="absolute right-0 top-11 z-20 w-80 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-[#20242c]">
           <div className="border-b border-zinc-100 px-4 py-2.5 dark:border-zinc-800">
             <p className="text-sm font-semibold text-black dark:text-zinc-50">
               {t("topbar.notifications")}

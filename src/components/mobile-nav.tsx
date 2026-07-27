@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Menu, X } from "lucide-react";
@@ -22,6 +23,12 @@ export default function MobileNav({
   const pathname = usePathname();
   const t = useT();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Portal se renderuje tek na klijentu (nema document tokom SSR).
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Zatvori pri promjeni rute.
   useEffect(() => {
@@ -75,8 +82,10 @@ export default function MobileNav({
         <Menu className="h-5 w-5" />
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-[60] md:hidden">
+      {open &&
+        mounted &&
+        createPortal(
+          <div className="fixed inset-0 z-[60] md:hidden">
           {/* Zatamnjenje */}
           <div
             className="absolute inset-0 bg-black/50"
@@ -145,8 +154,9 @@ export default function MobileNav({
               </div>
             )}
           </aside>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
     </>
   );
 }
