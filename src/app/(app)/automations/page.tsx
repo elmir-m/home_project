@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { Zap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getT } from "@/lib/i18n-server";
+import { getT, getLocale } from "@/lib/i18n-server";
+import { localeTag } from "@/lib/i18n";
 import { EVENT_TYPES, ACTION_TYPES, eventLabel } from "@/lib/platform";
 import { toggleAutomation, deleteAutomation } from "../apps/actions";
 import AutomationForm from "./automation-form";
@@ -22,6 +23,7 @@ type Event = {
 
 export default async function AutomationsPage() {
   const tr = await getT();
+  const tag = localeTag(await getLocale());
   const supabase = await createClient();
   const {
     data: { user },
@@ -137,7 +139,7 @@ export default async function AutomationsPage() {
                 {e.payload?.title ?? ""}
               </span>
               <span className="text-xs text-zinc-400">
-                {new Date(e.created_at).toLocaleString("bs-BA")}
+                {new Date(e.created_at).toLocaleString(tag)}
               </span>
             </li>
           ))}

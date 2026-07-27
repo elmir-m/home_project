@@ -265,12 +265,12 @@ export default async function DashboardPage({
               <li key={e.id} className="flex items-center justify-between gap-2">
                 <span className="text-zinc-800 dark:text-zinc-100">
                   <span className="text-zinc-500 dark:text-zinc-400">
-                    {eventLabel(e.type)}:
+                    {t(eventLabel(e.type))}:
                   </span>{" "}
                   {e.payload?.title ?? ""}
                 </span>
                 <span className="shrink-0 text-xs text-zinc-400">
-                  {new Date(e.created_at).toLocaleString("bs-BA")}
+                  {new Date(e.created_at).toLocaleString(tag)}
                 </span>
               </li>
             ))}
