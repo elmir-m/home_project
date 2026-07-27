@@ -17,15 +17,19 @@ export const metadata: Metadata = {
   description: "Zajednički kućni sistem za cijelo domaćinstvo.",
 };
 
-// Postavi temu prije iscrtavanja (izbjegava treptaj pri učitavanju).
+// Postavi temu, veličinu fonta i akcentnu boju prije iscrtavanja (izbjegava treptaj).
 const themeScript = `
 (function(){
+  var d = document.documentElement;
   try {
     var t = localStorage.getItem('theme');
     if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', t);
+    d.setAttribute('data-theme', t);
+    d.setAttribute('data-font', localStorage.getItem('appFont') || 'md');
+    var a = localStorage.getItem('appAccent');
+    if (a && a !== 'indigo') d.setAttribute('data-accent', a);
   } catch(e) {
-    document.documentElement.setAttribute('data-theme','light');
+    d.setAttribute('data-theme','light');
   }
 })();
 `;

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { saveNotificationPrefs } from "./actions";
+import Appearance from "./appearance";
 
 type Prefs = {
   email_reminders: boolean;
@@ -50,6 +51,8 @@ export default async function SettingsPage() {
           Prijavljen kao {user.email}. Ove postavke vrijede samo za tebe.
         </p>
       </div>
+
+      <Appearance />
 
       <form
         action={saveNotificationPrefs}
