@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { Bell, Check, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useT, useLocale } from "@/components/locale-provider";
@@ -48,8 +49,12 @@ export default function NotificationsBell({
   const tag = localeTag(useLocale());
   const [items, setItems] = useState<Notif[]>(initial);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [, startTransition] = useTransition();
   const boxRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => setMounted(true), []);
 
   const unread = items.filter((n) => !n.read).length;
 
@@ -91,9 +96,10 @@ export default function NotificationsBell({
   useEffect(() => {
     if (!open) return;
     const onClick = (e: MouseEvent) => {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const target = e.target as Node;
+      const inButton = boxRef.current?.contains(target);
+      const inPanel = panelRef.current?.contains(target);
+      if (!inButton && !inPanel) setOpen(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
@@ -126,8 +132,11 @@ export default function NotificationsBell({
         )}
       </button>
 
-      {open && (
-        <div className="absolute right-0 top-11 z-20 w-80 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-[#20242c]">
+      {open && mounted && createPortal(
+        <div
+          ref={panelRef}
+          className="fixed right-3 top-16 z-[70] w-80 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-[#20242c]"
+        >
           <div className="border-b border-zinc-100 px-4 py-2.5 dark:border-zinc-800">
             <p className="text-sm font-semibold text-black dark:text-zinc-50">
               {t("topbar.notifications")}
@@ -200,7 +209,8 @@ export default function NotificationsBell({
               );
             })}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
