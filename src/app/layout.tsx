@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { createClient } from "@/lib/supabase/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,32 +18,54 @@ export const metadata: Metadata = {
   description: "Zajednički kućni sistem za cijelo domaćinstvo.",
 };
 
-// Postavi temu, veličinu fonta i akcentnu boju prije iscrtavanja (izbjegava treptaj).
+// Temu postavljamo prije iscrtavanja iz localStorage (izbjegava treptaj).
+// Font i akcent dolaze iz baze (SSR atributi ispod) — vezani za nalog.
 const themeScript = `
 (function(){
-  var d = document.documentElement;
   try {
     var t = localStorage.getItem('theme');
     if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    d.setAttribute('data-theme', t);
-    d.setAttribute('data-font', localStorage.getItem('appFont') || 'md');
-    var a = localStorage.getItem('appAccent');
-    if (a && a !== 'indigo') d.setAttribute('data-accent', a);
+    document.documentElement.setAttribute('data-theme', t);
   } catch(e) {
-    d.setAttribute('data-theme','light');
+    document.documentElement.setAttribute('data-theme','light');
   }
 })();
 `;
 
-export default function RootLayout({
+// Pročitaj postavke izgleda s profila (ako je korisnik prijavljen).
+async function getAppearance() {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { font: "md", accent: "indigo" };
+    const { data } = await supabase
+      .from("profiles")
+      .select("font_size, accent")
+      .eq("id", user.id)
+      .single();
+    return {
+      font: (data?.font_size as string) || "md",
+      accent: (data?.accent as string) || "indigo",
+    };
+  } catch {
+    return { font: "md", accent: "indigo" };
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { font, accent } = await getAppearance();
   return (
     <html
       lang="bs"
       suppressHydrationWarning
+      data-font={font}
+      data-accent={accent === "indigo" ? undefined : accent}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>

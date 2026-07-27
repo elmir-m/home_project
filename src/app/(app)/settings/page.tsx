@@ -41,6 +41,12 @@ export default async function SettingsPage() {
 
   const prefs = { ...DEFAULTS, ...(data as Prefs | null) };
 
+  const { data: appearance } = await supabase
+    .from("profiles")
+    .select("font_size, accent")
+    .eq("id", user.id)
+    .single();
+
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-8">
       <div>
@@ -52,7 +58,10 @@ export default async function SettingsPage() {
         </p>
       </div>
 
-      <Appearance />
+      <Appearance
+        initialFont={(appearance?.font_size as string) ?? "md"}
+        initialAccent={(appearance?.accent as string) ?? "indigo"}
+      />
 
       <form
         action={saveNotificationPrefs}

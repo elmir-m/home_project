@@ -25,3 +25,27 @@ export async function saveNotificationPrefs(formData: FormData) {
 
   revalidatePath("/settings");
 }
+
+const FONTS = ["sm", "md", "lg"];
+const ACCENTS = ["indigo", "blue", "violet", "emerald", "teal", "rose", "amber"];
+
+// Sprema izgled (veličina fonta + akcent) na profil korisnika — sinhronizuje se
+// preko svih uređaja. Poziva se iz klijentske komponente s običnim argumentima.
+export async function saveAppearance(font: string, accent: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const safeFont = FONTS.includes(font) ? font : "md";
+  const safeAccent = ACCENTS.includes(accent) ? accent : "indigo";
+
+  await supabase
+    .from("profiles")
+    .update({ font_size: safeFont, accent: safeAccent })
+    .eq("id", user.id);
+
+  // Da SSR (root layout) na sljedećoj navigaciji odmah pročita nove vrijednosti.
+  revalidatePath("/", "layout");
+}

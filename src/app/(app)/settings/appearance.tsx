@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useTransition } from "react";
+import { saveAppearance } from "./actions";
 
 const FONTS: { key: string; label: string; sample: string }[] = [
   { key: "sm", label: "Mala", sample: "text-sm" },
@@ -8,7 +9,7 @@ const FONTS: { key: string; label: string; sample: string }[] = [
   { key: "lg", label: "Velika", sample: "text-xl" },
 ];
 
-// value = ime paviljona (data-accent); swatch = boja kruga (600 nijansa).
+// value = ime palete (data-accent); swatch = boja kruga (600 nijansa).
 const ACCENTS: { key: string; label: string; swatch: string }[] = [
   { key: "indigo", label: "Indigo", swatch: "#4f46e5" },
   { key: "blue", label: "Plava", swatch: "#2563eb" },
@@ -19,34 +20,46 @@ const ACCENTS: { key: string; label: string; swatch: string }[] = [
   { key: "amber", label: "Narandžasta", swatch: "#d97706" },
 ];
 
-export default function Appearance() {
-  const [font, setFont] = useState("md");
-  const [accent, setAccent] = useState("indigo");
+export default function Appearance({
+  initialFont,
+  initialAccent,
+}: {
+  initialFont: string;
+  initialAccent: string;
+}) {
+  const [font, setFont] = useState(initialFont);
+  const [accent, setAccent] = useState(initialAccent);
+  const [saving, startSaving] = useTransition();
 
-  // Učitaj trenutne vrijednosti nakon montiranja (izbjegava hydration mismatch).
-  useEffect(() => {
-    setFont(localStorage.getItem("appFont") || "md");
-    setAccent(localStorage.getItem("appAccent") || "indigo");
-  }, []);
+  function persist(nextFont: string, nextAccent: string) {
+    startSaving(() => {
+      saveAppearance(nextFont, nextAccent);
+    });
+  }
 
   function chooseFont(v: string) {
     setFont(v);
-    localStorage.setItem("appFont", v);
     document.documentElement.setAttribute("data-font", v);
+    persist(v, accent);
   }
 
   function chooseAccent(v: string) {
     setAccent(v);
-    localStorage.setItem("appAccent", v);
     if (v === "indigo") document.documentElement.removeAttribute("data-accent");
     else document.documentElement.setAttribute("data-accent", v);
+    persist(font, v);
   }
 
   return (
     <section className="flex flex-col gap-5 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-[#20242c]">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-        Izgled
-      </h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+          Izgled
+        </h2>
+        {saving && (
+          <span className="text-xs text-zinc-400 dark:text-zinc-500">Čuvam…</span>
+        )}
+      </div>
 
       {/* Veličina fonta */}
       <div>
@@ -101,7 +114,7 @@ export default function Appearance() {
                 type="button"
                 onClick={() => chooseAccent(a.key)}
                 title={a.label}
-                className={`flex flex-col items-center gap-1.5`}
+                className="flex flex-col items-center gap-1.5"
               >
                 <span
                   className={`flex h-10 w-10 items-center justify-center rounded-full transition ${
@@ -143,7 +156,7 @@ export default function Appearance() {
       </div>
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        Vrijedi samo za tebe (spremljeno na ovom uređaju). Primjenjuje se odmah.
+        Vezano za tvoj nalog — vrijedi na svim uređajima. Primjenjuje se odmah.
       </p>
     </section>
   );
