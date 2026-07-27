@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Search, LogOut } from "lucide-react";
 import QuickCapture from "@/components/quick-capture";
 import ThemeToggle from "@/components/theme-toggle";
+import NotificationsBell, { type Notif } from "@/components/notifications-bell";
 import { logout } from "@/app/login/actions";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
@@ -24,6 +25,15 @@ export default async function TopBar() {
     ? await supabase.from("profiles").select("avatar_url").eq("id", user.id).single()
     : { data: null };
   const avatarUrl = prof?.avatar_url ?? null;
+
+  const { data: notifs } = user
+    ? await supabase
+        .from("notifications")
+        .select("id, type, title, body, data, read, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20)
+    : { data: [] };
 
   return (
     <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-zinc-200 bg-[var(--background)]/80 px-4 py-3 backdrop-blur sm:px-6 dark:border-zinc-800">
@@ -67,6 +77,9 @@ export default async function TopBar() {
         </span>
       </Link>
 
+      {user && (
+        <NotificationsBell userId={user.id} initial={(notifs as Notif[]) ?? []} />
+      )}
       <ThemeToggle />
       <QuickCapture />
 

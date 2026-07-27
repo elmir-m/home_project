@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentHousehold } from "@/lib/household";
 import { sendEmail, basicEmail } from "@/lib/email";
+import { notify } from "@/lib/notifications";
 
 const enc = (s: string) => encodeURIComponent(s);
 
@@ -73,6 +74,15 @@ export async function inviteMember(formData: FormData) {
     email,
     token,
     invited_by: user.id,
+  });
+
+  // Notifikacija u aplikaciji — pozvani (koji već ima nalog) je odmah vidi i može prihvatiti.
+  await notify({
+    userId: prof!.id,
+    type: "invite",
+    title: `Pozivnica u domaćinstvo „${household.name}“`,
+    body: "Klikni „Prihvati“ da se pridružiš.",
+    data: { token, household_id: household.id, household_name: household.name },
   });
 
   const link = `${await baseUrl()}/invite/${token}`;
